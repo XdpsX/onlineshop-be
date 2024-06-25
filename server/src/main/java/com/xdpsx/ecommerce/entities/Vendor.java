@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @Entity
@@ -18,4 +20,7 @@ public class Vendor {
 
     @Column(nullable = false)
     private String logo;
+
+    @OneToMany(mappedBy = "vendor")
+    private List<Product> products;
 }

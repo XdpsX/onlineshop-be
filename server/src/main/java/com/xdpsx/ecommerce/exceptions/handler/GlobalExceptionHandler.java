@@ -5,6 +5,8 @@ import com.xdpsx.ecommerce.exceptions.BadRequestException;
 import com.xdpsx.ecommerce.exceptions.ResourceNotFoundException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
@@ -16,7 +18,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -60,6 +65,26 @@ public class GlobalExceptionHandler {
         ErrorDetails errorDetails = new ErrorDetails(e.getMessage());
         errorDetails.setStatus(HttpStatus.BAD_REQUEST.value());
         errorDetails.setPath(request.getServletPath());
+        return errorDetails;
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorDetails handleConstraintViolation(HttpServletRequest request, ConstraintViolationException e) {
+        log.error(e.getMessage(), e);
+        ErrorDetails errorDetails = new ErrorDetails("Validation Error");
+        errorDetails.setStatus(HttpStatus.BAD_REQUEST.value());
+        errorDetails.setPath(request.getServletPath());
+
+        Set<ConstraintViolation<?>> errors = e.getConstraintViolations();
+        Map<String, String> details = new HashMap();
+        errors.forEach(error -> {
+            String[] splitted = error.getPropertyPath().toString().split("\\.");
+            String fieldError = splitted[splitted.length - 1];
+            details.put(fieldError, error.getMessage());
+        });
+        errorDetails.setDetails(details);
+
         return errorDetails;
     }
 

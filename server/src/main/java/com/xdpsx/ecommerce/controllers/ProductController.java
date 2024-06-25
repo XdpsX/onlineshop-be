@@ -1,0 +1,70 @@
+package com.xdpsx.ecommerce.controllers;
+
+import com.xdpsx.ecommerce.constants.AppConstants;
+import com.xdpsx.ecommerce.dtos.product.ProductRequest;
+import com.xdpsx.ecommerce.dtos.product.ProductResponse;
+import com.xdpsx.ecommerce.dtos.vendor.VendorResponse;
+import com.xdpsx.ecommerce.services.ProductService;
+import com.xdpsx.ecommerce.validator.ImageConstraint;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.net.URI;
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/v1/products")
+@RequiredArgsConstructor
+@Validated
+public class ProductController {
+    private final ProductService productService;
+
+    @GetMapping
+    public ResponseEntity<List<ProductResponse>> getAllVendors() {
+        List<ProductResponse> products = productService.getAllProducts();
+        return ResponseEntity.ok(products);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ProductResponse> getVendor(@PathVariable Long id) {
+        ProductResponse product = productService.getProduct(id);
+        return ResponseEntity.ok(product);
+    }
+
+    @PostMapping
+    public ResponseEntity<ProductResponse> createProduct(
+            @Valid @ModelAttribute ProductRequest request,
+            @ImageConstraint(minWidth = AppConstants.PRODUCT_IMG_WIDTH, maxNumber = AppConstants.NUMBER_PRODUCT_IMAGES)
+                @RequestParam List<MultipartFile> images
+    ){
+        ProductResponse createdProduct = productService.createProduct(request, images);
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(createdProduct.getId())
+                .toUri();
+        return ResponseEntity.created(uri).body(createdProduct);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ProductResponse> updateProduct(
+            @PathVariable Long id,
+            @Valid @ModelAttribute ProductRequest request,
+            @ImageConstraint(minWidth = AppConstants.PRODUCT_IMG_WIDTH, maxNumber = AppConstants.NUMBER_PRODUCT_IMAGES)
+                @RequestParam(required = false) List<MultipartFile> images
+    ){
+        ProductResponse updatedProduct = productService.updateProduct(id, request, images);
+        return ResponseEntity.ok(updatedProduct);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
+        productService.deleteProduct(id);
+        return ResponseEntity.noContent().build();
+    }
+
+}

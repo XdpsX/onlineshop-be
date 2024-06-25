@@ -2,6 +2,7 @@ package com.xdpsx.ecommerce.services.impl;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import com.xdpsx.ecommerce.constants.AppConstants;
 import com.xdpsx.ecommerce.exceptions.BadRequestException;
 import com.xdpsx.ecommerce.services.UploadFileService;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +32,17 @@ public class UploadFileCloudinaryService implements UploadFileService {
     @Override
     public boolean checkValidImgType(MultipartFile file) {
         String contentType = file.getContentType();
-        if (contentType == null || (!contentType.equals("image/png") && !contentType.equals("image/jpeg"))) {
+        if (contentType == null || !AppConstants.IMG_CONTENT_TYPES.contains(contentType)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean checkValidImgSize(MultipartFile file, int imgSize) throws IOException {
+        BufferedImage image = ImageIO.read(file.getInputStream());
+        int imageWidth = image.getWidth();
+        if (imageWidth < imgSize) {
             return false;
         }
         return true;
@@ -42,7 +53,8 @@ public class UploadFileCloudinaryService implements UploadFileService {
         try{
             cloudinary.uploader().destroy(getPublicIdFromUrl(imgURL), ObjectUtils.emptyMap());
         }catch (IOException io){
-            throw new RuntimeException("Deleting image is failed!");
+//            throw new RuntimeException("Deleting image is failed!");
+            System.out.println("Deleting image is failed!");
         }
     }
 
@@ -50,7 +62,7 @@ public class UploadFileCloudinaryService implements UploadFileService {
         // Tách URL thành các phần bằng cách sử dụng split
         String[] parts = imageUrl.split("/");
 
-        String fodlerName = parts[parts.length - 2];
+        String folderName = parts[parts.length - 2];
         // Lấy phần cuối cùng của URL (tức là tên file ảnh)
         String fileName = parts[parts.length - 1];
 
@@ -58,7 +70,7 @@ public class UploadFileCloudinaryService implements UploadFileService {
         String[] fileNameParts = fileName.split("\\.");
 
         // Public ID sẽ là phần trước dấu chấm trong tên file ảnh
-        String publicId = fodlerName + "/" +fileNameParts[0];
+        String publicId = folderName + "/" +fileNameParts[0];
 
         return publicId;
     }
