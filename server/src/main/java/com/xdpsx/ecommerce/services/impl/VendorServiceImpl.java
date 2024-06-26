@@ -3,6 +3,8 @@ package com.xdpsx.ecommerce.services.impl;
 import com.cloudinary.Transformation;
 import com.cloudinary.utils.ObjectUtils;
 import com.xdpsx.ecommerce.constants.AppConstants;
+import com.xdpsx.ecommerce.dtos.common.PageResponse;
+import com.xdpsx.ecommerce.dtos.vendor.VendorPageRequest;
 import com.xdpsx.ecommerce.dtos.vendor.VendorRequest;
 import com.xdpsx.ecommerce.dtos.vendor.VendorResponse;
 import com.xdpsx.ecommerce.entities.Vendor;
@@ -12,7 +14,11 @@ import com.xdpsx.ecommerce.mappers.VendorMapper;
 import com.xdpsx.ecommerce.repositories.VendorRepository;
 import com.xdpsx.ecommerce.services.UploadFileService;
 import com.xdpsx.ecommerce.services.VendorService;
+import com.xdpsx.ecommerce.specifications.VendorSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -28,11 +34,24 @@ public class VendorServiceImpl implements VendorService {
     private final UploadFileService uploadFileService;
 
     @Override
-    public List<VendorResponse> getAllVendors() {
-        List<Vendor> vendors = vendorRepository.findAll();
-        return vendors.stream()
+    public PageResponse<VendorResponse> getAllVendors(VendorPageRequest request) {
+        Pageable pageable = PageRequest.of(request.getPageNum() - 1, request.getPageSize());
+        Page<Vendor> vendorsPage = vendorRepository.findAll(
+                VendorSpecification.buildSearchSpecification(request.getSearch(), request.getSort()),
+                pageable
+        );
+
+        List<VendorResponse> vendorResponses = vendorsPage.getContent().stream()
                 .map(vendorMapper::fromEntityToResponse)
                 .collect(Collectors.toList());
+
+        return PageResponse.<VendorResponse>builder()
+                .items(vendorResponses)
+                .pageNum(vendorsPage.getNumber() + 1)
+                .pageSize(vendorsPage.getSize())
+                .totalItems(vendorsPage.getTotalElements())
+                .totalPages(vendorsPage.getTotalPages())
+                .build();
     }
 
     @Override

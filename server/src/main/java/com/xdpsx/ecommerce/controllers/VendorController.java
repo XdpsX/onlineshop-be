@@ -1,6 +1,8 @@
 package com.xdpsx.ecommerce.controllers;
 
 import com.xdpsx.ecommerce.constants.AppConstants;
+import com.xdpsx.ecommerce.dtos.common.PageResponse;
+import com.xdpsx.ecommerce.dtos.vendor.VendorPageRequest;
 import com.xdpsx.ecommerce.dtos.vendor.VendorRequest;
 import com.xdpsx.ecommerce.dtos.vendor.VendorResponse;
 import com.xdpsx.ecommerce.services.VendorService;
@@ -14,7 +16,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/vendors")
@@ -24,8 +25,8 @@ public class VendorController {
     private final VendorService vendorService;
 
     @GetMapping
-    public ResponseEntity<List<VendorResponse>> getAllVendors() {
-        List<VendorResponse> vendors = vendorService.getAllVendors();
+    public ResponseEntity<PageResponse<VendorResponse>> getAllVendors(VendorPageRequest request) {
+        PageResponse<VendorResponse> vendors = vendorService.getAllVendors(request);
         return ResponseEntity.ok(vendors);
     }
 

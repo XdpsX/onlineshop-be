@@ -15,4 +15,8 @@ public class AppConstants {
     public final static int VENDOR_IMG_WIDTH = 320;
     public final static String VENDOR_IMG_FOLDER = "vendors";
 
+    public final static int MIN_ITEMS_PER_PAGE = 5;
+    public final static int MAX_ITEMS_PER_PAGE = 20;
+    public final static String DEFAULT_SORT_FIELD = "-date";
+
 }
