@@ -2,6 +2,7 @@ package com.xdpsx.ecommerce.services.impl;
 
 import com.cloudinary.Transformation;
 import com.cloudinary.utils.ObjectUtils;
+import com.xdpsx.ecommerce.constants.AppConstants;
 import com.xdpsx.ecommerce.dtos.vendor.VendorRequest;
 import com.xdpsx.ecommerce.dtos.vendor.VendorResponse;
 import com.xdpsx.ecommerce.entities.Vendor;
@@ -15,9 +16,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -28,9 +26,6 @@ public class VendorServiceImpl implements VendorService {
     private final VendorMapper vendorMapper;
     private final VendorRepository vendorRepository;
     private final UploadFileService uploadFileService;
-
-    private final static int IMG_SIZE = 320;
-    private final static String IMG_FOLDER = "vendors";
 
     @Override
     public List<VendorResponse> getAllVendors() {
@@ -54,29 +49,15 @@ public class VendorServiceImpl implements VendorService {
             throw new BadRequestException("Vendor with name=[%s] has already existed!".formatted(vendor.getName()));
         }
 
-        if (!uploadFileService.checkValidImgType(file)){
-            throw new BadRequestException("Only PNG or JPG images are supported");
-        }
+        Map uploadOptions = ObjectUtils.asMap(
+                "folder", AppConstants.VENDOR_IMG_FOLDER,
+                "transformation", new Transformation().width(AppConstants.VENDOR_IMG_WIDTH).crop("scale")
+        );
+        Map uploadFile = uploadFileService.uploadFile(file, uploadOptions);
+        vendor.setLogo((String)uploadFile.get("url"));
 
-        try {
-            BufferedImage image = ImageIO.read(file.getInputStream());
-            int imageWidth = image.getWidth();
-            if (imageWidth < IMG_SIZE) {
-                throw new BadRequestException("Image width must be at least " + IMG_SIZE + " pixels");
-            }
-
-            Map uploadOptions = ObjectUtils.asMap(
-                    "folder", IMG_FOLDER,
-                    "transformation", new Transformation().width(IMG_SIZE).crop("scale")
-            );
-            Map uploadFile = uploadFileService.uploadFile(file, uploadOptions);
-            vendor.setLogo((String)uploadFile.get("url"));
-
-            Vendor savedVendor = vendorRepository.save(vendor);
-            return vendorMapper.fromEntityToResponse(savedVendor);
-        } catch (IOException e) {
-            throw new BadRequestException("Error reading image file.");
-        }
+        Vendor savedVendor = vendorRepository.save(vendor);
+        return vendorMapper.fromEntityToResponse(savedVendor);
     }
 
     @Override
@@ -92,30 +73,16 @@ public class VendorServiceImpl implements VendorService {
         }
 
         if (file != null) {
-            if (!uploadFileService.checkValidImgType(file)) {
-                throw new BadRequestException("Only PNG or JPG images are supported");
-            }
-
             String oldImageUrl = vendor.getLogo();
 
-            try {
-                BufferedImage image = ImageIO.read(file.getInputStream());
-                int imageWidth = image.getWidth();
-                if (imageWidth < IMG_SIZE) {
-                    throw new BadRequestException("Image width must be at least " + IMG_SIZE + " pixels");
-                }
+            Map uploadOptions = ObjectUtils.asMap(
+                    "folder", AppConstants.VENDOR_IMG_FOLDER,
+                    "transformation", new Transformation().width(AppConstants.VENDOR_IMG_WIDTH).crop("scale")
+            );
+            Map uploadFile = uploadFileService.uploadFile(file, uploadOptions);
+            vendor.setLogo((String) uploadFile.get("url"));
 
-                Map uploadOptions = ObjectUtils.asMap(
-                        "folder", IMG_FOLDER,
-                        "transformation", new Transformation().width(IMG_SIZE).crop("scale")
-                );
-                Map uploadFile = uploadFileService.uploadFile(file, uploadOptions);
-                vendor.setLogo((String) uploadFile.get("url"));
-
-                uploadFileService.deleteImage(oldImageUrl);
-            } catch (IOException e) {
-                throw new BadRequestException("Error reading image file.");
-            }
+            uploadFileService.deleteImage(oldImageUrl);
         }
 
         Vendor savedVendor = vendorRepository.save(vendor);

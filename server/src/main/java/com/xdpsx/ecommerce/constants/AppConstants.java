@@ -12,4 +12,7 @@ public class AppConstants {
     public final static int PRODUCT_IMG_WIDTH = 300;
     public final static String PRODUCT_IMG_FOLDER = "products";
 
+    public final static int VENDOR_IMG_WIDTH = 320;
+    public final static String VENDOR_IMG_FOLDER = "vendors";
+
 }
