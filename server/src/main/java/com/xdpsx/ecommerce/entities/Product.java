@@ -3,11 +3,8 @@ package com.xdpsx.ecommerce.entities;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -15,7 +12,7 @@ import java.util.List;
 @Entity
 @Table(name = "products")
 @EntityListeners(AuditingEntityListener.class)
-public class Product {
+public class Product extends AuditEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,17 +32,6 @@ public class Product {
 
     @Column(length = 4096)
     private String description;
-
-    @CreatedDate
-    @Column(
-            nullable = false,
-            updatable = false
-    )
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    @Column(insertable = false)
-    private LocalDateTime updatedAt;
 
     @Column(nullable = false)
     private String mainImage;

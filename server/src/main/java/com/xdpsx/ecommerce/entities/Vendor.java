@@ -3,6 +3,7 @@ package com.xdpsx.ecommerce.entities;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.List;
 
@@ -10,7 +11,8 @@ import java.util.List;
 @Setter
 @Entity
 @Table(name = "vendors")
-public class Vendor {
+@EntityListeners(AuditingEntityListener.class)
+public class Vendor extends AuditEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
