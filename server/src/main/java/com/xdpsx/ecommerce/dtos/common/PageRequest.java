@@ -1,33 +1,17 @@
 package com.xdpsx.ecommerce.dtos.common;
 
+import jakarta.validation.constraints.Min;
 import lombok.Data;
 
 import static com.xdpsx.ecommerce.constants.AppConstants.*;
 
 @Data
 public class PageRequest {
-    private int pageNum = 1;
-    private int pageSize = 5;
+    @Min(value = 1, message = "Page number must be at least 1")
+    private Integer pageNum = 1;
+
+    @Min(value = MIN_ITEMS_PER_PAGE, message = "Page size must be at least " + MIN_ITEMS_PER_PAGE)
+    private Integer pageSize = MIN_ITEMS_PER_PAGE;
     private String search;
-    private String sort = DEFAULT_SORT_FIELD;
 
-    public void setPageNum(int pageNum) {
-        if (pageNum < 1){
-            this.pageNum = 1;
-            return;
-        }
-        this.pageNum = pageNum;
-    }
-
-    public void setPageSize(int pageSize) {
-        if (pageSize < MIN_ITEMS_PER_PAGE) {
-            this.pageSize = MIN_ITEMS_PER_PAGE;
-            return;
-        }
-        if (pageSize > MAX_ITEMS_PER_PAGE){
-            this.pageSize = MAX_ITEMS_PER_PAGE;
-            return;
-        }
-        this.pageSize = pageSize;
-    }
 }

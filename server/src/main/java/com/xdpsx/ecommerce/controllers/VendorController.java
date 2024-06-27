@@ -25,7 +25,7 @@ public class VendorController {
     private final VendorService vendorService;
 
     @GetMapping
-    public ResponseEntity<PageResponse<VendorResponse>> getAllVendors(VendorPageRequest request) {
+    public ResponseEntity<PageResponse<VendorResponse>> getAllVendors(@Valid VendorPageRequest request) {
         PageResponse<VendorResponse> vendors = vendorService.getAllVendors(request);
         return ResponseEntity.ok(vendors);
     }
