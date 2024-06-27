@@ -18,7 +18,7 @@ public class VendorPageRequest extends PageRequest {
     @Override
     public void setSort(String sort) {
         String actualField = sort;
-        if (sort.startsWith("+") || sort.startsWith("-")){
+        if (sort.startsWith("-")){
             actualField = sort.substring(1);
         }
 
