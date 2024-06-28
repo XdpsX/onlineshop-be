@@ -2,6 +2,8 @@ package com.xdpsx.ecommerce.controllers;
 
 import com.xdpsx.ecommerce.dtos.category.CategoryRequest;
 import com.xdpsx.ecommerce.dtos.category.CategoryResponse;
+import com.xdpsx.ecommerce.dtos.common.PagableRequest;
+import com.xdpsx.ecommerce.dtos.common.PageResponse;
 import com.xdpsx.ecommerce.services.CategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/categories")
@@ -20,8 +21,8 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @GetMapping
-    public ResponseEntity<List<CategoryResponse>> getAllCategories() {
-        List<CategoryResponse> categories = categoryService.getAllCategories();
+    public ResponseEntity<PageResponse<CategoryResponse>> getAllCategories(@Valid PagableRequest request) {
+        PageResponse<CategoryResponse> categories = categoryService.getAllCategories(request);
         return ResponseEntity.ok(categories);
     }
 

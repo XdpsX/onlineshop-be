@@ -14,6 +14,7 @@ import com.xdpsx.ecommerce.mappers.VendorMapper;
 import com.xdpsx.ecommerce.repositories.VendorRepository;
 import com.xdpsx.ecommerce.services.UploadFileService;
 import com.xdpsx.ecommerce.services.VendorService;
+import com.xdpsx.ecommerce.specifications.SimpleSpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,10 +33,15 @@ public class VendorServiceImpl implements VendorService {
     private final VendorRepository vendorRepository;
     private final UploadFileService uploadFileService;
 
+    private final SimpleSpecification<Vendor> spec;
+
     @Override
     public PageResponse<VendorResponse> getAllVendors(PagableRequest request) {
         Pageable pageable = PageRequest.of(request.getPageNum() - 1, request.getPageSize());
-        Page<Vendor> vendorsPage = vendorRepository.findWithFilter(pageable, request.getSearch(), request.getSort());
+        Page<Vendor> vendorsPage = vendorRepository.findAll(
+                spec.getSearchSpec(request.getSearch(), request.getSort()),
+                pageable
+        );
         List<VendorResponse> vendorResponses = vendorsPage.getContent().stream()
                 .map(vendorMapper::fromEntityToResponse)
                 .collect(Collectors.toList());
