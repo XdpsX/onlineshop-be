@@ -1,8 +1,8 @@
 package com.xdpsx.ecommerce.controllers;
 
 import com.xdpsx.ecommerce.constants.AppConstants;
+import com.xdpsx.ecommerce.dtos.common.PagableRequest;
 import com.xdpsx.ecommerce.dtos.common.PageResponse;
-import com.xdpsx.ecommerce.dtos.vendor.VendorPageRequest;
 import com.xdpsx.ecommerce.dtos.vendor.VendorRequest;
 import com.xdpsx.ecommerce.dtos.vendor.VendorResponse;
 import com.xdpsx.ecommerce.services.VendorService;
@@ -25,7 +25,7 @@ public class VendorController {
     private final VendorService vendorService;
 
     @GetMapping
-    public ResponseEntity<PageResponse<VendorResponse>> getAllVendors(@Valid VendorPageRequest request) {
+    public ResponseEntity<PageResponse<VendorResponse>> getAllVendors(@Valid PagableRequest request) {
         PageResponse<VendorResponse> vendors = vendorService.getAllVendors(request);
         return ResponseEntity.ok(vendors);
     }

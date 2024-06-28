@@ -3,8 +3,8 @@ package com.xdpsx.ecommerce.services.impl;
 import com.cloudinary.Transformation;
 import com.cloudinary.utils.ObjectUtils;
 import com.xdpsx.ecommerce.constants.AppConstants;
+import com.xdpsx.ecommerce.dtos.common.PagableRequest;
 import com.xdpsx.ecommerce.dtos.common.PageResponse;
-import com.xdpsx.ecommerce.dtos.vendor.VendorPageRequest;
 import com.xdpsx.ecommerce.dtos.vendor.VendorRequest;
 import com.xdpsx.ecommerce.dtos.vendor.VendorResponse;
 import com.xdpsx.ecommerce.entities.Vendor;
@@ -33,7 +33,7 @@ public class VendorServiceImpl implements VendorService {
     private final UploadFileService uploadFileService;
 
     @Override
-    public PageResponse<VendorResponse> getAllVendors(VendorPageRequest request) {
+    public PageResponse<VendorResponse> getAllVendors(PagableRequest request) {
         Pageable pageable = PageRequest.of(request.getPageNum() - 1, request.getPageSize());
         Page<Vendor> vendorsPage = vendorRepository.findWithFilter(pageable, request.getSearch(), request.getSort());
         List<VendorResponse> vendorResponses = vendorsPage.getContent().stream()
