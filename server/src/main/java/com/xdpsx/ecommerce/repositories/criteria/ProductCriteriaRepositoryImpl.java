@@ -51,6 +51,18 @@ public class ProductCriteriaRepositoryImpl implements ProductCriteriaRepository 
         }
         query.where(predicates.toArray(new Predicate[0]));
 
+        query.multiselect(
+                product.get("id"),
+                product.get("name"),
+                product.get("price"),
+                product.get("discountPercent"),
+                product.get("inStock"),
+                product.get("enabled"),
+                product.get("mainImage"),
+                product.get("category"),
+                product.get("vendor")
+        );
+
         Order order = getSortOrder(sort, cb, product);
         query.orderBy(order);
         TypedQuery<Product> typedQuery = entityManager.createQuery(query);
