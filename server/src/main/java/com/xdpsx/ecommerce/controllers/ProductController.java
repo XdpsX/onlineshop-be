@@ -1,9 +1,10 @@
 package com.xdpsx.ecommerce.controllers;
 
 import com.xdpsx.ecommerce.constants.AppConstants;
+import com.xdpsx.ecommerce.dtos.common.PageResponse;
+import com.xdpsx.ecommerce.dtos.product.ProductPageParams;
 import com.xdpsx.ecommerce.dtos.product.ProductRequest;
 import com.xdpsx.ecommerce.dtos.product.ProductResponse;
-import com.xdpsx.ecommerce.dtos.vendor.VendorResponse;
 import com.xdpsx.ecommerce.services.ProductService;
 import com.xdpsx.ecommerce.validator.ImageConstraint;
 import jakarta.validation.Valid;
@@ -25,13 +26,15 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping
-    public ResponseEntity<List<ProductResponse>> getAllVendors() {
-        List<ProductResponse> products = productService.getAllProducts();
+    public ResponseEntity<PageResponse<ProductResponse>> getAllProducts(
+            @Valid ProductPageParams params
+            ) {
+        PageResponse<ProductResponse> products = productService.getAllProducts(params, true);
         return ResponseEntity.ok(products);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductResponse> getVendor(@PathVariable Long id) {
+    public ResponseEntity<ProductResponse> getProduct(@PathVariable Long id) {
         ProductResponse product = productService.getProduct(id);
         return ResponseEntity.ok(product);
     }

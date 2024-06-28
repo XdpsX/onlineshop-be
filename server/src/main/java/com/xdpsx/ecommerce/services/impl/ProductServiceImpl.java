@@ -3,13 +3,14 @@ package com.xdpsx.ecommerce.services.impl;
 import com.cloudinary.Transformation;
 import com.cloudinary.utils.ObjectUtils;
 import com.xdpsx.ecommerce.constants.AppConstants;
+import com.xdpsx.ecommerce.dtos.common.PageResponse;
+import com.xdpsx.ecommerce.dtos.product.ProductPageParams;
 import com.xdpsx.ecommerce.dtos.product.ProductRequest;
 import com.xdpsx.ecommerce.dtos.product.ProductResponse;
 import com.xdpsx.ecommerce.entities.Category;
 import com.xdpsx.ecommerce.entities.Product;
 import com.xdpsx.ecommerce.entities.ProductImage;
 import com.xdpsx.ecommerce.entities.Vendor;
-import com.xdpsx.ecommerce.exceptions.BadRequestException;
 import com.xdpsx.ecommerce.exceptions.ResourceNotFoundException;
 import com.xdpsx.ecommerce.mappers.ProductMapper;
 import com.xdpsx.ecommerce.repositories.CategoryRepository;
@@ -19,11 +20,13 @@ import com.xdpsx.ecommerce.repositories.VendorRepository;
 import com.xdpsx.ecommerce.services.ProductService;
 import com.xdpsx.ecommerce.services.UploadFileService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -41,11 +44,22 @@ public class ProductServiceImpl implements ProductService {
     private final UploadFileService uploadFileService;
 
     @Override
-    public List<ProductResponse> getAllProducts() {
-        List<Product> products = productRepository.findAll();
-        return products.stream()
+    public PageResponse<ProductResponse> getAllProducts(ProductPageParams params, Boolean enabled) {
+        Pageable pageable = PageRequest.of(params.getPageNum() - 1, params.getPageSize());
+        Page<Product> productPage = productRepository.findWithFilters(
+                pageable, params.getSearch(), params.getSort(), enabled, params.getMinPrice(), params.getMaxPrice(),
+                params.isHasDiscount(), params.getVendorId(), params.getCategoryId()
+        );
+        List<ProductResponse> productResponses = productPage.getContent().stream()
                 .map(productMapper::fromEntityToResponse)
                 .collect(Collectors.toList());
+        return PageResponse.<ProductResponse>builder()
+                .items(productResponses)
+                .pageNum(productPage.getNumber() + 1)
+                .pageSize(productPage.getSize())
+                .totalItems(productPage.getTotalElements())
+                .totalPages(productPage.getTotalPages())
+                .build();
     }
 
     @Override
