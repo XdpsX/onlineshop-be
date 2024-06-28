@@ -2,8 +2,7 @@ package com.xdpsx.ecommerce.services.impl;
 
 import com.cloudinary.Transformation;
 import com.cloudinary.utils.ObjectUtils;
-import com.xdpsx.ecommerce.constants.AppConstants;
-import com.xdpsx.ecommerce.dtos.common.PagableRequest;
+import com.xdpsx.ecommerce.dtos.common.PageParams;
 import com.xdpsx.ecommerce.dtos.common.PageResponse;
 import com.xdpsx.ecommerce.dtos.vendor.VendorRequest;
 import com.xdpsx.ecommerce.dtos.vendor.VendorResponse;
@@ -26,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.xdpsx.ecommerce.constants.AppConstants.*;
+
 @Service
 @RequiredArgsConstructor
 public class VendorServiceImpl implements VendorService {
@@ -36,7 +37,7 @@ public class VendorServiceImpl implements VendorService {
     private final SimpleSpecification<Vendor> spec;
 
     @Override
-    public PageResponse<VendorResponse> getAllVendors(PagableRequest request) {
+    public PageResponse<VendorResponse> getAllVendors(PageParams request) {
         Pageable pageable = PageRequest.of(request.getPageNum() - 1, request.getPageSize());
         Page<Vendor> vendorsPage = vendorRepository.findAll(
                 spec.getSearchSpec(request.getSearch(), request.getSort()),
@@ -69,15 +70,20 @@ public class VendorServiceImpl implements VendorService {
             throw new BadRequestException("Vendor with name=[%s] has already existed!".formatted(vendor.getName()));
         }
 
-        Map uploadOptions = ObjectUtils.asMap(
-                "folder", AppConstants.VENDOR_IMG_FOLDER,
-                "transformation", new Transformation().width(AppConstants.VENDOR_IMG_WIDTH).crop("scale")
-        );
-        Map uploadFile = uploadFileService.uploadFile(file, uploadOptions);
-        vendor.setLogo((String)uploadFile.get("url"));
+        String logoUrl = uploadVendorLogo(file);
+        vendor.setLogo(logoUrl);
 
         Vendor savedVendor = vendorRepository.save(vendor);
         return vendorMapper.fromEntityToResponse(savedVendor);
+    }
+
+    private String uploadVendorLogo(MultipartFile file){
+        Map uploadOptions = ObjectUtils.asMap(
+                "folder", VENDOR_IMG_FOLDER,
+                "transformation", new Transformation().width(VENDOR_IMG_WIDTH).crop("scale")
+        );
+        Map uploadFile = uploadFileService.uploadFile(file, uploadOptions);
+        return (String)uploadFile.get("url");
     }
 
     @Override
@@ -94,14 +100,8 @@ public class VendorServiceImpl implements VendorService {
 
         if (file != null) {
             String oldImageUrl = vendor.getLogo();
-
-            Map uploadOptions = ObjectUtils.asMap(
-                    "folder", AppConstants.VENDOR_IMG_FOLDER,
-                    "transformation", new Transformation().width(AppConstants.VENDOR_IMG_WIDTH).crop("scale")
-            );
-            Map uploadFile = uploadFileService.uploadFile(file, uploadOptions);
-            vendor.setLogo((String) uploadFile.get("url"));
-
+            String logoUrl = uploadVendorLogo(file);
+            vendor.setLogo(logoUrl);
             uploadFileService.deleteImage(oldImageUrl);
         }
 

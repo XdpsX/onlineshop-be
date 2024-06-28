@@ -2,7 +2,6 @@ package com.xdpsx.ecommerce.services.impl;
 
 import com.cloudinary.Transformation;
 import com.cloudinary.utils.ObjectUtils;
-import com.xdpsx.ecommerce.constants.AppConstants;
 import com.xdpsx.ecommerce.dtos.common.PageResponse;
 import com.xdpsx.ecommerce.dtos.product.ProductPageParams;
 import com.xdpsx.ecommerce.dtos.product.ProductRequest;
@@ -31,6 +30,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static com.xdpsx.ecommerce.constants.AppConstants.*;
 
 @Service
 @RequiredArgsConstructor
@@ -73,9 +74,26 @@ public class ProductServiceImpl implements ProductService {
     public ProductResponse createProduct(ProductRequest request, List<MultipartFile> files) {
         Product product = productMapper.fromRequestToEntity(request);
 
+        List<ProductImage> images = uploadProductImages(files, product);
+
+        Category category = categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new ResourceNotFoundException("Category with id=[%s] not found!".formatted(request.getCategoryId())));
+        Vendor vendor = vendorRepository.findById(request.getVendorId())
+                .orElseThrow(() -> new ResourceNotFoundException("Vendor with id=[%s] not found!".formatted(request.getVendorId())));
+
+        product.setCategory(category);
+        product.setVendor(vendor);
+        product.setMainImage(images.get(0).getUrl());
+        product.setImages(images);
+
+        Product savedProduct = productRepository.save(product);
+        return productMapper.fromEntityToResponse(savedProduct);
+    }
+
+    private List<ProductImage> uploadProductImages(List<MultipartFile> files, Product product){
         Map uploadOptions = ObjectUtils.asMap(
-                "folder", AppConstants.PRODUCT_IMG_FOLDER,
-                "transformation", new Transformation().width(AppConstants.PRODUCT_IMG_WIDTH).crop("scale")
+                "folder", PRODUCT_IMG_FOLDER,
+                "transformation", new Transformation().width(PRODUCT_IMG_WIDTH).crop("scale")
         );
         List<ProductImage> images = new ArrayList<>();
         for (MultipartFile file: files){
@@ -86,20 +104,7 @@ public class ProductServiceImpl implements ProductService {
                     .build();
             images.add(productImage);
         }
-
-        Category category = categoryRepository.findById(request.getCategoryId())
-                .orElse(null);
-        Vendor vendor = vendorRepository.findById(request.getVendorId())
-                .orElse(null);
-
-
-        product.setCategory(category);
-        product.setVendor(vendor);
-        product.setMainImage(images.get(0).getUrl());
-        product.setImages(images);
-
-        Product savedProduct = productRepository.save(product);
-        return productMapper.fromEntityToResponse(savedProduct);
+        return images;
     }
 
     @Transactional
@@ -114,38 +119,20 @@ public class ProductServiceImpl implements ProductService {
         newProduct.setMainImage(product.getMainImage());
         newProduct.setImages(product.getImages());
 
-        if (product.getCategory().getId() != request.getCategoryId()){
-            Category category = null;
-            if (request.getCategoryId() != null){
-                category = categoryRepository.findById(request.getCategoryId())
-                        .orElse(null);
-            }
+        if (!product.getCategory().getId().equals(request.getCategoryId())){
+            Category category = categoryRepository.findById(request.getCategoryId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Category with id=[%s] not found!".formatted(request.getCategoryId())));
             newProduct.setCategory(category);
         }
-        if (product.getVendor().getId() != request.getVendorId()){
-            Vendor vendor = null;
-            if (request.getVendorId() != null){
-                vendor = vendorRepository.findById(request.getVendorId())
-                        .orElse(null);
-            }
+        if (!product.getVendor().getId().equals(request.getVendorId())){
+            Vendor vendor = vendorRepository.findById(request.getVendorId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Vendor with id=[%s] not found!".formatted(request.getVendorId())));
 
             newProduct.setVendor(vendor);
         }
 
         if (files != null && files.size() > 0){
-            Map uploadOptions = ObjectUtils.asMap(
-                    "folder", AppConstants.PRODUCT_IMG_FOLDER,
-                    "transformation", new Transformation().width(AppConstants.PRODUCT_IMG_WIDTH).crop("scale")
-            );
-            List<ProductImage> images = new ArrayList<>();
-            for (MultipartFile file: files){
-                Map uploadFile = uploadFileService.uploadFile(file, uploadOptions);
-                ProductImage productImage =  ProductImage.builder()
-                        .url((String)uploadFile.get("url"))
-                        .product(newProduct)
-                        .build();
-                images.add(productImage);
-            }
+            List<ProductImage> images = uploadProductImages(files, newProduct);
 
             newProduct.setMainImage(images.get(0).getUrl());
             newProduct.setImages(images);

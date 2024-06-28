@@ -6,7 +6,7 @@ import lombok.Data;
 import static com.xdpsx.ecommerce.constants.AppConstants.DEFAULT_SORT_FIELD;
 
 @Data
-public class PagableRequest extends AbstractPageRequest{
+public class PageParams extends AbstractPageParams {
     @SortFieldConstraint(sortFields = {"date", "name"})
     private String sort = DEFAULT_SORT_FIELD;
 }

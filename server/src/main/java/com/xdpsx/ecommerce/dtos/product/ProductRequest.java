@@ -1,9 +1,6 @@
 package com.xdpsx.ecommerce.dtos.product;
 
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -27,7 +24,9 @@ public class ProductRequest {
     @Size(max=4096, message = "Product description cannot exceed 4096 characters")
     private String description;
 
+    @NotNull(message = "Category id can not be null")
     private Integer categoryId;
 
+    @NotNull(message = "Vendor id can not be null")
     private Integer vendorId;
 }

@@ -1,7 +1,7 @@
 package com.xdpsx.ecommerce.controllers;
 
-import com.xdpsx.ecommerce.constants.AppConstants;
-import com.xdpsx.ecommerce.dtos.common.PagableRequest;
+import static com.xdpsx.ecommerce.constants.AppConstants.*;
+import com.xdpsx.ecommerce.dtos.common.PageParams;
 import com.xdpsx.ecommerce.dtos.common.PageResponse;
 import com.xdpsx.ecommerce.dtos.vendor.VendorRequest;
 import com.xdpsx.ecommerce.dtos.vendor.VendorResponse;
@@ -9,6 +9,7 @@ import com.xdpsx.ecommerce.services.VendorService;
 import com.xdpsx.ecommerce.validator.ImageConstraint;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +26,7 @@ public class VendorController {
     private final VendorService vendorService;
 
     @GetMapping
-    public ResponseEntity<PageResponse<VendorResponse>> getAllVendors(@Valid PagableRequest request) {
+    public ResponseEntity<PageResponse<VendorResponse>> getAllVendors(@Valid PageParams request) {
         PageResponse<VendorResponse> vendors = vendorService.getAllVendors(request);
         return ResponseEntity.ok(vendors);
     }
@@ -36,11 +37,10 @@ public class VendorController {
         return ResponseEntity.ok(vendor);
     }
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<VendorResponse> createVendor(
             @Valid @ModelAttribute VendorRequest request,
-            @ImageConstraint(minWidth = AppConstants.VENDOR_IMG_WIDTH)
-                @RequestParam MultipartFile logo
+            @ImageConstraint(minWidth = VENDOR_IMG_WIDTH) @RequestParam MultipartFile logo
     ){
         VendorResponse createdVendor = vendorService.createVendor(request, logo);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
@@ -50,12 +50,11 @@ public class VendorController {
         return ResponseEntity.created(uri).body(createdVendor);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping(path="/{id}", consumes=MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<VendorResponse> updateVendor(
             @PathVariable Integer id,
             @Valid @ModelAttribute VendorRequest request,
-            @ImageConstraint(minWidth = AppConstants.VENDOR_IMG_WIDTH)
-                @RequestParam(required = false) MultipartFile logo
+            @ImageConstraint(minWidth = VENDOR_IMG_WIDTH) @RequestParam(required = false) MultipartFile logo
             ) {
         VendorResponse updatedVendor = vendorService.updateVendor(id, request, logo);
         return ResponseEntity.ok(updatedVendor);

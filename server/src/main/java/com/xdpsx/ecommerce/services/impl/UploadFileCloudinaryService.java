@@ -2,15 +2,11 @@ package com.xdpsx.ecommerce.services.impl;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
-import com.xdpsx.ecommerce.constants.AppConstants;
-import com.xdpsx.ecommerce.exceptions.BadRequestException;
 import com.xdpsx.ecommerce.services.UploadFileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Map;
 
@@ -27,25 +23,6 @@ public class UploadFileCloudinaryService implements UploadFileService {
         }catch (IOException io){
             throw new RuntimeException("Uploading image is failed!");
         }
-    }
-
-    @Override
-    public boolean checkValidImgType(MultipartFile file) {
-        String contentType = file.getContentType();
-        if (contentType == null || !AppConstants.IMG_CONTENT_TYPES.contains(contentType)) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public boolean checkValidImgSize(MultipartFile file, int imgSize) throws IOException {
-        BufferedImage image = ImageIO.read(file.getInputStream());
-        int imageWidth = image.getWidth();
-        if (imageWidth < imgSize) {
-            return false;
-        }
-        return true;
     }
 
     @Override

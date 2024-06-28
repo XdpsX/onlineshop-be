@@ -1,6 +1,6 @@
 package com.xdpsx.ecommerce.controllers;
 
-import com.xdpsx.ecommerce.constants.AppConstants;
+import static com.xdpsx.ecommerce.constants.AppConstants.*;
 import com.xdpsx.ecommerce.dtos.common.PageResponse;
 import com.xdpsx.ecommerce.dtos.product.ProductPageParams;
 import com.xdpsx.ecommerce.dtos.product.ProductRequest;
@@ -9,6 +9,7 @@ import com.xdpsx.ecommerce.services.ProductService;
 import com.xdpsx.ecommerce.validator.ImageConstraint;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -39,10 +40,10 @@ public class ProductController {
         return ResponseEntity.ok(product);
     }
 
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ProductResponse> createProduct(
             @Valid @ModelAttribute ProductRequest request,
-            @ImageConstraint(minWidth = AppConstants.PRODUCT_IMG_WIDTH, maxNumber = AppConstants.NUMBER_PRODUCT_IMAGES)
+            @ImageConstraint(minWidth = PRODUCT_IMG_WIDTH, maxNumber = NUMBER_PRODUCT_IMAGES)
                 @RequestParam List<MultipartFile> images
     ){
         ProductResponse createdProduct = productService.createProduct(request, images);
@@ -53,11 +54,11 @@ public class ProductController {
         return ResponseEntity.created(uri).body(createdProduct);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping(path="/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ProductResponse> updateProduct(
             @PathVariable Long id,
             @Valid @ModelAttribute ProductRequest request,
-            @ImageConstraint(minWidth = AppConstants.PRODUCT_IMG_WIDTH, maxNumber = AppConstants.NUMBER_PRODUCT_IMAGES)
+            @ImageConstraint(minWidth = PRODUCT_IMG_WIDTH, maxNumber = NUMBER_PRODUCT_IMAGES)
                 @RequestParam(required = false) List<MultipartFile> images
     ){
         ProductResponse updatedProduct = productService.updateProduct(id, request, images);

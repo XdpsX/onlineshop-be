@@ -2,7 +2,7 @@ package com.xdpsx.ecommerce.services.impl;
 
 import com.xdpsx.ecommerce.dtos.category.CategoryRequest;
 import com.xdpsx.ecommerce.dtos.category.CategoryResponse;
-import com.xdpsx.ecommerce.dtos.common.PagableRequest;
+import com.xdpsx.ecommerce.dtos.common.PageParams;
 import com.xdpsx.ecommerce.dtos.common.PageResponse;
 import com.xdpsx.ecommerce.entities.Category;
 import com.xdpsx.ecommerce.exceptions.BadRequestException;
@@ -29,7 +29,7 @@ public class CategoryServiceImpl implements CategoryService {
     private final SimpleSpecification<Category> spec;
 
     @Override
-    public PageResponse<CategoryResponse> getAllCategories(PagableRequest request) {
+    public PageResponse<CategoryResponse> getAllCategories(PageParams request) {
         Pageable pageable = PageRequest.of(request.getPageNum() - 1, request.getPageSize());
         Page<Category> categoryPage = categoryRepository.findAll(
                 spec.getSearchSpec(request.getSearch(), request.getSort()),

@@ -2,7 +2,7 @@ package com.xdpsx.ecommerce.controllers;
 
 import com.xdpsx.ecommerce.dtos.category.CategoryRequest;
 import com.xdpsx.ecommerce.dtos.category.CategoryResponse;
-import com.xdpsx.ecommerce.dtos.common.PagableRequest;
+import com.xdpsx.ecommerce.dtos.common.PageParams;
 import com.xdpsx.ecommerce.dtos.common.PageResponse;
 import com.xdpsx.ecommerce.services.CategoryService;
 import jakarta.validation.Valid;
@@ -21,7 +21,7 @@ public class CategoryController {
     private final CategoryService categoryService;
 
     @GetMapping
-    public ResponseEntity<PageResponse<CategoryResponse>> getAllCategories(@Valid PagableRequest request) {
+    public ResponseEntity<PageResponse<CategoryResponse>> getAllCategories(@Valid PageParams request) {
         PageResponse<CategoryResponse> categories = categoryService.getAllCategories(request);
         return ResponseEntity.ok(categories);
     }
