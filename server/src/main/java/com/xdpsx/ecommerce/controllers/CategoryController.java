@@ -4,7 +4,10 @@ import com.xdpsx.ecommerce.dtos.category.CategoryRequest;
 import com.xdpsx.ecommerce.dtos.category.CategoryResponse;
 import com.xdpsx.ecommerce.dtos.common.PageParams;
 import com.xdpsx.ecommerce.dtos.common.PageResponse;
+import com.xdpsx.ecommerce.dtos.product.ProductPageParams;
+import com.xdpsx.ecommerce.dtos.product.ProductResponse;
 import com.xdpsx.ecommerce.services.CategoryService;
+import com.xdpsx.ecommerce.services.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +22,7 @@ import java.net.URI;
 public class CategoryController {
 
     private final CategoryService categoryService;
+    private final ProductService productService;
 
     @GetMapping
     public ResponseEntity<PageResponse<CategoryResponse>> getAllCategories(@Valid PageParams request) {
@@ -54,5 +58,14 @@ public class CategoryController {
     public ResponseEntity<Void> deleteCategory(@PathVariable Integer id) {
         categoryService.deleteCategory(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}/products")
+    public ResponseEntity<PageResponse<ProductResponse>> getAllProductsByCategory(
+            @PathVariable Integer id,
+            @Valid ProductPageParams params
+    ){
+        PageResponse<ProductResponse> products = productService.getAllProducts(params, id);
+        return ResponseEntity.ok(products);
     }
 }

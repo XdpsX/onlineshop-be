@@ -30,7 +30,7 @@ public class ProductController {
     public ResponseEntity<PageResponse<ProductResponse>> getAllProducts(
             @Valid ProductPageParams params
             ) {
-        PageResponse<ProductResponse> products = productService.getAllProducts(params, true);
+        PageResponse<ProductResponse> products = productService.getAllProducts(params);
         return ResponseEntity.ok(products);
     }
 
@@ -68,6 +68,14 @@ public class ProductController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}/enabled/{status}")
+    public ResponseEntity<Void> updateProductEnabledStatus(
+            @PathVariable("id") Long id,
+            @PathVariable("status") boolean enabled) {
+        productService.updateProductEnabledStatus(id, enabled);
         return ResponseEntity.noContent().build();
     }
 

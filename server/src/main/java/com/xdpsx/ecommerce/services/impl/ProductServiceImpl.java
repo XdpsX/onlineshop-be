@@ -45,11 +45,21 @@ public class ProductServiceImpl implements ProductService {
     private final UploadFileService uploadFileService;
 
     @Override
-    public PageResponse<ProductResponse> getAllProducts(ProductPageParams params, Boolean enabled) {
+    public PageResponse<ProductResponse> getAllProducts(ProductPageParams params) {
+        return getAllProducts(params, true, null);
+    }
+
+    @Override
+    public PageResponse<ProductResponse> getAllProducts(ProductPageParams params, Integer categoryId) {
+        return getAllProducts(params, true, categoryId);
+    }
+
+    @Override
+    public PageResponse<ProductResponse> getAllProducts(ProductPageParams params, Boolean enabled, Integer categoryId) {
         Pageable pageable = PageRequest.of(params.getPageNum() - 1, params.getPageSize());
         Page<Product> productPage = productRepository.findWithFilters(
                 pageable, params.getSearch(), params.getSort(), enabled, params.getMinPrice(), params.getMaxPrice(),
-                params.isHasDiscount(), params.getVendorId(), params.getCategoryId()
+                params.isHasDiscount(), params.getVendorId(), categoryId
         );
         List<ProductResponse> productResponses = productPage.getContent().stream()
                 .map(productMapper::fromEntityToResponse)
@@ -157,19 +167,14 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
-    public void enableProduct(Long productId) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new ResourceNotFoundException("Product with id=%s not found!".formatted(productId)));
-
-        product.setEnabled(true);
-        productRepository.save(product);
+    @Override
+    public void updateProductEnabledStatus(Long id, boolean enabled) {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product with id=%s not found!".formatted(id)));
+        if (product.isEnabled() != enabled){
+            product.setEnabled(enabled);
+            productRepository.save(product);
+        }
     }
 
-    public void disableProduct(Long productId) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new ResourceNotFoundException("Product with id=%s not found!".formatted(productId)));
-
-        product.setEnabled(false);
-        productRepository.save(product);
-    }
 }

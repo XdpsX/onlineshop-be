@@ -38,7 +38,7 @@ public class Product extends AuditEntity{
     @Column(nullable = false)
     private String mainImage;
 
-    @OneToMany(mappedBy = "product", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE, CascadeType.DETACH})
+    @OneToMany(mappedBy = "product", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     private List<ProductImage> images;
 
     @ManyToOne

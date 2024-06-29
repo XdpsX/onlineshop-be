@@ -18,5 +18,4 @@ public class ProductPageParams extends AbstractPageParams {
     private Double maxPrice;
     private boolean hasDiscount;
     private Integer vendorId;
-    private Integer categoryId;
 }
