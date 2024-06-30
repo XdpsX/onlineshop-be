@@ -16,3 +16,8 @@ spring:
 
 cloudinary:
   url: cloudinary://${CLOUDINARY_API_KEY}:${CLOUDINARY_API_SECRET}@${CLOUDINARY_CLOUD_NAME}
+
+jwt:
+  secret-key: ${JWT_SECRET}
+  expired-access: 1
+  expired-refresh: 30
