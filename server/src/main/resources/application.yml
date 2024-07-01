@@ -19,5 +19,5 @@ cloudinary:
 
 jwt:
   secret-key: ${JWT_SECRET}
-  expired-access: 1
-  expired-refresh: 30
+  access-expiration: 2592000000 #30 days
+  refresh-expiration: 6048000000 #70 days

@@ -1,5 +1,6 @@
 package com.xdpsx.ecommerce.filters;
 
+import com.xdpsx.ecommerce.repositories.TokenRepository;
 import com.xdpsx.ecommerce.security.JwtProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -23,6 +24,7 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtProvider jwtProvider;
     private final UserDetailsService userDetailsService;
+    private final TokenRepository tokenRepository;
 
     @Override
     protected void doFilterInternal(
@@ -41,7 +43,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         userEmail = jwtProvider.extractUsername(jwt);
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null){
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
-            if (jwtProvider.isTokenValid(jwt, userDetails)){
+            boolean isTokenValid = tokenRepository.findByAccessToken(jwt)
+                    .map(t -> !t.isExpired() && !t.isRevoked())
+                    .orElse(false);
+            if (isTokenValid && jwtProvider.isTokenValid(jwt, userDetails)){
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails,
                         null,

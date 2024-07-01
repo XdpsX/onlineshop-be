@@ -3,12 +3,14 @@ package com.xdpsx.ecommerce.exceptions.handler;
 import com.xdpsx.ecommerce.dtos.error.ErrorDetails;
 import com.xdpsx.ecommerce.exceptions.BadRequestException;
 import com.xdpsx.ecommerce.exceptions.ResourceNotFoundException;
+import com.xdpsx.ecommerce.exceptions.TokenException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -18,15 +20,35 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(BadCredentialsException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ErrorDetails handleBadCredentials(HttpServletRequest request, BadCredentialsException ex){
+        log.error(ex.getMessage(), ex);
+
+        ErrorDetails errorDetails = new ErrorDetails("Wrong email or password!");
+        errorDetails.setTimestamp(new Date());
+        errorDetails.setStatus(HttpStatus.UNAUTHORIZED.value());
+        errorDetails.setPath(request.getServletPath());
+
+        return errorDetails;
+    }
+
+    @ExceptionHandler(TokenException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ErrorDetails handleTokenException(HttpServletRequest request, TokenException e){
+        log.error(e.getMessage(), e);
+        ErrorDetails errorDetails = new ErrorDetails(e.getMessage());
+        errorDetails.setStatus(HttpStatus.UNAUTHORIZED.value());
+        errorDetails.setPath(request.getServletPath());
+        return errorDetails;
+    }
 
     @ExceptionHandler(MissingServletRequestPartException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
