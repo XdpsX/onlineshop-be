@@ -51,6 +51,9 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "user")
     private List<Token> tokens;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    private List<CartItem> cartItems;
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("Role_" + role.getName()));
