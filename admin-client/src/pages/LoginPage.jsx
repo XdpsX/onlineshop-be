@@ -1,11 +1,13 @@
 import { BsEye, BsEyeSlash } from 'react-icons/bs'
 import logo from '../assets/react.svg'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Field, Form, Formik } from 'formik'
 import * as Yup from 'yup'
 import { useDispatch, useSelector } from 'react-redux'
-import { admin_login } from '../store/slices/authSlice'
+import { adminLogin } from '../store/slices/authSlice'
 import { BeatLoader } from 'react-spinners'
+import { useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
 
 const LoginSchema = Yup.object().shape({
   email: Yup.string()
@@ -13,13 +15,13 @@ const LoginSchema = Yup.object().shape({
     .max(128, 'Maximum 128 characters')
     .required('Email is required!'),
   password: Yup.string()
-    // .min(8, 'Minimum 8 characters')
+    .min(8, 'Minimum 8 characters')
     .max(128, 'Maximum 128 characters')
     .required('Password is required!'),
 })
 
 const initialValues = {
-  email: 'nam@gmail.com',
+  email: 'admin@gmail.com',
   password: '12345678',
 }
 
@@ -33,13 +35,24 @@ const overrideStyle = {
 
 const LoginPage = () => {
   const dispatch = useDispatch()
-  const { error, isLoading } = useSelector((state) => state.auth)
+  const navigate = useNavigate()
+  const { accessToken, error, isLoading } = useSelector((state) => state.auth)
 
   const [isShowPassword, setIsShowPassword] = useState(false)
 
+  useEffect(() => {
+    if (accessToken) {
+      navigate('/dashboard')
+    }
+  }, [accessToken, navigate])
+
   const submitHandler = (values, { setFieldError }) => {
-    dispatch(admin_login(values))
+    dispatch(adminLogin(values))
       .unwrap()
+      .then(() => {
+        navigate('/')
+        toast.success('Login Successfully')
+      })
       .catch((err) => {
         if (err.details) {
           Object.keys(err.details).forEach((field) => {

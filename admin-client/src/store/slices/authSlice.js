@@ -12,30 +12,41 @@ const returnRole = (token) => {
     } else {
       return decodeToken.role
     }
-
   } else {
     return ''
   }
 }
 
-export const admin_login = createAsyncThunk(
-  'auth/admin_login',
+export const adminLogin = createAsyncThunk(
+  'auth/adminLogin',
   async (request, { rejectWithValue, fulfillWithValue }) => {
     console.log(request)
     try {
       const { data } = await api.post('/auth/login', request)
-      console.log(data)
       return fulfillWithValue(data)
     } catch (error) {
-      console.log(error.response.data)
+      return rejectWithValue(error.response.data)
+    }
+  }
+)
+
+export const getUserProfile = createAsyncThunk(
+  'auth/getUserProfile',
+  async (_, { rejectWithValue, fulfillWithValue }) => {
+
+    try {
+      const { data } = await api.get('/users/profile')
+      return fulfillWithValue(data)
+    } catch (error) {
       return rejectWithValue(error.response.data)
     }
   }
 )
 
 const initialState = {
-  accessToken: null,
-  refreshToken: null,
+  accessToken: localStorage.getItem('accessToken'),
+  refreshToken: localStorage.getItem('refreshToken'),
+  userProfile: null,
   error: null,
   isLoading: false,
 }
@@ -46,15 +57,15 @@ const authSlice = createSlice({
   reducers: {},
   extraReducers: builder => {
     builder
-      .addCase(admin_login.pending, (state) => {
+      .addCase(adminLogin.pending, (state) => {
         state.isLoading = true
         state.error = null
       })
-      .addCase(admin_login.rejected, (state, { payload }) => {
+      .addCase(adminLogin.rejected, (state, { payload }) => {
         state.isLoading = false;
         state.error = payload.message
       })
-      .addCase(admin_login.fulfilled, (state, { payload }) => {
+      .addCase(adminLogin.fulfilled, (state, { payload }) => {
         state.isLoading = false;
         if (returnRole(payload.accessToken) === "Role_ADMIN") {
           state.accessToken = payload.accessToken
@@ -62,10 +73,16 @@ const authSlice = createSlice({
           localStorage.setItem('accessToken', payload.accessToken)
           localStorage.setItem('refreshToken', payload.refreshToken)
         } else {
-          console.log("Tét")
           state.error = "This is not admin account!"
         }
+      })
 
+      .addCase(getUserProfile.pending, (state) => {
+        state.isLoading = true
+      })
+      .addCase(getUserProfile.fulfilled, (state, { payload }) => {
+        state.isLoading = false
+        state.userProfile = payload
       })
   }
 })
