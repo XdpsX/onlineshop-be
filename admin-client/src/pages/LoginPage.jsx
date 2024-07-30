@@ -8,6 +8,7 @@ import { adminLogin } from '../store/slices/authSlice'
 import { BeatLoader } from 'react-spinners'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
+import { overrideStyle } from '../utils/cssHelper'
 
 const LoginSchema = Yup.object().shape({
   email: Yup.string()
@@ -23,14 +24,6 @@ const LoginSchema = Yup.object().shape({
 const initialValues = {
   email: 'admin@gmail.com',
   password: '12345678',
-}
-
-const overrideStyle = {
-  display: 'flex',
-  margin: '0 auto',
-  height: '24px',
-  justifyContent: 'center',
-  alignItems: 'center',
 }
 
 const LoginPage = () => {

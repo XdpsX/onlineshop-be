@@ -1,6 +1,7 @@
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
+import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
 import './App.css'
 import {
+  CategoryPage,
   Dashboard,
   ErrorPage,
   LoginPage,
@@ -17,6 +18,10 @@ const router = createBrowserRouter([
   },
   {
     path: '/',
+    element: <Navigate to="/dashboard" />,
+  },
+  {
+    path: 'dashboard',
     element: (
       <ProtectedRoute>
         <SharedLayout />
@@ -28,8 +33,8 @@ const router = createBrowserRouter([
         element: <Dashboard />,
       },
       {
-        path: 'dashboard',
-        element: <Dashboard />,
+        path: 'categories',
+        element: <CategoryPage />,
       },
     ],
   },
