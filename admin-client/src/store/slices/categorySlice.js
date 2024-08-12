@@ -23,6 +23,42 @@ export const getCategories = createAsyncThunk(
   }
 )
 
+export const addCategory = createAsyncThunk(
+  'category/addCategory',
+  async (request, { rejectWithValue, fulfillWithValue }) => {
+    try {
+      const { data } = await api.post('/categories', request)
+      return fulfillWithValue(data)
+    } catch (error) {
+      return rejectWithValue(error.response.data)
+    }
+  }
+)
+
+export const updateCategory = createAsyncThunk(
+  'category/updateCategory',
+  async (request, { rejectWithValue, fulfillWithValue }) => {
+    try {
+      const { data } = await api.put(`/categories/${request.id}`, request)
+      return fulfillWithValue(data)
+    } catch (error) {
+      return rejectWithValue(error.response.data)
+    }
+  }
+)
+
+export const deleteCategory = createAsyncThunk(
+  'category/deleteCategory',
+  async (categoryId, { rejectWithValue, fulfillWithValue }) => {
+    try {
+      const { data } = await api.delete(`/categories/${categoryId}`)
+      return fulfillWithValue(data)
+    } catch (error) {
+      return rejectWithValue(error.response.data)
+    }
+  }
+)
+
 const initialState = {
   categories: null,
   params: {
@@ -33,8 +69,10 @@ const initialState = {
   },
   totalItems: 0,
   totalPages: 0,
-  error: null,
   isLoading: true,
+  showModal: false,
+  delCategory: null,
+  updCategory: null
 }
 
 const categorySlice = createSlice({
@@ -50,6 +88,15 @@ const categorySlice = createSlice({
     setSort: (state, { payload }) => {
       state.params.sort = payload
     },
+    setDelCategory: (state, { payload }) => {
+      state.delCategory = payload
+    },
+    setUpdCategory: (state, { payload }) => {
+      state.updCategory = payload
+    },
+    setShowModal: (state, { payload }) => {
+      state.showModal = payload
+    }
   },
   extraReducers: builder => {
     builder
@@ -66,6 +113,6 @@ const categorySlice = createSlice({
   }
 })
 
-export const { setSearch, setPageNumber, setSort } = categorySlice.actions
+export const { setSearch, setPageNumber, setSort, setDelCategory, setUpdCategory, setShowModal } = categorySlice.actions
 const categoryReducer = categorySlice.reducer
 export default categoryReducer

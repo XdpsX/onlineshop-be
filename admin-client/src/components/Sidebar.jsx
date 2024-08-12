@@ -20,7 +20,7 @@ const Sidebar = ({ showSidebar, setShowSidebar }) => {
       ></div>
 
       <div
-        className={`w-[260px] fixed bg-[#e6e7fb] z-50 top-0 h-screen shadow-[0_0_15px_0_rgb(34_41_47_/_5%)] transition-all ${
+        className={`w-[260px] fixed bg-[#e6e7fb] z-30 top-0 h-screen shadow-[0_0_15px_0_rgb(34_41_47_/_5%)] transition-all ${
           showSidebar ? 'left-0' : '-left-[260px] lg:left-0'
         } `}
       >
