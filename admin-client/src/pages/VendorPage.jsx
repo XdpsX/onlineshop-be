@@ -1,70 +1,63 @@
 import { useEffect } from 'react'
-import { FaEdit, FaTrash } from 'react-icons/fa'
 import { useDispatch, useSelector } from 'react-redux'
+import { FaEdit, FaTrash } from 'react-icons/fa'
 import {
   clearFilters,
-  getCategories,
-  setDelCategory,
+  getVendors,
+  setDelVendor,
   setPageNumber,
   setSearch,
   setShowModal,
   setSort,
-  setUpdCategory,
-} from '../store/slices/categorySlice'
-import Loading from '../components/Loading'
+  setUpdVendor,
+} from '../store/slices/vendorSlice'
 import {
-  AddCategory,
-  DeleteCategory,
+  AddVendor,
+  DeleteVendor,
+  Loading,
   Pagination,
   Search,
   Sort,
 } from '../components'
 import { sortOptions } from '../utils/data'
+import defaultLogo from '../assets/images/default-vendor.png'
 
-const CategoryPage = () => {
+const VendorPage = () => {
   const dispatch = useDispatch()
-  const { categories, isLoading, params, totalPages } = useSelector(
-    (state) => state.category
+  const { vendors, isLoading, params, totalPages } = useSelector(
+    (state) => state.vendor
   )
 
-  // useEffect(() => {
-  //   return () => {
-  //     dispatch(clearFilters())
-  //   }
-  // }, [dispatch])
-
   useEffect(() => {
-    dispatch(getCategories(params))
+    dispatch(getVendors(params))
   }, [params, dispatch])
 
   const onSearching = (keyword) => {
     dispatch(setSearch(keyword))
   }
-
-  const handlePageNum = (pageNum) => {
+  const onSortChange = (sort) => {
+    dispatch(setSort(sort))
+  }
+  const onPageChange = (pageNum) => {
     dispatch(setPageNumber(pageNum))
   }
 
-  const handleSort = (sort) => {
-    dispatch(setSort(sort))
+  const onDeleteVen = (vendor) => {
+    dispatch(setDelVendor(vendor))
   }
 
-  const onDeleteCat = (category) => {
-    dispatch(setDelCategory(category))
-  }
-
-  const onUpdateCat = (category) => {
-    dispatch(setUpdCategory(category))
+  const onUpdateVen = (vendor) => {
+    dispatch(setUpdVendor(vendor))
     dispatch(setShowModal(true))
   }
 
-  if (!categories || isLoading) {
+  if (isLoading) {
     return <Loading />
   }
 
   return (
     <div className="px-2 lg:px-7 pt-5">
-      <AddCategory />
+      <AddVendor />
       <div className="w-full p-4 bg-[#6a5fdf] rounded-md">
         <div className="flex flex-col md:flex-row gap-3 md:gap-0 justify-between items-center mb-5">
           <Search
@@ -75,14 +68,12 @@ const CategoryPage = () => {
           <Sort
             curSelect={params.sort}
             options={sortOptions}
-            onSortChange={handleSort}
+            onSortChange={onSortChange}
           />
         </div>
-        {categories.length === 0 ? (
+        {vendors.length === 0 ? (
           <div className="text-center min-h-[340px] mt-28">
-            <h2 className="text-white font-medium text-lg">
-              No Category Found
-            </h2>
+            <h2 className="text-white font-medium text-lg">No Vendor Found</h2>
           </div>
         ) : (
           <>
@@ -94,6 +85,9 @@ const CategoryPage = () => {
                       No
                     </th>
                     <th scope="col" className="py-3 px-4">
+                      Logo
+                    </th>
+                    <th scope="col" className="py-3 px-4">
                       Name
                     </th>
                     <th scope="col" className="py-3 px-4">
@@ -103,19 +97,27 @@ const CategoryPage = () => {
                 </thead>
 
                 <tbody>
-                  {categories.map((cat, i) => (
-                    <tr key={cat.id}>
+                  {vendors.map((ven, i) => (
+                    <tr key={ven.id}>
                       <td
                         scope="row"
                         className="py-1 px-4 font-medium whitespace-nowrap"
                       >
                         {(params.pageNum - 1) * params.pageSize + i + 1}
                       </td>
+                      <td scope="row" className="py-1 px-4">
+                        {ven.logo ? (
+                          <img src={ven.logo} className="w-12" />
+                        ) : (
+                          <img src={defaultLogo} className="w-12" />
+                        )}
+                        {/* <img src={defaultLogo} className="w-12" /> */}
+                      </td>
                       <td
                         scope="row"
                         className="py-1 px-4 font-medium whitespace-nowrap"
                       >
-                        {cat.name}
+                        {ven.name}
                       </td>
 
                       <td
@@ -124,14 +126,14 @@ const CategoryPage = () => {
                       >
                         <div className="flex justify-start items-center gap-4">
                           <button
-                            onClick={() => onUpdateCat(cat)}
+                            onClick={() => onUpdateVen(ven)}
                             title="Edit"
                             className="p-[10px] bg-yellow-500 rounded hover:shadow-lg hover:shadow-yellow-500/50"
                           >
                             <FaEdit />
                           </button>
                           <button
-                            onClick={() => onDeleteCat(cat)}
+                            onClick={() => onDeleteVen(ven)}
                             title="Delete"
                             className="p-[10px] bg-red-500 rounded hover:shadow-lg hover:shadow-red-500/50"
                           >
@@ -148,7 +150,7 @@ const CategoryPage = () => {
               <div className="w-full flex justify-end mt-8 bottom-4 right-4">
                 <Pagination
                   pageNumber={params.pageNum}
-                  onPageChange={handlePageNum}
+                  onPageChange={onPageChange}
                   totalPages={totalPages}
                 />
               </div>
@@ -156,8 +158,8 @@ const CategoryPage = () => {
           </>
         )}
       </div>
-      <DeleteCategory />
+      <DeleteVendor />
     </div>
   )
 }
-export default CategoryPage
+export default VendorPage

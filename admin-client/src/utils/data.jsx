@@ -4,6 +4,7 @@ import { FaUserTimes, FaUsers } from 'react-icons/fa'
 import { MdPayment } from 'react-icons/md'
 import { FaCodePullRequest } from 'react-icons/fa6'
 import { IoIosChatbubbles } from 'react-icons/io'
+import { MdOutlineBrandingWatermark } from 'react-icons/md'
 import { IoMdAdd } from 'react-icons/io'
 import { MdViewList } from 'react-icons/md'
 import { TbBasketDiscount } from 'react-icons/tb'
@@ -36,10 +37,10 @@ export const allNavItems = [
   },
   {
     id: 4,
-    title: 'Sellers',
-    icon: <FaUsers />,
+    title: 'Vendors',
+    icon: <MdOutlineBrandingWatermark />,
     role: 'admin',
-    path: '/admin/dashboard/sellers',
+    path: '/dashboard/vendors',
   },
   {
     id: 5,

@@ -4,3 +4,4 @@ export { default as SharedLayout } from "./SharedLayout";
 export { default as Dashboard } from "./Dashboard";
 export { default as ErrorPage } from "./ErrorPage";
 export { default as CategoryPage } from "./CategoryPage";
+export { default as VendorPage } from "./VendorPage";

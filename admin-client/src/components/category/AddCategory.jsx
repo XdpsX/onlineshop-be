@@ -1,19 +1,21 @@
 import { useState } from 'react'
-import Modal from './Modal'
+import Modal from '../Modal'
 import { MdOutlineCreateNewFolder } from 'react-icons/md'
 import { IoClose } from 'react-icons/io5'
 import { FaPlus } from 'react-icons/fa'
 import * as Yup from 'yup'
 import { Field, Form, Formik } from 'formik'
 import { useDispatch, useSelector } from 'react-redux'
+import { BeatLoader } from 'react-spinners'
 import {
   addCategory,
   getCategories,
   setShowModal,
   setUpdCategory,
   updateCategory,
-} from '../store/slices/categorySlice'
+} from '../../store/slices/categorySlice'
 import { toast } from 'react-toastify'
+import { overrideStyle } from '../../utils/cssHelper'
 
 const CategorySchema = Yup.object().shape({
   name: Yup.string()
@@ -134,14 +136,27 @@ const AddCategory = () => {
                 )}
               </div>
 
-              <button
-                type="submit"
-                className="text-white gap-2 inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-                disabled={isProcessing}
-              >
-                <FaPlus />
-                {isUpdating ? 'Update' : 'Add'}
-              </button>
+              {isProcessing ? (
+                <button
+                  type="submit"
+                  className="text-white gap-2 inline-flex items-center bg-gray-700 focus:ring-4 focus:outline-non font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+                  disabled={true}
+                >
+                  <BeatLoader
+                    color="#fff"
+                    size={12}
+                    cssOverride={overrideStyle}
+                  />
+                </button>
+              ) : (
+                <button
+                  type="submit"
+                  className="text-white gap-2 inline-flex items-center bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+                >
+                  <FaPlus />
+                  {isUpdating ? 'Update' : 'Add'}
+                </button>
+              )}
             </Form>
           )}
         </Formik>

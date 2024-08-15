@@ -7,6 +7,7 @@ import {
   LoginPage,
   ProtectedRoute,
   SharedLayout,
+  VendorPage,
 } from './pages'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
@@ -35,6 +36,10 @@ const router = createBrowserRouter([
       {
         path: 'categories',
         element: <CategoryPage />,
+      },
+      {
+        path: 'vendors',
+        element: <VendorPage />,
       },
     ],
   },

@@ -1,12 +1,12 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import api from "../../utils/api"
 
-export const getCategories = createAsyncThunk(
-  'category/getCategories',
+export const getVendors = createAsyncThunk(
+  'vendor/getVendors',
   async ({ pageSize, pageNum, search, sort }, { rejectWithValue, fulfillWithValue }) => {
     console.log("search: ", search)
     try {
-      const { data } = await api.get('/categories', {
+      const { data } = await api.get('/vendors', {
         params: {
           pageSize,
           pageNum,
@@ -21,11 +21,15 @@ export const getCategories = createAsyncThunk(
   }
 )
 
-export const addCategory = createAsyncThunk(
-  'category/addCategory',
-  async (request, { rejectWithValue, fulfillWithValue }) => {
+export const addVendor = createAsyncThunk(
+  'vendor/addVendor',
+  async (formData, { rejectWithValue, fulfillWithValue }) => {
     try {
-      const { data } = await api.post('/categories', request)
+      const { data } = await api.post('/vendors', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        }
+      })
       return fulfillWithValue(data)
     } catch (error) {
       return rejectWithValue(error.response.data)
@@ -33,11 +37,11 @@ export const addCategory = createAsyncThunk(
   }
 )
 
-export const updateCategory = createAsyncThunk(
-  'category/updateCategory',
-  async (request, { rejectWithValue, fulfillWithValue }) => {
+export const deleteVendor = createAsyncThunk(
+  'vendor/deleteVendor',
+  async (vendorId, { rejectWithValue, fulfillWithValue }) => {
     try {
-      const { data } = await api.put(`/categories/${request.id}`, request)
+      const { data } = await api.delete(`/vendors/${vendorId}`)
       return fulfillWithValue(data)
     } catch (error) {
       return rejectWithValue(error.response.data)
@@ -45,11 +49,15 @@ export const updateCategory = createAsyncThunk(
   }
 )
 
-export const deleteCategory = createAsyncThunk(
-  'category/deleteCategory',
-  async (categoryId, { rejectWithValue, fulfillWithValue }) => {
+export const updateVendor = createAsyncThunk(
+  'vendor/updateVendor',
+  async ({ vendorId, formData }, { rejectWithValue, fulfillWithValue }) => {
     try {
-      const { data } = await api.delete(`/categories/${categoryId}`)
+      const { data } = await api.put(`/vendors/${vendorId}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        }
+      })
       return fulfillWithValue(data)
     } catch (error) {
       return rejectWithValue(error.response.data)
@@ -58,23 +66,23 @@ export const deleteCategory = createAsyncThunk(
 )
 
 const initialState = {
-  categories: null,
+  vendors: null,
   params: {
     pageNum: 1,
     pageSize: 5,
     search: '',
-    sort: null,
+    sort: '-date',
   },
   totalItems: 0,
   totalPages: 0,
   isLoading: true,
   showModal: false,
-  delCategory: null,
-  updCategory: null
+  delVendor: null,
+  updVendor: null
 }
 
-const categorySlice = createSlice({
-  name: 'category',
+const vendorSlice = createSlice({
+  name: 'vendor',
   initialState,
   reducers: {
     setSearch: (state, { payload }) => {
@@ -86,37 +94,36 @@ const categorySlice = createSlice({
     setSort: (state, { payload }) => {
       state.params.sort = payload
     },
-    setDelCategory: (state, { payload }) => {
-      state.delCategory = payload
-    },
-    setUpdCategory: (state, { payload }) => {
-      state.updCategory = payload
-    },
     setShowModal: (state, { payload }) => {
       state.showModal = payload
     },
     clearFilters: (state) => {
       state.params = initialState.params
-    }
+    },
+    setDelVendor: (state, { payload }) => {
+      state.delVendor = payload
+    },
+    setUpdVendor: (state, { payload }) => {
+      state.updVendor = payload
+    },
   },
   extraReducers: builder => {
     builder
-      .addCase(getCategories.pending, (state) => {
+      .addCase(getVendors.pending, (state) => {
         state.isLoading = true
       })
-      .addCase(getCategories.fulfilled, (state, { payload }) => {
+      .addCase(getVendors.fulfilled, (state, { payload }) => {
         state.isLoading = false
-        console.log(payload.totalItems)
-        state.categories = payload.items
+        state.vendors = payload.items
         state.totalItems = payload.totalItems
         state.totalPages = payload.totalPages
       })
-      .addCase(getCategories.rejected, (state) => {
+      .addCase(getVendors.rejected, (state) => {
         state.isLoading = false
       })
   }
 })
 
-export const { setSearch, setPageNumber, setSort, setDelCategory, setUpdCategory, setShowModal, clearFilters } = categorySlice.actions
-const categoryReducer = categorySlice.reducer
-export default categoryReducer
+export const { setSearch, setPageNumber, setSort, setShowModal, clearFilters, setDelVendor, setUpdVendor } = vendorSlice.actions
+const vendorReducer = vendorSlice.reducer
+export default vendorReducer

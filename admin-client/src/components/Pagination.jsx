@@ -1,4 +1,22 @@
+import { useEffect, useState } from 'react'
+import PropTypes from 'prop-types'
+
 const Pagination = ({ pageNumber, totalPages, onPageChange }) => {
+  const [isSmallScreen, setIsSmallScreen] = useState(false)
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsSmallScreen(window.innerWidth < 640) // 640px là kích thước breakpoint cho sm
+    }
+
+    handleResize() // Kiểm tra kích thước khi component mount
+    window.addEventListener('resize', handleResize) // Thêm event listener
+
+    return () => {
+      window.removeEventListener('resize', handleResize) // Cleanup
+    }
+  }, [])
+
   const handleFirstPage = () => {
     onPageChange(1)
   }
@@ -15,13 +33,17 @@ const Pagination = ({ pageNumber, totalPages, onPageChange }) => {
 
   const renderPageNumbers = () => {
     const pageNumbers = []
-    let startPage = Math.max(pageNumber - 2, 1)
-    let endPage = Math.min(pageNumber + 2, totalPages)
+    let startPage = Math.max(pageNumber - 1, 1)
+    let endPage = Math.min(pageNumber + 1, totalPages)
 
-    if (pageNumber <= 3) {
-      endPage = Math.min(5, totalPages)
-    } else if (pageNumber >= totalPages - 2) {
-      startPage = Math.max(totalPages - 4, 1)
+    if (isSmallScreen) {
+      // Nếu là màn hình nhỏ, chỉ hiển thị 3 nút
+      startPage = Math.max(pageNumber - 1, 1)
+      endPage = Math.min(pageNumber + 1, totalPages)
+    } else {
+      // Nếu không, hiển thị 5 nút
+      startPage = Math.max(pageNumber - 2, 1)
+      endPage = Math.min(pageNumber + 2, totalPages)
     }
 
     for (let i = startPage; i <= endPage; i++) {
@@ -62,6 +84,12 @@ const Pagination = ({ pageNumber, totalPages, onPageChange }) => {
       </button>
     </div>
   )
+}
+
+Pagination.propTypes = {
+  pageNumber: PropTypes.number,
+  totalPages: PropTypes.number,
+  onPageChange: PropTypes.func,
 }
 
 export default Pagination

@@ -1,7 +1,9 @@
 import { AiOutlineSearch } from 'react-icons/ai'
+import { GrClear } from 'react-icons/gr'
 import { useState } from 'react'
+import PropTypes from 'prop-types'
 
-const Search = ({ search, onSearching }) => {
+const Search = ({ search, onSearching, onClear }) => {
   const [searchValue, setSearchValue] = useState(search)
 
   const handleSearch = () => {
@@ -20,14 +22,23 @@ const Search = ({ search, onSearching }) => {
         type="text"
         placeholder="Search"
       />
+      <button type="submit" className="text-center bg-blue-500 py-1 px-1">
+        <AiOutlineSearch size={28} color="white" title="Search" />
+      </button>
       <button
-        type="submit"
-        className="text-center bg-blue-500 rounded-e-md py-1 px-1"
+        onClick={onClear}
+        className="text-center bg-white rounded-e-md py-1 px-1"
       >
-        <AiOutlineSearch size={28} color="white" />
+        <GrClear size={28} color="gray" title="Clear" />
       </button>
     </form>
   )
+}
+
+Search.propTypes = {
+  search: PropTypes.string,
+  onSearching: PropTypes.func,
+  onClear: PropTypes.func,
 }
 
 export default Search
