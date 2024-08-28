@@ -29,10 +29,18 @@ public class CategoryServiceImplTest {
     @DisplayName("Create category successfully")
     @Test
     void testCreateCategory_ShouldSaveCategory() {
-        CategoryRequest request = new CategoryRequest("Test Category");
-        Category category = new Category(null, "Test Category", null);
-        Category savedCategory = new Category(1, "Test Category", "test-category");
-        CategoryResponse expectedResponse = new CategoryResponse(1, "Test Category", "test-category");
+        CategoryRequest request = CategoryRequest.builder().name("Test Category").build();
+        Category category = Category.builder().name("Test Category").build();
+        Category savedCategory = Category.builder()
+                .id(1)
+                .name("Test Category")
+                .slug("test-category")
+                .build();
+        CategoryResponse expectedResponse = CategoryResponse.builder()
+                .id(1)
+                .name("Test Category")
+                .slug("test-category")
+                .build();
 
         when(categoryRepository.existsByName(request.getName())).thenReturn(false);
         when(categoryMapper.fromRequestToEntity(request)).thenReturn(category);
@@ -48,7 +56,7 @@ public class CategoryServiceImplTest {
     @DisplayName("Create category with existing name")
     @Test
     void testCreateCategory_WhenCategoryAlreadyExists_ShouldThrowBadRequestException() {
-        CategoryRequest request = new CategoryRequest("Existing Category");
+        CategoryRequest request = CategoryRequest.builder().name("Existing Category").build();
 
         when(categoryRepository.existsByName(request.getName())).thenReturn(true);
 
@@ -60,10 +68,22 @@ public class CategoryServiceImplTest {
     @Test
     void testUpdateCategory_ShouldUpdateCategory() {
         Integer categoryId = 1;
-        CategoryRequest request = new CategoryRequest("Updated Category");
-        Category existingCategory = new Category(1, "Old Category", "old-category");
-        Category updatedCategory = new Category(1, "Updated Category", "updated-category");
-        CategoryResponse expectedResponse = new CategoryResponse(1, "Updated Category", "updated-category");
+        CategoryRequest request = CategoryRequest.builder().name("Updated Category").build();
+        Category existingCategory = Category.builder()
+                .id(1)
+                .name("Old Category")
+                .slug("old-category")
+                .build();
+        Category updatedCategory = Category.builder()
+                .id(1)
+                .name("Updated Category")
+                .slug("updated-category")
+                .build();
+        CategoryResponse expectedResponse = CategoryResponse.builder()
+                .id(1)
+                .name("Updated Category")
+                .slug("updated-category")
+                .build();
 
         when(categoryRepository.findById(categoryId)).thenReturn(java.util.Optional.of(existingCategory));
         when(categoryRepository.existsByName(request.getName())).thenReturn(false);
@@ -80,7 +100,7 @@ public class CategoryServiceImplTest {
     @Test
     void testUpdateCategory_WhenCategoryNotFound_ShouldThrowResourceNotFoundException() {
         Integer categoryId = 1;
-        CategoryRequest request = new CategoryRequest("Updated Category");
+        CategoryRequest request = CategoryRequest.builder().name("Updated Category").build();
 
         when(categoryRepository.findById(categoryId)).thenReturn(java.util.Optional.empty());
 
@@ -92,8 +112,12 @@ public class CategoryServiceImplTest {
     @Test
     void testUpdateCategory_WhenCategoryWithSameNameExists_ShouldThrowBadRequestException() {
         Integer categoryId = 1;
-        CategoryRequest request = new CategoryRequest("Existing Category");
-        Category existingCategory = new Category(1, "Old Category", "old-category");
+        CategoryRequest request = CategoryRequest.builder().name("Existing Category").build();
+        Category existingCategory = Category.builder()
+                .id(1)
+                .name("Old Category")
+                .slug("old-category")
+                .build();
 
         when(categoryRepository.findById(categoryId)).thenReturn(java.util.Optional.of(existingCategory));
         when(categoryRepository.existsByName(request.getName())).thenReturn(true);
@@ -106,7 +130,11 @@ public class CategoryServiceImplTest {
     @Test
     void testDeleteCategory_ShouldDeleteCategory() {
         Integer categoryId = 1;
-        Category existingCategory = new Category(1, "Category To Delete", "category-to-delete");
+        Category existingCategory = Category.builder()
+                .id(1)
+                .name("Category To Delete")
+                .slug("category-to-delete")
+                .build();
 
         when(categoryRepository.findById(categoryId)).thenReturn(java.util.Optional.of(existingCategory));
 
