@@ -1,13 +1,13 @@
-package com.xdpsx.ecommerce;
+package com.xdpsx.onlineshop;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class EcommerceApplication {
+public class OnlineShopApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(EcommerceApplication.class, args);
+		SpringApplication.run(OnlineShopApplication.class, args);
 	}
 
 }
