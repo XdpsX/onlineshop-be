@@ -10,6 +10,7 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -80,9 +81,9 @@ public class GlobalExceptionHandler {
         return errorDetails;
     }
 
-    @ExceptionHandler(BadRequestException.class)
+    @ExceptionHandler({BadRequestException.class, HttpMessageNotReadableException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorDetails handleBadRequest(HttpServletRequest request, BadRequestException e){
+    public ErrorDetails handleBadRequest(HttpServletRequest request, RuntimeException e){
         log.error(e.getMessage(), e);
         ErrorDetails errorDetails = new ErrorDetails(e.getMessage());
         errorDetails.setStatus(HttpStatus.BAD_REQUEST.value());

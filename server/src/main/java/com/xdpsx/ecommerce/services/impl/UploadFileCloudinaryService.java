@@ -32,6 +32,8 @@ public class UploadFileCloudinaryService implements UploadFileService {
         }catch (IOException io){
 //            throw new RuntimeException("Deleting image is failed!");
             System.out.println("Deleting image is failed!");
+        }catch (Exception e){
+            System.out.println("Exception: " + e.getMessage());
         }
     }
 

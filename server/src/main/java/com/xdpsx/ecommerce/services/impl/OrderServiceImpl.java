@@ -1,5 +1,7 @@
 package com.xdpsx.ecommerce.services.impl;
 
+import com.xdpsx.ecommerce.dtos.common.PageResponse;
+import com.xdpsx.ecommerce.dtos.order.OrderPageParams;
 import com.xdpsx.ecommerce.dtos.order.OrderRequest;
 import com.xdpsx.ecommerce.dtos.order.OrderResponse;
 import com.xdpsx.ecommerce.entities.*;
@@ -48,4 +50,19 @@ public class OrderServiceImpl implements OrderService {
         OrderResponse orderResponse = orderMapper.fromEntityToResponse(savedOrder);
         return orderResponse;
     }
+
+    @Override
+    public OrderResponse updateOrderStatus(Long orderId, OrderStatus status) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order with id=%s not found!".formatted(orderId)));
+        order.setStatus(status);
+        Order savedOrder = orderRepository.save(order);
+        return orderMapper.fromEntityToResponse(savedOrder);
+    }
+
+    @Override
+    public PageResponse<OrderResponse> getListOrders(OrderPageParams params) {
+        return null;
+    }
+
 }
