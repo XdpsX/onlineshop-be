@@ -3,6 +3,8 @@ package com.xdpsx.onlineshop.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor @Builder
 @Entity
@@ -17,4 +19,7 @@ public class Category {
 
     @Column(nullable = false)
     private String slug;
+
+    @ManyToMany(mappedBy = "categories")
+    private List<Brand> brands;
 }
