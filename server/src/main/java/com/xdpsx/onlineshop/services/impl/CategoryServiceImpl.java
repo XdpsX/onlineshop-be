@@ -1,6 +1,6 @@
 package com.xdpsx.onlineshop.services.impl;
 
-import com.xdpsx.onlineshop.dtos.category.CategoryCreateRequest;
+import com.xdpsx.onlineshop.dtos.category.CategoryRequest;
 import com.xdpsx.onlineshop.dtos.category.CategoryResponse;
 import com.xdpsx.onlineshop.entities.Category;
 import com.xdpsx.onlineshop.exceptions.BadRequestException;
@@ -31,27 +31,39 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public CategoryResponse createCategory(CategoryCreateRequest request) {
+    public CategoryResponse createCategory(CategoryRequest request) {
         if (categoryRepository.existsByName(request.getName())){
             throw new BadRequestException("Category with name=%s already exists".formatted(request.getName()));
         }
+        if (categoryRepository.existsBySlug(request.getSlug())){
+            throw new BadRequestException("Category with slug=%s already exists".formatted(request.getSlug()));
+        }
         Category category = categoryMapper.fromRequestToEntity(request);
-        category.setSlug(SlugConverter.toSlug(category.getName()));
         Category savedCategory = categoryRepository.save(category);
         return categoryMapper.fromEntityToResponse(savedCategory);
     }
 
     @Override
-    public CategoryResponse updateCategory(Integer id, CategoryCreateRequest request) {
+    public CategoryResponse updateCategory(Integer id, CategoryRequest request) {
         Category existingCat = categoryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Category with id=%s not found".formatted(id)));
 
-        if (categoryRepository.existsByName(request.getName())){
-            throw new BadRequestException("Category with name=%s already exists".formatted(request.getName()));
+        // Update name
+        if (!existingCat.getName().equals(request.getName())){
+            if (categoryRepository.existsByName(request.getName())){
+                throw new BadRequestException("Category with name=%s already exists".formatted(request.getName()));
+            }
+            existingCat.setName(request.getName());
         }
 
-        existingCat.setName(request.getName());
-        existingCat.setSlug(SlugConverter.toSlug(request.getName()));
+        // Update slug
+        if (!existingCat.getSlug().equals(request.getSlug())){
+            if (categoryRepository.existsBySlug(request.getSlug())){
+                throw new BadRequestException("Category with slug=%s already exists".formatted(request.getSlug()));
+            }
+            existingCat.setSlug(request.getSlug());
+        }
+
         Category savedCategory = categoryRepository.save(existingCat);
         return categoryMapper.fromEntityToResponse(savedCategory);
     }

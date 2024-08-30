@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 
 public interface CategoryRepository extends JpaRepository<Category, Integer> {
     boolean existsByName(String name);
+    boolean existsBySlug(String slug);
 
     @Query(value =
             "SELECT COUNT(*) FROM (" +
