@@ -13,6 +13,9 @@ public class I18nUtils {
     public String getCatCannotDeleteMsg(String name){
         return getMessage("category.can-not-delete", name);
     }
+    public String getBrandCannotDeleteMsg(String name){
+        return getMessage("brand.can-not-delete", name);
+    }
 
     private String getMessage(String msgKey, Object... params) {
         return messageSource.getMessage(msgKey, params, LocaleContextHolder.getLocale());

@@ -20,7 +20,7 @@ public class Brand {
     @Column(nullable = false)
     private String logo;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "category_brands",
             joinColumns = @JoinColumn(name = "brand_id", referencedColumnName = "id"),
