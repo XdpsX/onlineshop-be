@@ -1,7 +1,7 @@
 package com.xdpsx.onlineshop.apis;
 
-import com.xdpsx.onlineshop.dtos.request.CategoryRequest;
-import com.xdpsx.onlineshop.dtos.response.CategoryResponse;
+import com.xdpsx.onlineshop.dtos.category.CategoryCreateRequest;
+import com.xdpsx.onlineshop.dtos.category.CategoryResponse;
 import com.xdpsx.onlineshop.services.CategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ public class CategoryController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<CategoryResponse> createCategory(@Valid @RequestBody CategoryRequest request) {
+    public ResponseEntity<CategoryResponse> createCategory(@Valid @RequestBody CategoryCreateRequest request) {
         CategoryResponse createdCategory = categoryService.createCategory(request);
         return new ResponseEntity<>(createdCategory, HttpStatus.CREATED);
     }
@@ -31,7 +31,7 @@ public class CategoryController {
     @PutMapping("/{id}/update")
     public ResponseEntity<CategoryResponse> updateCategory(
             @PathVariable Integer id,
-            @Valid @RequestBody CategoryRequest request) {
+            @Valid @RequestBody CategoryCreateRequest request) {
         CategoryResponse updatedCategory = categoryService.updateCategory(id, request);
         return ResponseEntity.ok(updatedCategory);
     }

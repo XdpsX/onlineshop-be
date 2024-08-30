@@ -1,7 +1,7 @@
 package com.xdpsx.onlineshop.services.impl;
 
-import com.xdpsx.onlineshop.dtos.request.CategoryRequest;
-import com.xdpsx.onlineshop.dtos.response.CategoryResponse;
+import com.xdpsx.onlineshop.dtos.category.CategoryCreateRequest;
+import com.xdpsx.onlineshop.dtos.category.CategoryResponse;
 import com.xdpsx.onlineshop.entities.Category;
 import com.xdpsx.onlineshop.exceptions.BadRequestException;
 import com.xdpsx.onlineshop.exceptions.ResourceNotFoundException;
@@ -31,7 +31,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public CategoryResponse createCategory(CategoryRequest request) {
+    public CategoryResponse createCategory(CategoryCreateRequest request) {
         if (categoryRepository.existsByName(request.getName())){
             throw new BadRequestException("Category with name=%s already exists".formatted(request.getName()));
         }
@@ -42,7 +42,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public CategoryResponse updateCategory(Integer id, CategoryRequest request) {
+    public CategoryResponse updateCategory(Integer id, CategoryCreateRequest request) {
         Category existingCat = categoryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Category with id=%s not found".formatted(id)));
 

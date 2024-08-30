@@ -1,7 +1,7 @@
 package com.xdpsx.onlineshop.services;
 
-import com.xdpsx.onlineshop.dtos.request.CategoryRequest;
-import com.xdpsx.onlineshop.dtos.response.CategoryResponse;
+import com.xdpsx.onlineshop.dtos.category.CategoryCreateRequest;
+import com.xdpsx.onlineshop.dtos.category.CategoryResponse;
 import com.xdpsx.onlineshop.entities.Category;
 import com.xdpsx.onlineshop.exceptions.BadRequestException;
 import com.xdpsx.onlineshop.exceptions.ResourceNotFoundException;
@@ -31,7 +31,7 @@ public class CategoryServiceImplTest {
     @DisplayName("Create category successfully")
     @Test
     void testCreateCategory_ShouldSaveCategory() {
-        CategoryRequest request = CategoryRequest.builder().name("Test Category").build();
+        CategoryCreateRequest request = CategoryCreateRequest.builder().name("Test Category").build();
         Category category = Category.builder().name("Test Category").build();
         Category savedCategory = Category.builder()
                 .id(1)
@@ -58,7 +58,7 @@ public class CategoryServiceImplTest {
     @DisplayName("Create category with existing name")
     @Test
     void testCreateCategory_WhenCategoryAlreadyExists_ShouldThrowBadRequestException() {
-        CategoryRequest request = CategoryRequest.builder().name("Existing Category").build();
+        CategoryCreateRequest request = CategoryCreateRequest.builder().name("Existing Category").build();
 
         when(categoryRepository.existsByName(request.getName())).thenReturn(true);
 
@@ -70,7 +70,7 @@ public class CategoryServiceImplTest {
     @Test
     void testUpdateCategory_ShouldUpdateCategory() {
         Integer categoryId = 1;
-        CategoryRequest request = CategoryRequest.builder().name("Updated Category").build();
+        CategoryCreateRequest request = CategoryCreateRequest.builder().name("Updated Category").build();
         Category existingCategory = Category.builder()
                 .id(1)
                 .name("Old Category")
@@ -102,7 +102,7 @@ public class CategoryServiceImplTest {
     @Test
     void testUpdateCategory_WhenCategoryNotFound_ShouldThrowResourceNotFoundException() {
         Integer categoryId = 1;
-        CategoryRequest request = CategoryRequest.builder().name("Updated Category").build();
+        CategoryCreateRequest request = CategoryCreateRequest.builder().name("Updated Category").build();
 
         when(categoryRepository.findById(categoryId)).thenReturn(java.util.Optional.empty());
 
@@ -114,7 +114,7 @@ public class CategoryServiceImplTest {
     @Test
     void testUpdateCategory_WhenCategoryWithSameNameExists_ShouldThrowBadRequestException() {
         Integer categoryId = 1;
-        CategoryRequest request = CategoryRequest.builder().name("Existing Category").build();
+        CategoryCreateRequest request = CategoryCreateRequest.builder().name("Existing Category").build();
         Category existingCategory = Category.builder()
                 .id(1)
                 .name("Old Category")

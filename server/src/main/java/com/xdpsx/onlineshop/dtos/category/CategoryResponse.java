@@ -1,4 +1,4 @@
-package com.xdpsx.onlineshop.dtos.response;
+package com.xdpsx.onlineshop.dtos.category;
 
 import lombok.*;
 
