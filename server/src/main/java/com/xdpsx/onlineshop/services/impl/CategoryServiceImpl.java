@@ -8,6 +8,7 @@ import com.xdpsx.onlineshop.exceptions.ResourceNotFoundException;
 import com.xdpsx.onlineshop.mappers.CategoryMapper;
 import com.xdpsx.onlineshop.repositories.CategoryRepository;
 import com.xdpsx.onlineshop.services.CategoryService;
+import com.xdpsx.onlineshop.utils.I18nUtils;
 import com.xdpsx.onlineshop.utils.SlugConverter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
+    private final I18nUtils i18nUtils;
     private final CategoryMapper categoryMapper;
     private final CategoryRepository categoryRepository;
 
@@ -31,7 +33,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryResponse createCategory(CategoryRequest request) {
         if (categoryRepository.existsByName(request.getName())){
-            throw new BadRequestException("Category with name=[%s] already exists".formatted(request.getName()));
+            throw new BadRequestException("Category with name=%s already exists".formatted(request.getName()));
         }
         Category category = categoryMapper.fromRequestToEntity(request);
         category.setSlug(SlugConverter.toSlug(category.getName()));
@@ -42,10 +44,10 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryResponse updateCategory(Integer id, CategoryRequest request) {
         Category existingCat = categoryRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Category with id=[%s] not found".formatted(id)));
+                .orElseThrow(() -> new ResourceNotFoundException("Category with id=%s not found".formatted(id)));
 
         if (categoryRepository.existsByName(request.getName())){
-            throw new BadRequestException("Category with name=[%s] already exists".formatted(request.getName()));
+            throw new BadRequestException("Category with name=%s already exists".formatted(request.getName()));
         }
 
         existingCat.setName(request.getName());
@@ -57,7 +59,11 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public void deleteCategory(Integer id) {
         Category existingCat = categoryRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Category with id=[%s] not found".formatted(id)));
+                .orElseThrow(() -> new ResourceNotFoundException("Category with id=%s not found".formatted(id)));
+        long countCategories = categoryRepository.countCategoriesInOtherTables(id);
+        if (countCategories > 0){
+            throw new BadRequestException(i18nUtils.getCatCannotDeleteMsg(existingCat.getName()));
+        }
         categoryRepository.delete(existingCat);
     }
 }

@@ -8,6 +8,7 @@ import com.xdpsx.onlineshop.exceptions.ResourceNotFoundException;
 import com.xdpsx.onlineshop.mappers.CategoryMapper;
 import com.xdpsx.onlineshop.repositories.CategoryRepository;
 import com.xdpsx.onlineshop.services.impl.CategoryServiceImpl;
+import com.xdpsx.onlineshop.utils.I18nUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,6 +25,7 @@ import static org.mockito.Mockito.*;
 public class CategoryServiceImplTest {
     @Mock private CategoryRepository categoryRepository;
     @Mock private CategoryMapper categoryMapper;
+    @Mock private I18nUtils i18nUtils;
     @InjectMocks private CategoryServiceImpl categoryService;
 
     @DisplayName("Create category successfully")
@@ -137,6 +139,7 @@ public class CategoryServiceImplTest {
                 .build();
 
         when(categoryRepository.findById(categoryId)).thenReturn(java.util.Optional.of(existingCategory));
+        when(categoryRepository.countCategoriesInOtherTables(existingCategory.getId())).thenReturn(0L);
 
         categoryService.deleteCategory(categoryId);
 
@@ -152,5 +155,27 @@ public class CategoryServiceImplTest {
 
         assertThrows(ResourceNotFoundException.class, () -> categoryService.deleteCategory(categoryId));
         verify(categoryRepository, never()).delete(any(Category.class));
+    }
+
+    @DisplayName("Delete category that is currently in use")
+    @Test
+    void testDeleteCategory_WhenCategoryInUser_ShouldThrowBadRequestException() {
+        Integer categoryId = 1;
+        String msg = "Category is in use";
+        Category existingCategory = Category.builder()
+                .id(1)
+                .name("Category To Delete")
+                .slug("category-to-delete")
+                .build();
+
+        when(categoryRepository.findById(categoryId)).thenReturn(java.util.Optional.of(existingCategory));
+        when(categoryRepository.countCategoriesInOtherTables(existingCategory.getId())).thenReturn(1L);
+        when(i18nUtils.getCatCannotDeleteMsg(existingCategory.getName())).thenReturn(msg);
+
+        BadRequestException exception =
+                assertThrows(BadRequestException.class, () -> categoryService.deleteCategory(categoryId));
+
+        assertEquals(msg, exception.getMessage());
+        verify(categoryRepository, never()).delete(existingCategory);
     }
 }
