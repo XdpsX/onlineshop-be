@@ -2,6 +2,7 @@ package com.xdpsx.onlineshop.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.List;
 
@@ -9,7 +10,8 @@ import java.util.List;
 @NoArgsConstructor @AllArgsConstructor @Builder
 @Entity
 @Table(name = "categories")
-public class Category {
+@EntityListeners(AuditingEntityListener.class)
+public class Category extends AuditEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;

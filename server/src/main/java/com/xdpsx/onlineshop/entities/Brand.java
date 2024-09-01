@@ -9,7 +9,7 @@ import java.util.List;
 @NoArgsConstructor @AllArgsConstructor @Builder
 @Entity
 @Table(name = "brands")
-public class Brand {
+public class Brand extends AuditEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
