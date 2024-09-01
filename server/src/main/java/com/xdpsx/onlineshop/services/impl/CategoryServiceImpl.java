@@ -2,15 +2,20 @@ package com.xdpsx.onlineshop.services.impl;
 
 import com.xdpsx.onlineshop.dtos.category.CategoryRequest;
 import com.xdpsx.onlineshop.dtos.category.CategoryResponse;
+import com.xdpsx.onlineshop.dtos.common.PageParams;
+import com.xdpsx.onlineshop.dtos.common.PageResponse;
 import com.xdpsx.onlineshop.entities.Category;
 import com.xdpsx.onlineshop.exceptions.BadRequestException;
 import com.xdpsx.onlineshop.exceptions.ResourceNotFoundException;
 import com.xdpsx.onlineshop.mappers.CategoryMapper;
+import com.xdpsx.onlineshop.mappers.PageMapper;
 import com.xdpsx.onlineshop.repositories.CategoryRepository;
+import com.xdpsx.onlineshop.repositories.specs.BasicSpecification;
 import com.xdpsx.onlineshop.services.CategoryService;
 import com.xdpsx.onlineshop.utils.I18nUtils;
-import com.xdpsx.onlineshop.utils.SlugConverter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,11 +26,16 @@ import java.util.stream.Collectors;
 public class CategoryServiceImpl implements CategoryService {
     private final I18nUtils i18nUtils;
     private final CategoryMapper categoryMapper;
+    private final PageMapper pageMapper;
     private final CategoryRepository categoryRepository;
 
+    private final BasicSpecification<Category> spec;
+
     @Override
-    public List<CategoryResponse> listCategories() {
-        return categoryRepository.findAll().stream()
+    public List<CategoryResponse> listAllCategories() {
+        return categoryRepository
+                .findAll(spec.getSortSpec("name"))
+                .stream()
                 .map(categoryMapper::fromEntityToResponse)
                 .collect(Collectors.toList());
     }
@@ -77,5 +87,14 @@ public class CategoryServiceImpl implements CategoryService {
             throw new BadRequestException(i18nUtils.getCatCannotDeleteMsg(existingCat.getName()));
         }
         categoryRepository.delete(existingCat);
+    }
+
+    @Override
+    public PageResponse<CategoryResponse> listCategoriesByPage(PageParams params) {
+        Page<Category> categoryPage = categoryRepository.findAll(
+                spec.getFiltersSpec(params.getSearch(), params.getSort()),
+                PageRequest.of(params.getPageNum() - 1, params.getPageSize())
+        );
+        return pageMapper.toCategoryPageResponse(categoryPage);
     }
 }

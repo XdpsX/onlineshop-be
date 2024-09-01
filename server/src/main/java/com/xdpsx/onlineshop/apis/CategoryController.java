@@ -2,6 +2,8 @@ package com.xdpsx.onlineshop.apis;
 
 import com.xdpsx.onlineshop.dtos.category.CategoryRequest;
 import com.xdpsx.onlineshop.dtos.category.CategoryResponse;
+import com.xdpsx.onlineshop.dtos.common.PageParams;
+import com.xdpsx.onlineshop.dtos.common.PageResponse;
 import com.xdpsx.onlineshop.services.CategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -17,9 +19,15 @@ import java.util.List;
 public class CategoryController {
     private final CategoryService categoryService;
 
-    @GetMapping
-    public ResponseEntity<List<CategoryResponse>> listCategories() {
-        return ResponseEntity.ok(categoryService.listCategories());
+    @GetMapping("/filters")
+    public ResponseEntity<PageResponse<CategoryResponse>> getCategoriesByPage(@Valid PageParams params) {
+        PageResponse<CategoryResponse> pageResponse = categoryService.listCategoriesByPage(params);
+        return ResponseEntity.status(HttpStatus.OK).body(pageResponse);
+    }
+
+    @GetMapping("/get-all")
+    public ResponseEntity<List<CategoryResponse>> getAllCategories() {
+        return ResponseEntity.ok(categoryService.listAllCategories());
     }
 
     @PostMapping("/create")
