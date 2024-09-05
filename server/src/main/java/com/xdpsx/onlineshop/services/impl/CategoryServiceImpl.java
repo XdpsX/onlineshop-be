@@ -18,7 +18,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -96,5 +98,13 @@ public class CategoryServiceImpl implements CategoryService {
                 PageRequest.of(params.getPageNum() - 1, params.getPageSize())
         );
         return pageMapper.toCategoryPageResponse(categoryPage);
+    }
+
+    @Override
+    public Map<String, Boolean> checkExistsCat(String name, String slug) {
+        Map<String, Boolean> exists = new HashMap<>();
+        exists.put("nameExists", categoryRepository.existsByName(name));
+        exists.put("slugExists",categoryRepository.existsBySlug(slug));
+        return exists;
     }
 }

@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/categories")
@@ -48,5 +49,14 @@ public class CategoryController {
     public ResponseEntity<Void> deleteCategory(@PathVariable Integer id) {
         categoryService.deleteCategory(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/exists")
+    public ResponseEntity<Map<String, Boolean>> checkExistsCat(
+            @RequestParam String name,
+            @RequestParam String slug
+    ){
+        Map<String, Boolean> exists = categoryService.checkExistsCat(name, slug);
+        return ResponseEntity.ok(exists);
     }
 }
