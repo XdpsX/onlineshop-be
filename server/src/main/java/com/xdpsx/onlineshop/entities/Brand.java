@@ -2,6 +2,7 @@ package com.xdpsx.onlineshop.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.List;
 
@@ -9,6 +10,7 @@ import java.util.List;
 @NoArgsConstructor @AllArgsConstructor @Builder
 @Entity
 @Table(name = "brands")
+@EntityListeners(AuditingEntityListener.class)
 public class Brand extends AuditEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

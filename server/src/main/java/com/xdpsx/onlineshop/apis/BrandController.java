@@ -2,6 +2,8 @@ package com.xdpsx.onlineshop.apis;
 
 import com.xdpsx.onlineshop.dtos.brand.BrandRequest;
 import com.xdpsx.onlineshop.dtos.brand.BrandResponse;
+import com.xdpsx.onlineshop.dtos.common.PageParams;
+import com.xdpsx.onlineshop.dtos.common.PageResponse;
 import com.xdpsx.onlineshop.services.BrandService;
 import com.xdpsx.onlineshop.validations.OnCreate;
 import jakarta.validation.Valid;
@@ -13,11 +15,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/brands")
 @RequiredArgsConstructor
 public class BrandController {
     private final BrandService brandService;
+
+    @GetMapping("/filters")
+    public ResponseEntity<PageResponse<BrandResponse>> getBrandsByPage(@Valid PageParams params) {
+        PageResponse<BrandResponse> pageResponse = brandService.listBrandsByPage(params);
+        return ResponseEntity.status(HttpStatus.OK).body(pageResponse);
+    }
 
     @PostMapping(path="/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<BrandResponse> createBrand(
@@ -36,5 +46,13 @@ public class BrandController {
     public ResponseEntity<Void> deleteBrand(@PathVariable Integer id) {
         brandService.deleteBrand(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/exists")
+    public ResponseEntity<Map<String, Boolean>> checkExistsBrand(
+            @RequestParam String name
+    ){
+        Map<String, Boolean> exists = brandService.checkExistsBrand(name);
+        return ResponseEntity.ok(exists);
     }
 }

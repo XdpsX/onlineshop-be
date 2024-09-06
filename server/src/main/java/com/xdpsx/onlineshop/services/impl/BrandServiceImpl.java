@@ -4,21 +4,28 @@ import com.cloudinary.Transformation;
 import com.cloudinary.utils.ObjectUtils;
 import com.xdpsx.onlineshop.dtos.brand.BrandRequest;
 import com.xdpsx.onlineshop.dtos.brand.BrandResponse;
+import com.xdpsx.onlineshop.dtos.common.PageParams;
+import com.xdpsx.onlineshop.dtos.common.PageResponse;
 import com.xdpsx.onlineshop.entities.Brand;
 import com.xdpsx.onlineshop.entities.Category;
 import com.xdpsx.onlineshop.exceptions.BadRequestException;
 import com.xdpsx.onlineshop.exceptions.ResourceNotFoundException;
 import com.xdpsx.onlineshop.mappers.BrandMapper;
+import com.xdpsx.onlineshop.mappers.PageMapper;
 import com.xdpsx.onlineshop.repositories.BrandRepository;
 import com.xdpsx.onlineshop.repositories.CategoryRepository;
+import com.xdpsx.onlineshop.repositories.specs.BasicSpecification;
 import com.xdpsx.onlineshop.services.BrandService;
 import com.xdpsx.onlineshop.utils.CloudinaryUploader;
 import com.xdpsx.onlineshop.utils.I18nUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -32,13 +39,24 @@ public class BrandServiceImpl implements BrandService {
     private final CloudinaryUploader uploader;
     private final I18nUtils i18nUtils;
     private final BrandMapper brandMapper;
+    private final PageMapper pageMapper;
     private final BrandRepository brandRepository;
     private final CategoryRepository categoryRepository;
+    private final BasicSpecification<Brand> spec;
 
     private final static Map uploadOptions = ObjectUtils.asMap(
             "folder", BRAND_IMG_FOLDER,
             "transformation", new Transformation().width(BRAND_IMG_WIDTH).crop("scale")
     );
+
+    @Override
+    public PageResponse<BrandResponse> listBrandsByPage(PageParams params) {
+        Page<Brand> brandPage = brandRepository.findAll(
+                spec.getFiltersSpec(params.getSearch(), params.getSort()),
+                PageRequest.of(params.getPageNum() - 1, params.getPageSize())
+        );
+        return pageMapper.toBrandPageResponse(brandPage);
+    }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
     @Override
@@ -66,10 +84,12 @@ public class BrandServiceImpl implements BrandService {
                 .orElseThrow(() -> new ResourceNotFoundException("Brand with id=%s not found".formatted(id)));
 
         // Update name
-        if (brandRepository.existsByName(request.getName())){
-            throw new BadRequestException("Brand with name=%s already exists".formatted(request.getName()));
+        if (!existingBrand.getName().equals(request.getName())){
+            if (brandRepository.existsByName(request.getName())){
+                throw new BadRequestException("Brand with name=%s already exists".formatted(request.getName()));
+            }
+            existingBrand.setName(request.getName());
         }
-        existingBrand.setName(request.getName());
 
         // Update categories
         if (request.getCategoryIds() != null){
@@ -94,12 +114,19 @@ public class BrandServiceImpl implements BrandService {
     public void deleteBrand(Integer id) {
         Brand existingBrand = brandRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Brand with id=%s not found".formatted(id)));
-        long countBrands = brandRepository.countBrandsInOtherTables(id);
-        if (countBrands > 0){
-            throw new BadRequestException(i18nUtils.getBrandCannotDeleteMsg(existingBrand.getName()));
-        }
+//        long countBrands = brandRepository.countBrandsInOtherTables(id);
+//        if (countBrands > 0){
+//            throw new BadRequestException(i18nUtils.getBrandCannotDeleteMsg(existingBrand.getName()));
+//        }
         brandRepository.delete(existingBrand);
         uploader.deleteFile(existingBrand.getLogo());
+    }
+
+    @Override
+    public Map<String, Boolean> checkExistsBrand(String name) {
+        Map<String, Boolean> exists = new HashMap<>();
+        exists.put("nameExists", brandRepository.existsByName(name));
+        return exists;
     }
 
     private List<Category> fetchCategories(Set<Integer> categoryIds) {

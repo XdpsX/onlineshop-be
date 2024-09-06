@@ -1,7 +1,9 @@
 package com.xdpsx.onlineshop.mappers;
 
+import com.xdpsx.onlineshop.dtos.brand.BrandResponse;
 import com.xdpsx.onlineshop.dtos.category.CategoryResponse;
 import com.xdpsx.onlineshop.dtos.common.PageResponse;
+import com.xdpsx.onlineshop.entities.Brand;
 import com.xdpsx.onlineshop.entities.Category;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -15,9 +17,14 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PageMapper {
     private final CategoryMapper categoryMapper;
+    private final BrandMapper brandMapper;
 
     public PageResponse<CategoryResponse> toCategoryPageResponse(Page<Category> categoryPage){
         return toPageResponse(categoryPage, categoryMapper::fromEntityToResponse);
+    }
+
+    public PageResponse<BrandResponse> toBrandPageResponse(Page<Brand> brandPage){
+        return toPageResponse(brandPage, brandMapper::fromEntityToResponse);
     }
 
     public <T, R> PageResponse<R> toPageResponse(Page<T> page, Function<T, R> mapper) {
