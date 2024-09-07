@@ -30,7 +30,7 @@ public class BasicSpecification<T> {
         };
     }
 
-    private Specification<T> hasName(String name) {
+    protected Specification<T> hasName(String name) {
         return (Root<T> root, CriteriaQuery<?> query, CriteriaBuilder builder) -> {
             if (name == null || name.isEmpty()) {
                 return builder.conjunction();
@@ -39,7 +39,7 @@ public class BasicSpecification<T> {
         };
     }
 
-    private Specification<T> sortByDate(boolean asc) {
+    protected Specification<T> sortByDate(boolean asc) {
         return (root, query, criteriaBuilder) -> {
             if (asc){
                 query.orderBy(criteriaBuilder.asc(criteriaBuilder.coalesce(root.get("updatedAt"), root.get("createdAt"))));
@@ -50,7 +50,7 @@ public class BasicSpecification<T> {
         };
     }
 
-    private Specification<T> sortByName(boolean asc) {
+    protected Specification<T> sortByName(boolean asc) {
         return (root, query, criteriaBuilder) -> {
             if (asc){
                 query.orderBy(criteriaBuilder.asc(root.get("name")));

@@ -14,4 +14,8 @@ public class FileConstants {
 
     public final static int BRAND_IMG_WIDTH = 320;
     public final static String BRAND_IMG_FOLDER = "brands";
+
+    public final static int NUMBER_PRODUCT_IMAGES = 5;
+    public final static int PRODUCT_IMG_WIDTH = 300;
+    public final static String PRODUCT_IMG_FOLDER = "products";
 }
