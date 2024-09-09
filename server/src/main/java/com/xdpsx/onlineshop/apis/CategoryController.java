@@ -1,9 +1,12 @@
 package com.xdpsx.onlineshop.apis;
 
+import com.xdpsx.onlineshop.dtos.brand.BrandNoCatsDTO;
+import com.xdpsx.onlineshop.dtos.brand.BrandResponse;
 import com.xdpsx.onlineshop.dtos.category.CategoryRequest;
 import com.xdpsx.onlineshop.dtos.category.CategoryResponse;
 import com.xdpsx.onlineshop.dtos.common.PageParams;
 import com.xdpsx.onlineshop.dtos.common.PageResponse;
+import com.xdpsx.onlineshop.services.BrandService;
 import com.xdpsx.onlineshop.services.CategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -14,11 +17,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+@CrossOrigin("*")
 @RestController
 @RequestMapping("/categories")
 @RequiredArgsConstructor
 public class CategoryController {
     private final CategoryService categoryService;
+    private final BrandService brandService;
 
     @GetMapping("/filters")
     public ResponseEntity<PageResponse<CategoryResponse>> getCategoriesByPage(@Valid PageParams params) {
@@ -29,6 +34,11 @@ public class CategoryController {
     @GetMapping("/get-all")
     public ResponseEntity<List<CategoryResponse>> getAllCategories() {
         return ResponseEntity.ok(categoryService.listAllCategories());
+    }
+
+    @GetMapping("/{categoryId}/brands")
+    public ResponseEntity<List<BrandNoCatsDTO>> getBrandsByCategoryId(@PathVariable Integer categoryId) {
+        return ResponseEntity.ok(brandService.listBrandsByCategoryId(categoryId));
     }
 
     @PostMapping("/create")

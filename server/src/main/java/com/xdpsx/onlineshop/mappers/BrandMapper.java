@@ -1,5 +1,6 @@
 package com.xdpsx.onlineshop.mappers;
 
+import com.xdpsx.onlineshop.dtos.brand.BrandNoCatsDTO;
 import com.xdpsx.onlineshop.dtos.brand.BrandRequest;
 import com.xdpsx.onlineshop.dtos.brand.BrandResponse;
 import com.xdpsx.onlineshop.entities.Brand;
@@ -25,4 +26,6 @@ public abstract class BrandMapper {
         response.setLogo(uploader.getFileUrl(entity.getLogo()));
         return response;
     }
+
+    public abstract BrandNoCatsDTO fromEntityToNotCatsDTO(Brand entity);
 }

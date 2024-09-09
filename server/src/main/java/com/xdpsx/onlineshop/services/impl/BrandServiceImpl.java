@@ -2,6 +2,7 @@ package com.xdpsx.onlineshop.services.impl;
 
 import com.cloudinary.Transformation;
 import com.cloudinary.utils.ObjectUtils;
+import com.xdpsx.onlineshop.dtos.brand.BrandNoCatsDTO;
 import com.xdpsx.onlineshop.dtos.brand.BrandRequest;
 import com.xdpsx.onlineshop.dtos.brand.BrandResponse;
 import com.xdpsx.onlineshop.dtos.common.PageParams;
@@ -127,6 +128,15 @@ public class BrandServiceImpl implements BrandService {
         Map<String, Boolean> exists = new HashMap<>();
         exists.put("nameExists", brandRepository.existsByName(name));
         return exists;
+    }
+
+    @Override
+    public List<BrandNoCatsDTO> listBrandsByCategoryId(Integer categoryId) {
+        return brandRepository
+                .findAll(spec.getSortSpec("name"))
+                .stream()
+                .map(brandMapper::fromEntityToNotCatsDTO)
+                .collect(Collectors.toList());
     }
 
     private List<Category> fetchCategories(Set<Integer> categoryIds) {

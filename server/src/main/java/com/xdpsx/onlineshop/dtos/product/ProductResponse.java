@@ -14,7 +14,7 @@ public class ProductResponse {
     private BigDecimal price;
     private double discountPercent;
     private boolean inStock;
-    private boolean isPublished;
+    private boolean published;
     private String mainImage;
     private CategoryResponse category;
     private BrandNoCatsDTO brand;
