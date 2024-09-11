@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -158,6 +159,21 @@ public class ProductServiceImpl implements ProductService {
         for (ProductImage productImage: product.getImages()) {
             uploader.deleteFile(productImage.getUrl());
         }
+    }
+
+    @Override
+    public void publishProduct(Long id, boolean status) {
+        Product product = productRepository.findProductById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product with id=%s not found!".formatted(id)));
+        product.setPublished(status);
+        productRepository.save(product);
+    }
+
+    @Override
+    public Map<String, Boolean> checkExistsProduct(String slug) {
+        Map<String, Boolean> exists = new HashMap<>();
+        exists.put("slugExists", productRepository.existsBySlug(slug));
+        return exists;
     }
 
     private void uploadProductImages(List<MultipartFile> files, Product product){

@@ -130,11 +130,14 @@ public class BrandServiceImpl implements BrandService {
         return exists;
     }
 
+//    @Transactional(readOnly = true)
     @Override
     public List<BrandNoCatsDTO> listBrandsByCategoryId(Integer categoryId) {
-        return brandRepository
-                .findAll(spec.getSortSpec("name"))
-                .stream()
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new ResourceNotFoundException("Category with id=%s not found".formatted(categoryId)));
+//        List<Brand> brands = category.getBrands();
+        List<Brand> brands = brandRepository.findBrandsByCategoryId(category.getId());
+        return brands.stream()
                 .map(brandMapper::fromEntityToNotCatsDTO)
                 .collect(Collectors.toList());
     }

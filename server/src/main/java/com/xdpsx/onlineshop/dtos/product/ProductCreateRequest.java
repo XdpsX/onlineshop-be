@@ -24,6 +24,8 @@ public class ProductCreateRequest {
     @Max(value = 1_000_000_000)
     private double price;
 
+    @Min(value = 0)
+    @Max(value = 100)
     private double discountPercent;
 
     private boolean inStock;

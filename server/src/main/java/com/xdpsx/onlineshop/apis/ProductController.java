@@ -10,6 +10,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @CrossOrigin("*")
 @RestController
 @RequestMapping("/products")
@@ -46,5 +48,21 @@ public class ProductController {
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/{id}/public/{status}")
+    public ResponseEntity<Void> updateProductPublicStatus(
+            @PathVariable Long id,
+            @PathVariable boolean status) {
+        productService.publishProduct(id, status);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/exists")
+    public ResponseEntity<Map<String, Boolean>> checkExistsProduct(
+            @RequestParam String slug
+    ){
+        Map<String, Boolean> exists = productService.checkExistsProduct(slug);
+        return ResponseEntity.ok(exists);
     }
 }
