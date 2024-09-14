@@ -23,3 +23,9 @@ cloudinary:
     secret: ${CLOUDINARY_API_SECRET}
   cloud:
     name: ${CLOUDINARY_CLOUD_NAME}
+
+app:
+  jwt:
+    secret: AxdbTQmW/abSjS3TpqhS2rHHUTtK8ESb0xq9uueSj34=
+    expiration:
+      seconds: 3600

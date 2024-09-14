@@ -5,6 +5,7 @@ import com.xdpsx.onlineshop.dtos.common.ErrorDetails;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -17,6 +18,16 @@ import java.util.stream.Collectors;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(BadCredentialsException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ErrorDTO handleBadCredentials(HttpServletRequest request, BadCredentialsException e){
+        log.error(e.getMessage(), e);
+        ErrorDTO errorDTO = new ErrorDTO();
+        errorDTO.setStatus(HttpStatus.UNAUTHORIZED.value());
+        errorDTO.setMessage("Wrong email or password"); // e.getMessage() = "Bad credentials"
+        return errorDTO;
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
