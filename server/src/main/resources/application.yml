@@ -29,3 +29,5 @@ app:
     secret: AxdbTQmW/abSjS3TpqhS2rHHUTtK8ESb0xq9uueSj34=
     expiration:
       seconds: 3600
+  cors:
+    allowed-origins: http://localhost:3000,http://localhost:3001

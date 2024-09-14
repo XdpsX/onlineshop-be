@@ -4,6 +4,7 @@ import com.nimbusds.jose.JWSAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -23,8 +24,13 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
 
 import javax.crypto.spec.SecretKeySpec;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import static com.xdpsx.onlineshop.constants.SecurityConstants.PUBLIC_ENDPOINTS;
 import static com.xdpsx.onlineshop.constants.SecurityConstants.PUBLIC_GET_ENDPOINTS;
@@ -36,12 +42,26 @@ public class SecurityConfig {
     @Value("${app.jwt.secret}")
     private String SECRET_KEY;
 
+    @Value("${app.cors.allowed-origins}")
+    List<String> allowedOrigins;
+
     @Bean
     public SecurityFilterChain filterChain(
             HttpSecurity http,
             AuthenticationEntryPoint authenticationEntryPoint
     ) throws Exception {
-        http.csrf(AbstractHttpConfigurer::disable);
+        http
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(cors -> cors.configurationSource(request -> {
+                    CorsConfiguration config = new CorsConfiguration();
+                    config.setAllowedOrigins(allowedOrigins);
+                    config.setAllowedMethods(Collections.singletonList("*"));
+                    config.setAllowCredentials(true);
+                    config.setAllowedHeaders(Collections.singletonList("*"));
+                    config.setExposedHeaders(List.of(HttpHeaders.AUTHORIZATION));
+                    config.setMaxAge(3600L);
+                    return config;
+                }));
         http.sessionManagement(session -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         );
@@ -98,4 +118,5 @@ public class SecurityConfig {
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
+
 }
