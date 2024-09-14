@@ -47,6 +47,16 @@ CREATE TABLE product_images (
     FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
 );
 
+CREATE TABLE users (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(64) NOT NULL,
+    email VARCHAR(64) NOT NULL,
+    password VARCHAR(255),
+    avatar VARCHAR(255),
+    role VARCHAR(32) NOT NULL,
+    auth_provider VARCHAR(32) NOT NULL
+);
+
 INSERT INTO categories (name, slug)
 VALUES 
 	("Laptop", "laptop"),
