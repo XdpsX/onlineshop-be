@@ -9,6 +9,7 @@ import com.xdpsx.onlineshop.entities.Category;
 import com.xdpsx.onlineshop.entities.Product;
 import com.xdpsx.onlineshop.entities.ProductImage;
 import com.xdpsx.onlineshop.exceptions.BadRequestException;
+import com.xdpsx.onlineshop.exceptions.DuplicateException;
 import com.xdpsx.onlineshop.exceptions.ResourceNotFoundException;
 import com.xdpsx.onlineshop.mappers.PageMapper;
 import com.xdpsx.onlineshop.mappers.ProductMapper;
@@ -68,7 +69,7 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductResponse createProduct(ProductCreateRequest request) {
         if (productRepository.existsBySlug(request.getSlug())){
-            throw new BadRequestException("Product with slug=%s already exists".formatted(request.getSlug()));
+            throw new DuplicateException("Product with slug=%s already exists".formatted(request.getSlug()));
         }
         Category category = categoryRepository.findById(request.getCategoryId())
                 .orElseThrow(() -> new ResourceNotFoundException("Category with id=%s not found!".formatted(request.getCategoryId())));
@@ -104,7 +105,7 @@ public class ProductServiceImpl implements ProductService {
 
         if (!request.getSlug().equals(product.getSlug())){
             if (productRepository.existsBySlug(request.getSlug())){
-                throw new BadRequestException("Product with slug=%s already exists".formatted(request.getSlug()));
+                throw new DuplicateException("Product with slug=%s already exists".formatted(request.getSlug()));
             }
             product.setSlug(request.getSlug());
         }

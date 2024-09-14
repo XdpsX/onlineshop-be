@@ -6,6 +6,7 @@ import com.xdpsx.onlineshop.dtos.common.PageParams;
 import com.xdpsx.onlineshop.dtos.common.PageResponse;
 import com.xdpsx.onlineshop.entities.Category;
 import com.xdpsx.onlineshop.exceptions.BadRequestException;
+import com.xdpsx.onlineshop.exceptions.DuplicateException;
 import com.xdpsx.onlineshop.exceptions.ResourceNotFoundException;
 import com.xdpsx.onlineshop.mappers.CategoryMapper;
 import com.xdpsx.onlineshop.mappers.PageMapper;
@@ -45,10 +46,10 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryResponse createCategory(CategoryRequest request) {
         if (categoryRepository.existsByName(request.getName())){
-            throw new BadRequestException("Category with name=%s already exists".formatted(request.getName()));
+            throw new DuplicateException("Category with name=%s already exists".formatted(request.getName()));
         }
         if (categoryRepository.existsBySlug(request.getSlug())){
-            throw new BadRequestException("Category with slug=%s already exists".formatted(request.getSlug()));
+            throw new DuplicateException("Category with slug=%s already exists".formatted(request.getSlug()));
         }
         Category category = categoryMapper.fromRequestToEntity(request);
         Category savedCategory = categoryRepository.save(category);
@@ -63,7 +64,7 @@ public class CategoryServiceImpl implements CategoryService {
         // Update name
         if (!existingCat.getName().equals(request.getName())){
             if (categoryRepository.existsByName(request.getName())){
-                throw new BadRequestException("Category with name=%s already exists".formatted(request.getName()));
+                throw new DuplicateException("Category with name=%s already exists".formatted(request.getName()));
             }
             existingCat.setName(request.getName());
         }
@@ -71,7 +72,7 @@ public class CategoryServiceImpl implements CategoryService {
         // Update slug
         if (!existingCat.getSlug().equals(request.getSlug())){
             if (categoryRepository.existsBySlug(request.getSlug())){
-                throw new BadRequestException("Category with slug=%s already exists".formatted(request.getSlug()));
+                throw new DuplicateException("Category with slug=%s already exists".formatted(request.getSlug()));
             }
             existingCat.setSlug(request.getSlug());
         }

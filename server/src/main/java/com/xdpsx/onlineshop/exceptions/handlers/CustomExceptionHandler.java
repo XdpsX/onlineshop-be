@@ -2,6 +2,7 @@ package com.xdpsx.onlineshop.exceptions.handlers;
 
 import com.xdpsx.onlineshop.dtos.common.ErrorDTO;
 import com.xdpsx.onlineshop.exceptions.BadRequestException;
+import com.xdpsx.onlineshop.exceptions.DuplicateException;
 import com.xdpsx.onlineshop.exceptions.ResourceNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +14,16 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @Slf4j
 @RestControllerAdvice
 public class CustomExceptionHandler {
+
+    @ExceptionHandler(DuplicateException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErrorDTO handleDuplicate(HttpServletRequest request, DuplicateException e) {
+        log.error(e.getMessage(), e);
+        ErrorDTO error = new ErrorDTO();
+        error.setStatus(HttpStatus.CONFLICT.value());
+        error.setMessage(e.getMessage());
+        return error;
+    }
 
     @ExceptionHandler(ResourceNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)

@@ -9,7 +9,7 @@ import com.xdpsx.onlineshop.dtos.common.PageParams;
 import com.xdpsx.onlineshop.dtos.common.PageResponse;
 import com.xdpsx.onlineshop.entities.Brand;
 import com.xdpsx.onlineshop.entities.Category;
-import com.xdpsx.onlineshop.exceptions.BadRequestException;
+import com.xdpsx.onlineshop.exceptions.DuplicateException;
 import com.xdpsx.onlineshop.exceptions.ResourceNotFoundException;
 import com.xdpsx.onlineshop.mappers.BrandMapper;
 import com.xdpsx.onlineshop.mappers.PageMapper;
@@ -63,7 +63,7 @@ public class BrandServiceImpl implements BrandService {
     @Override
     public BrandResponse createBrand(BrandRequest request) {
         if (brandRepository.existsByName(request.getName())){
-            throw new BadRequestException("Brand with name=%s already exists".formatted(request.getName()));
+            throw new DuplicateException("Brand with name=%s already exists".formatted(request.getName()));
         }
 
         Brand brand = brandMapper.fromRequestToEntity(request);
@@ -87,7 +87,7 @@ public class BrandServiceImpl implements BrandService {
         // Update name
         if (!existingBrand.getName().equals(request.getName())){
             if (brandRepository.existsByName(request.getName())){
-                throw new BadRequestException("Brand with name=%s already exists".formatted(request.getName()));
+                throw new DuplicateException("Brand with name=%s already exists".formatted(request.getName()));
             }
             existingBrand.setName(request.getName());
         }
