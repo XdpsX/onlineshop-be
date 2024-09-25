@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
-@CrossOrigin("*")
 @RestController
 @RequestMapping("/products")
 @RequiredArgsConstructor
@@ -64,5 +63,23 @@ public class ProductController {
     ){
         Map<String, Boolean> exists = productService.checkExistsProduct(slug);
         return ResponseEntity.ok(exists);
+    }
+
+    @GetMapping("/discount")
+    public ResponseEntity<PageResponse<ProductResponse>> getDiscountProducts(
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "8") int pageSize
+    ) {
+        PageResponse<ProductResponse> response = productService.getDiscountProducts(pageNum, pageSize);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/latest")
+    public ResponseEntity<PageResponse<ProductResponse>> getLatestProducts(
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "8") int pageSize
+    ) {
+        PageResponse<ProductResponse> response = productService.getLatestProducts(pageNum, pageSize);
+        return ResponseEntity.ok(response);
     }
 }

@@ -12,6 +12,7 @@ public class ProductResponse {
     private String name;
     private String slug;
     private BigDecimal price;
+    private BigDecimal discountedPrice;
     private double discountPercent;
     private boolean inStock;
     private boolean published;

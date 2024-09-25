@@ -22,6 +22,7 @@ import com.xdpsx.onlineshop.utils.CloudinaryUploader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -175,6 +176,49 @@ public class ProductServiceImpl implements ProductService {
         Map<String, Boolean> exists = new HashMap<>();
         exists.put("slugExists", productRepository.existsBySlug(slug));
         return exists;
+    }
+
+    @Override
+    public PageResponse<ProductResponse> getDiscountProducts(int pageNum, int pageSize) {
+        Specification<Product> prodSpec = Specification
+                .where(spec.hasDiscount(true))
+                .and(spec.hasPublished(true));
+        Page<Product> productPage = productRepository.findAll(
+                prodSpec,
+                PageRequest.of(pageNum - 1, pageSize)
+        );
+        return pageMapper.toProductPageResponse(productPage);
+    }
+
+    @Override
+    public PageResponse<ProductResponse> getLatestProducts(int pageNum, int pageSize) {
+        Specification<Product> prodSpec = Specification
+                .where(spec.getSortSpec("-date"))
+                .and(spec.hasPublished(true));
+        Page<Product> productPage = productRepository.findAll(
+                prodSpec,
+                PageRequest.of(pageNum - 1, pageSize)
+        );
+        return pageMapper.toProductPageResponse(productPage);
+    }
+
+    @Override
+    public PageResponse<ProductResponse> getProductsByCategoryId(Integer categoryId, int pageNum, int pageSize,
+                                                                 List<Integer> brandIds, String sort, Double minPrice, Double maxPrice) {
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new ResourceNotFoundException("Category with id=%s not found!".formatted(categoryId)));
+        Specification<Product> prodSpec = Specification
+                .where(spec.belongsToCategory(categoryId))
+                .and(spec.belongsToBrands(brandIds))
+                .and(spec.hasPublished(true))
+                .and(spec.getSortSpec(sort))
+                .and(spec.hasMinPrice(minPrice))
+                .and(spec.hasMaxPrice(maxPrice));
+        Page<Product> productPage = productRepository.findAll(
+                prodSpec,
+                PageRequest.of(pageNum - 1, pageSize)
+        );
+        return pageMapper.toProductPageResponse(productPage);
     }
 
     private void uploadProductImages(List<MultipartFile> files, Product product){

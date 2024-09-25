@@ -1,8 +1,11 @@
 package com.xdpsx.onlineshop.repositories.specs;
 
 import com.xdpsx.onlineshop.entities.Product;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 import static com.xdpsx.onlineshop.constants.FieldConstants.*;
 
@@ -42,7 +45,7 @@ public class ProductSpecification extends BasicSpecification<Product> {
         };
     }
 
-    private Specification<Product> hasMinPrice(Double minPrice) {
+    public Specification<Product> hasMinPrice(Double minPrice) {
         return (root, query, criteriaBuilder) -> {
             if (minPrice == null) {
                 return criteriaBuilder.conjunction();
@@ -51,7 +54,7 @@ public class ProductSpecification extends BasicSpecification<Product> {
         };
     }
 
-    private Specification<Product> hasMaxPrice(Double maxPrice) {
+    public Specification<Product> hasMaxPrice(Double maxPrice) {
         return (root, query, criteriaBuilder) -> {
             if (maxPrice == null) {
                 return criteriaBuilder.conjunction();
@@ -60,14 +63,14 @@ public class ProductSpecification extends BasicSpecification<Product> {
         };
     }
 
-    private Specification<Product> hasPublished(Boolean hasPublished) {
+    public Specification<Product> hasPublished(Boolean hasPublished) {
         return (root, query, criteriaBuilder) -> {
             if (hasPublished == null) return criteriaBuilder.conjunction();
             return criteriaBuilder.equal(root.get("published"), hasPublished);
         };
     }
 
-    private Specification<Product> hasDiscount(Boolean hasDiscount) {
+    public Specification<Product> hasDiscount(Boolean hasDiscount) {
         return (root, query, criteriaBuilder) -> {
             if (hasDiscount == null) return criteriaBuilder.conjunction();
             if (hasDiscount) {
@@ -78,14 +81,14 @@ public class ProductSpecification extends BasicSpecification<Product> {
         };
     }
 
-    private Specification<Product> isInStock(Boolean inStock) {
+    public Specification<Product> isInStock(Boolean inStock) {
         return (root, query, criteriaBuilder) -> {
             if (inStock == null) return criteriaBuilder.conjunction();
             return criteriaBuilder.equal(root.get("inStock"), inStock);
         };
     }
 
-    private Specification<Product> belongsToCategory(Integer categoryId) {
+    public Specification<Product> belongsToCategory(Integer categoryId) {
         return (root, query, criteriaBuilder) -> {
             if (categoryId == null) {
                 return criteriaBuilder.conjunction();
@@ -94,7 +97,7 @@ public class ProductSpecification extends BasicSpecification<Product> {
         };
     }
 
-    private Specification<Product> belongsToBrand(Integer brandId) {
+    public Specification<Product> belongsToBrand(Integer brandId) {
         return (root, query, criteriaBuilder) -> {
             if (brandId == null) {
                 return criteriaBuilder.conjunction();
@@ -103,7 +106,20 @@ public class ProductSpecification extends BasicSpecification<Product> {
         };
     }
 
-    private Specification<Product> sortByPrice (boolean asc){
+    public Specification<Product> belongsToBrands(List<Integer> brandIds) {
+        return (root, query, criteriaBuilder) -> {
+            if (brandIds == null || brandIds.isEmpty()) {
+                return criteriaBuilder.conjunction();
+            }
+            CriteriaBuilder.In<Integer> inClause = criteriaBuilder.in(root.get("brand").get("id"));
+            for (Integer id : brandIds) {
+                inClause.value(id);
+            }
+            return inClause;
+        };
+    }
+
+    public Specification<Product> sortByPrice (boolean asc){
         return (root, query, criteriaBuilder) -> {
             if (asc) {
                 query.orderBy(criteriaBuilder.asc(root.get("price")));

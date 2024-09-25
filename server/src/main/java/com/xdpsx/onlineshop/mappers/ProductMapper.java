@@ -21,6 +21,7 @@ public abstract class ProductMapper {
     public abstract Product fromUpdateRequestToEntity(ProductUpdateRequest request);
 
     @Mapping(target = "mainImage", ignore = true)
+    @Mapping(target = "discountedPrice", expression = "java(entity.getDiscountedPrice())")
     protected abstract ProductResponse toResponse(Product entity);
 
     public ProductResponse fromEntityToResponse(Product entity) {
