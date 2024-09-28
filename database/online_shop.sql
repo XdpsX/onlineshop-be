@@ -69,16 +69,14 @@ VALUES
     ("Màn hình", "man-hinh")
 ;
 
-INSERT INTO brands (name, logo)
-VALUES 
-	("Dell", "dell.png"),
-    ("HP", "hp.png"),
-    ("IPhone", "iphone.jpg")
-;
+CREATE TABLE cart_items (
+    user_id BIGINT NOT NULL,
+    product_id BIGINT NOT NULL,
+    quantity INT NOT NULL,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (user_id, product_id),
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+);
 
-INSERT INTO category_brands (brand_id, category_id)
-VALUES 
-	(1, 1),
-    (2,1),
-    (3,2)
-;
