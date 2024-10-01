@@ -10,7 +10,8 @@ public class SecurityConstants {
             "/categories/*/products",
             "/categories/*",
             "/products/*",
-            "/products"
+            "/products",
+            "/products/slug/*"
     };
 
     public static final String ROLE_PREFIX = "ROLE_";

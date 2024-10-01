@@ -68,6 +68,13 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    public ProductDetailsDTO getProductBySlug(String slug) {
+        Product product = productRepository.findProductBySlug(slug)
+                .orElseThrow(() -> new ResourceNotFoundException("Product with slug=%s not found!".formatted(slug)));
+        return productMapper.fromEntityToDetailsDTO(product);
+    }
+
+    @Override
     public ProductResponse createProduct(ProductCreateRequest request) {
         if (productRepository.existsBySlug(request.getSlug())){
             throw new DuplicateException("Product with slug=%s already exists".formatted(request.getSlug()));

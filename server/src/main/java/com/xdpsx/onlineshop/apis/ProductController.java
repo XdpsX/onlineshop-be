@@ -30,6 +30,12 @@ public class ProductController {
         return ResponseEntity.ok(product);
     }
 
+    @GetMapping("/slug/{slug}")
+    public ResponseEntity<ProductDetailsDTO> getProductBySlug(@PathVariable String slug) {
+        ProductDetailsDTO product = productService.getProductBySlug(slug);
+        return ResponseEntity.ok(product);
+    }
+
     @PostMapping(path="/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ProductResponse> createProduct(@Valid @ModelAttribute ProductCreateRequest request) {
         ProductResponse response = productService.createProduct(request);
