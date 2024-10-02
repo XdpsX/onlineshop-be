@@ -1,4 +1,4 @@
-package com.xdpsx.onlineshop.services;
+package com.xdpsx.onlineshop.services.impl;
 
 import com.xdpsx.onlineshop.dtos.cart.CartItemRequest;
 import com.xdpsx.onlineshop.dtos.cart.CartItemResponse;
@@ -11,6 +11,7 @@ import com.xdpsx.onlineshop.mappers.CartItemMapper;
 import com.xdpsx.onlineshop.repositories.CartItemRepository;
 import com.xdpsx.onlineshop.repositories.ProductRepository;
 import com.xdpsx.onlineshop.repositories.UserRepository;
+import com.xdpsx.onlineshop.services.CartService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
