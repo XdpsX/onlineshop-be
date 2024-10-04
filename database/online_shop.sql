@@ -88,6 +88,7 @@ CREATE TABLE orders (
     address VARCHAR(255) NOT NULL,
     mobile_number VARCHAR(20) NOT NULL,
     description VARCHAR(500),
+    total_amount DECIMAL(20, 2),
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     delivered_at TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
@@ -105,7 +106,6 @@ CREATE TABLE order_items (
 CREATE TABLE payments (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     order_id BIGINT,
-    amount DECIMAL(16, 2) NOT NULL,
     payment_method VARCHAR(20),
     status ENUM('UNPAID', 'PAID') NOT NULL,
     payment_date TIMESTAMP,

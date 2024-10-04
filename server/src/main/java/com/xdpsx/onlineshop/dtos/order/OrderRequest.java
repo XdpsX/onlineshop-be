@@ -16,4 +16,6 @@ public class OrderRequest {
 
     @Size(max = 500)
     private String description;
+
+    private String ipAddress;
 }

@@ -5,4 +5,5 @@ import com.xdpsx.onlineshop.dtos.order.OrderResponse;
 
 public interface OrderService {
     OrderResponse placeOrder(String userEmail, OrderRequest orderRequest);
+    void payment(String userEmail, long orderId);
 }

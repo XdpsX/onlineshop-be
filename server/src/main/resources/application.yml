@@ -31,3 +31,11 @@ app:
       seconds: 3600
   cors:
     allowed-origins: http://localhost:3000,http://localhost:3001
+
+payment:
+  vnpay:
+    tmn-code: ${VNPAY_TMN_CODE}
+    secret-key: ${VNPAY_SECRET_KEY}
+    init-payment-url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+    return-url: http://localhost:3000/orders/%s/status
+    timeout: 15 # in minutes

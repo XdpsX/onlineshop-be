@@ -1,9 +1,11 @@
 package com.xdpsx.onlineshop.dtos.order;
 
+import com.xdpsx.onlineshop.dtos.payment.InitPaymentResponse;
 import lombok.Builder;
 import lombok.Data;
 
 @Data @Builder
 public class OrderResponse {
-    OrderDTO order;
+    private OrderDTO order;
+    private InitPaymentResponse payment;
 }

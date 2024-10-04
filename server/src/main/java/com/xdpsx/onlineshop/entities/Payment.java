@@ -21,8 +21,6 @@ public class Payment {
     @JoinColumn(name = "order_id")
     private Order order;
 
-    private BigDecimal amount;
-
     @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;
 
