@@ -51,4 +51,7 @@ public class Order {
     private LocalDateTime createdAt;
 
     private LocalDateTime deliveredAt;
+
+    @OneToOne(mappedBy = "order",cascade = CascadeType.PERSIST)
+    private Payment payment;
 }

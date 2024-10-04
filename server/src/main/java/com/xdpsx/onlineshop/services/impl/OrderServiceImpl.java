@@ -54,18 +54,24 @@ public class OrderServiceImpl implements OrderService {
                     .order(order)
                     .build();
             order.getItems().add(orderItem);
+            BigDecimal total;
             if (item.getProduct().getDiscountPercent() > 0){
-                BigDecimal total = item.getProduct().getDiscountedPrice().multiply(BigDecimal.valueOf(item.getQuantity()));
-                totalAmount = totalAmount.add(total);
+                total = item.getProduct().getDiscountedPrice().multiply(BigDecimal.valueOf(item.getQuantity()));
             }else {
-                BigDecimal total = item.getProduct().getPrice().multiply(BigDecimal.valueOf(item.getQuantity()));
-                totalAmount = totalAmount.add(total);
+                total = item.getProduct().getPrice().multiply(BigDecimal.valueOf(item.getQuantity()));
             }
+            totalAmount = totalAmount.add(total);
         }
         order.setTrackingNumber(UUID.randomUUID().toString());
         order.setUser(user);
         order.setStatus(OrderStatus.PENDING);
         order.setTotalAmount(totalAmount);
+
+        Payment payment = Payment.builder()
+                .status(PaymentStatus.UNPAID)
+                .order(order)
+                .build();
+        order.setPayment(payment);
 
         Order savedOrder = orderRepository.save(order);
 
@@ -104,13 +110,11 @@ public class OrderServiceImpl implements OrderService {
         if (!user.getId().equals(order.getUser().getId())){
             throw new BadRequestException("You are not authorized to pay this order");
         }
-        Payment payment = Payment.builder()
-                .order(order)
-                .paymentMethod(PaymentMethod.VNPAY)
-                .paymentDate(LocalDateTime.now())
-                .status(PaymentStatus.PAID)
-                .build();
-        payment.setOrder(order);
+        Payment payment = order.getPayment();
+        payment.setStatus(PaymentStatus.PAID);
+        payment.setPaymentMethod(PaymentMethod.VNPAY);
+        payment.setPaymentDate(LocalDateTime.now());
+
         paymentRepository.save(payment);
     }
 
