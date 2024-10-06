@@ -1,12 +1,13 @@
 package com.xdpsx.onlineshop.dtos.order;
 
-import lombok.Builder;
 import lombok.Data;
+import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-@Data @Builder
+@Data
+@SuperBuilder
 public class OrderDTO {
     private Long id;
     private String trackingNumber;
@@ -14,6 +15,7 @@ public class OrderDTO {
     private BigDecimal total;
     private String address;
     private String mobileNumber;
+    private String paymentStatus;
     private LocalDateTime createdAt;
     private LocalDateTime deliveredAt;
 }

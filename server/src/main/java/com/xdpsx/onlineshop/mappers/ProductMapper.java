@@ -31,7 +31,7 @@ public abstract class ProductMapper {
     }
 
     @Mapping(target = "mainImage", ignore = true)
-    @Mapping(target = "images", ignore = true)
+    @Mapping(source = "entity.images", target="images", ignore = true)
     protected abstract ProductDetailsDTO toDetailsDTO(Product entity);
 
     public ProductDetailsDTO fromEntityToDetailsDTO(Product entity) {
