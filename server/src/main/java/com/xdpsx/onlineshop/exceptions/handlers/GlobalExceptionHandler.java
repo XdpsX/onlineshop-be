@@ -5,6 +5,7 @@ import com.xdpsx.onlineshop.dtos.common.ErrorDetails;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -18,6 +19,16 @@ import java.util.stream.Collectors;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(AccessDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ErrorDTO handleAccessDenied(HttpServletRequest request, AccessDeniedException e){
+        log.error(e.getMessage(), e);
+        ErrorDTO errorDTO = new ErrorDTO();
+        errorDTO.setStatus(HttpStatus.FORBIDDEN.value());
+        errorDTO.setMessage(e.getMessage());
+        return errorDTO;
+    }
 
     @ExceptionHandler(BadCredentialsException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
