@@ -16,6 +16,16 @@ spring:
     properties:
       hibernate:
         format_sql: true
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            scope:
+              - email
+              - profile
 
 cloudinary:
   api:
@@ -31,6 +41,9 @@ app:
       seconds: 3600
   cors:
     allowed-origins: http://localhost:3000,http://localhost:3001
+  oauth2:
+      redirect-uri: http://localhost:3001/oauth2/redirect
+      error-uri: http://localhost:3001/login
 
 payment:
   vnpay:

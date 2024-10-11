@@ -1,6 +1,9 @@
 package com.xdpsx.onlineshop.configs;
 
 import com.nimbusds.jose.JWSAlgorithm;
+import com.xdpsx.onlineshop.security.oauth2.CustomAuthenticationSuccessHandler;
+import com.xdpsx.onlineshop.security.oauth2.CustomOAuth2FailureHandler;
+import com.xdpsx.onlineshop.security.oauth2.CustomOAuth2UserService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -49,7 +52,10 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(
             HttpSecurity http,
-            AuthenticationEntryPoint authenticationEntryPoint
+            AuthenticationEntryPoint authenticationEntryPoint,
+            CustomOAuth2UserService customOAuth2UserService,
+            CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler,
+            CustomOAuth2FailureHandler customOAuth2FailureHandler
     ) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
@@ -80,6 +86,11 @@ public class SecurityConfig {
                         .authenticationEntryPoint(authenticationEntryPoint)
 
         );
+        http.oauth2Login(oauth2 -> oauth2
+                .loginPage("/auth/nopage")
+                .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
+                .successHandler(customAuthenticationSuccessHandler)
+                .failureHandler(customOAuth2FailureHandler));
         return http.build();
     }
 

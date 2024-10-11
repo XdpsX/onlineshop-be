@@ -2,6 +2,7 @@ package com.xdpsx.onlineshop.mappers;
 
 import com.xdpsx.onlineshop.dtos.user.UserProfile;
 import com.xdpsx.onlineshop.entities.User;
+import com.xdpsx.onlineshop.entities.enums.AuthProvider;
 import com.xdpsx.onlineshop.utils.CloudinaryUploader;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -17,7 +18,11 @@ public abstract class UserMapper {
 
     public UserProfile fromEntityToProfile(User entity){
         UserProfile response = buildUserProfile(entity);
-        response.setAvatarUrl(uploader.getFileUrl(entity.getAvatar()));
+        if (entity.getAuthProvider().equals(AuthProvider.LOCAL)){
+            response.setAvatarUrl(uploader.getFileUrl(entity.getAvatar()));
+        }else {
+            response.setAvatarUrl(entity.getAvatar());
+        }
         response.setRole(entity.getRole().name());
         return response;
     }
