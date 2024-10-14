@@ -17,11 +17,14 @@ import com.xdpsx.onlineshop.repositories.CartItemRepository;
 import com.xdpsx.onlineshop.repositories.OrderRepository;
 import com.xdpsx.onlineshop.repositories.PaymentRepository;
 import com.xdpsx.onlineshop.repositories.UserRepository;
+import com.xdpsx.onlineshop.repositories.specs.OrderSpecification;
 import com.xdpsx.onlineshop.services.OrderService;
 import com.xdpsx.onlineshop.services.PaymentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -137,6 +140,35 @@ public class OrderServiceImpl implements OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order with id=%s not found".formatted(orderId)));
         return orderMapper.fromEntityToDetails(order);
+    }
+
+    @Override
+    public PageResponse<OrderDTO> getAllOrders(int pageNum, int pageSize, OrderStatus orderStatus, PaymentStatus paymentStatus) {
+        Pageable pageable = PageRequest.of(pageNum-1, pageSize);
+        Specification<Order> spec = OrderSpecification.withStatusAndPaymentStatus(orderStatus, paymentStatus);
+        Page<Order> orderPage = orderRepository.findAll(spec, pageable);
+        List<OrderDTO> responses = orderPage.getContent().stream()
+                .map(this::convertToDTO)
+                .toList();
+        return PageResponse.<OrderDTO>builder()
+                .items(responses)
+                .pageNum(orderPage.getNumber() + 1)
+                .pageSize(orderPage.getSize())
+                .totalItems(orderPage.getTotalElements())
+                .totalPages(orderPage.getTotalPages())
+                .build();
+    }
+
+    @Override
+    public OrderDTO updateOrderStatus(Long id, OrderStatusUpdate request) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Order with id=%s not found".formatted(id)));
+        order.setStatus(request.getStatus());
+        if (request.getStatus().equals(OrderStatus.DELIVERED)){
+            order.setDeliveredAt(LocalDateTime.now());
+        }
+        Order savedOrder = orderRepository.save(order);
+        return convertToDTO(savedOrder);
     }
 
     @Override

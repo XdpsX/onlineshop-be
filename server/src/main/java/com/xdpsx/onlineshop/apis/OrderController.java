@@ -1,10 +1,9 @@
 package com.xdpsx.onlineshop.apis;
 
 import com.xdpsx.onlineshop.dtos.common.PageResponse;
-import com.xdpsx.onlineshop.dtos.order.OrderDTO;
-import com.xdpsx.onlineshop.dtos.order.OrderDetailsDTO;
-import com.xdpsx.onlineshop.dtos.order.OrderRequest;
-import com.xdpsx.onlineshop.dtos.order.OrderResponse;
+import com.xdpsx.onlineshop.dtos.order.*;
+import com.xdpsx.onlineshop.entities.enums.OrderStatus;
+import com.xdpsx.onlineshop.entities.enums.PaymentStatus;
 import com.xdpsx.onlineshop.services.OrderService;
 import com.xdpsx.onlineshop.utils.RequestUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -57,6 +56,23 @@ public class OrderController {
     @GetMapping("/{orderId}")
     public ResponseEntity<OrderDetailsDTO> getOrderById(@PathVariable Long orderId){
         OrderDetailsDTO response = orderService.getOrderById(orderId);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping
+    public ResponseEntity<PageResponse<OrderDTO>> getPageOrders(
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "5") int pageSize,
+            @RequestParam(required = false) OrderStatus orderStatus,
+            @RequestParam(required = false) PaymentStatus paymentStatus
+    ){
+        PageResponse<OrderDTO> response = orderService.getAllOrders(pageNum, pageSize, orderStatus, paymentStatus);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<OrderDTO> updateOrderStatus(@PathVariable Long id, @Valid @RequestBody OrderStatusUpdate request){
+        OrderDTO response = orderService.updateOrderStatus(id, request);
         return ResponseEntity.ok(response);
     }
 }

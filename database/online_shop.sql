@@ -90,6 +90,7 @@ CREATE TABLE orders (
     description VARCHAR(500),
     total_amount DECIMAL(20, 2),
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP,
     delivered_at TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 );

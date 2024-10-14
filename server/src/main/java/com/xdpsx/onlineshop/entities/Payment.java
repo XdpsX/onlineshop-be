@@ -5,7 +5,6 @@ import com.xdpsx.onlineshop.entities.enums.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Setter @Getter
