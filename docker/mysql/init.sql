@@ -1,0 +1,4 @@
+CREATE DATABASE onlineshop;
+
+GRANT ALL PRIVILEGES ON onlineshop.* TO 'xdpsx'@'%';
+FLUSH PRIVILEGES;
