@@ -1,8 +1,7 @@
-package com.xdpsx.onlineshop.apis;
+package com.xdpsx.onlineshop.controllers;
 
 import com.xdpsx.onlineshop.dtos.cart.CartItemRequest;
 import com.xdpsx.onlineshop.dtos.cart.CartItemResponse;
-import com.xdpsx.onlineshop.dtos.common.PageResponse;
 import com.xdpsx.onlineshop.services.CartService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

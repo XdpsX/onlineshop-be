@@ -1,4 +1,4 @@
-package com.xdpsx.onlineshop.apis;
+package com.xdpsx.onlineshop.controllers;
 
 import com.xdpsx.onlineshop.dtos.user.UserProfile;
 import com.xdpsx.onlineshop.services.UserService;

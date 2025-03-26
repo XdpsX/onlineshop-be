@@ -1,4 +1,4 @@
-package com.xdpsx.onlineshop.apis;
+package com.xdpsx.onlineshop.controllers;
 
 import com.xdpsx.onlineshop.dtos.brand.BrandRequest;
 import com.xdpsx.onlineshop.dtos.brand.BrandResponse;
