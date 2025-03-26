@@ -1,15 +1,26 @@
 package com.xdpsx.onlineshop.services.impl;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.xdpsx.onlineshop.dtos.common.PageResponse;
 import com.xdpsx.onlineshop.dtos.order.*;
 import com.xdpsx.onlineshop.dtos.payment.InitPaymentRequest;
 import com.xdpsx.onlineshop.dtos.payment.InitPaymentResponse;
-import com.xdpsx.onlineshop.dtos.product.ProductResponse;
 import com.xdpsx.onlineshop.entities.*;
 import com.xdpsx.onlineshop.entities.enums.OrderStatus;
 import com.xdpsx.onlineshop.entities.enums.PaymentMethod;
 import com.xdpsx.onlineshop.entities.enums.PaymentStatus;
-import com.xdpsx.onlineshop.entities.enums.Role;
 import com.xdpsx.onlineshop.exceptions.BadRequestException;
 import com.xdpsx.onlineshop.exceptions.ResourceNotFoundException;
 import com.xdpsx.onlineshop.mappers.OrderMapper;
@@ -20,19 +31,8 @@ import com.xdpsx.onlineshop.repositories.UserRepository;
 import com.xdpsx.onlineshop.repositories.specs.OrderSpecification;
 import com.xdpsx.onlineshop.services.OrderService;
 import com.xdpsx.onlineshop.services.PaymentService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -49,7 +49,7 @@ public class OrderServiceImpl implements OrderService {
     public OrderResponse placeOrder(String userEmail, OrderRequest orderRequest) {
         User user = getUser(userEmail);
         List<CartItem> cartItems = cartItemRepository.findInStockCartByUserId(user.getId());
-        if (cartItems.isEmpty()){
+        if (cartItems.isEmpty()) {
             throw new BadRequestException("Cart item is empty");
         }
         Order order = orderMapper.fromRequestToEntity(orderRequest);
@@ -62,9 +62,9 @@ public class OrderServiceImpl implements OrderService {
                     .build();
             order.getItems().add(orderItem);
             BigDecimal total;
-            if (item.getProduct().getDiscountPercent() > 0){
+            if (item.getProduct().getDiscountPercent() > 0) {
                 total = item.getProduct().getDiscountedPrice().multiply(BigDecimal.valueOf(item.getQuantity()));
-            }else {
+            } else {
                 total = item.getProduct().getPrice().multiply(BigDecimal.valueOf(item.getQuantity()));
             }
             totalAmount = totalAmount.add(total);
@@ -74,15 +74,13 @@ public class OrderServiceImpl implements OrderService {
         order.setStatus(OrderStatus.PENDING);
         order.setTotalAmount(totalAmount);
 
-        Payment payment = Payment.builder()
-                .status(PaymentStatus.UNPAID)
-                .order(order)
-                .build();
+        Payment payment =
+                Payment.builder().status(PaymentStatus.UNPAID).order(order).build();
         order.setPayment(payment);
 
         Order savedOrder = orderRepository.save(order);
 
-//        cartItemRepository.deleteInStockCartByUserId(user.getId());
+        //        cartItemRepository.deleteInStockCartByUserId(user.getId());
 
         var initPaymentRequest = InitPaymentRequest.builder()
                 .userId(savedOrder.getUser().getId())
@@ -103,9 +101,10 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public void payment(String userEmail, long orderId) {
         User user = getUser(userEmail);
-        Order order = orderRepository.findById(orderId)
+        Order order = orderRepository
+                .findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order id=%s not found".formatted(orderId)));
-        if (!user.getId().equals(order.getUser().getId())){
+        if (!user.getId().equals(order.getUser().getId())) {
             throw new BadRequestException("You are not authorized to pay this order");
         }
         Payment payment = order.getPayment();
@@ -119,12 +118,9 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public PageResponse<OrderDTO> getMyOrders(String userEmail, int pageNum, int pageSize) {
         User user = getUser(userEmail);
-        Page<Order> orderPage = orderRepository.findByUser(
-                user.getId(),
-                PageRequest.of(pageNum-1, pageSize));
-        List<OrderDTO> responses = orderPage.getContent().stream()
-                .map(this::convertToDTO)
-                .toList();
+        Page<Order> orderPage = orderRepository.findByUser(user.getId(), PageRequest.of(pageNum - 1, pageSize));
+        List<OrderDTO> responses =
+                orderPage.getContent().stream().map(this::convertToDTO).toList();
         return PageResponse.<OrderDTO>builder()
                 .items(responses)
                 .pageNum(orderPage.getNumber() + 1)
@@ -137,19 +133,20 @@ public class OrderServiceImpl implements OrderService {
     @PreAuthorize("hasRole('ADMIN')")
     @Override
     public OrderDetailsDTO getOrderById(Long orderId) {
-        Order order = orderRepository.findById(orderId)
+        Order order = orderRepository
+                .findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order with id=%s not found".formatted(orderId)));
         return orderMapper.fromEntityToDetails(order);
     }
 
     @Override
-    public PageResponse<OrderDTO> getAllOrders(int pageNum, int pageSize, OrderStatus orderStatus, PaymentStatus paymentStatus) {
-        Pageable pageable = PageRequest.of(pageNum-1, pageSize);
+    public PageResponse<OrderDTO> getAllOrders(
+            int pageNum, int pageSize, OrderStatus orderStatus, PaymentStatus paymentStatus) {
+        Pageable pageable = PageRequest.of(pageNum - 1, pageSize);
         Specification<Order> spec = OrderSpecification.withStatusAndPaymentStatus(orderStatus, paymentStatus);
         Page<Order> orderPage = orderRepository.findAll(spec, pageable);
-        List<OrderDTO> responses = orderPage.getContent().stream()
-                .map(this::convertToDTO)
-                .toList();
+        List<OrderDTO> responses =
+                orderPage.getContent().stream().map(this::convertToDTO).toList();
         return PageResponse.<OrderDTO>builder()
                 .items(responses)
                 .pageNum(orderPage.getNumber() + 1)
@@ -161,10 +158,11 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderDTO updateOrderStatus(Long id, OrderStatusUpdate request) {
-        Order order = orderRepository.findById(id)
+        Order order = orderRepository
+                .findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Order with id=%s not found".formatted(id)));
         order.setStatus(request.getStatus());
-        if (request.getStatus().equals(OrderStatus.DELIVERED)){
+        if (request.getStatus().equals(OrderStatus.DELIVERED)) {
             order.setDeliveredAt(LocalDateTime.now());
         }
         Order savedOrder = orderRepository.save(order);
@@ -174,13 +172,16 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderDetailsDTO getOrderByTrackingNumber(String name, String trackingNumber) {
         User user = getUser(name);
-        Order order = orderRepository.findByUserIdAndTrackingNumber(user.getId(), trackingNumber)
-                .orElseThrow(() -> new ResourceNotFoundException("Order with tracking number=%s not found".formatted(trackingNumber)));
+        Order order = orderRepository
+                .findByUserIdAndTrackingNumber(user.getId(), trackingNumber)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Order with tracking number=%s not found".formatted(trackingNumber)));
         return orderMapper.fromEntityToDetails(order);
     }
 
     private User getUser(String userEmail) {
-        return userRepository.findByEmail(userEmail)
+        return userRepository
+                .findByEmail(userEmail)
                 .orElseThrow(() -> new ResourceNotFoundException("User with email=%s not found".formatted(userEmail)));
     }
 
@@ -198,34 +199,35 @@ public class OrderServiceImpl implements OrderService {
                 .build();
     }
 
-//    private OrderDetailsDTO convertToOrderDetails(Order order) {
-//        if (order == null) {
-//            return null;
-//        }
-//
-//        List<OrderItemResponse> items = order.getItems().stream()
-//                .map(orderItem -> OrderItemResponse.builder()
-//                        .id(orderItem.getId())
-//                        .product(ProductResponse.builder()
-//                                .id(orderItem.getProduct().getId())
-//                                .name(orderItem.getProduct().getName())
-//                                .price(orderItem.getProduct().getPrice())
-//                                .build())
-//                        .quantity(orderItem.getQuantity())
-//                        .build())
-//                .collect(Collectors.toList());
-//
-//        return OrderDetailsDTO.builder()
-//                .id(order.getId())
-//                .trackingNumber(order.getTrackingNumber())
-//                .status(order.getStatus().name()) // Chuyển đổi enum thành String
-//                .total(order.getTotalAmount())
-//                .address(order.getAddress())
-//                .mobileNumber(order.getMobileNumber())
-//                .paymentStatus(order.getPayment() != null ? order.getPayment().getStatus().name() : null) // Kiểm tra null
-//                .createdAt(order.getCreatedAt())
-//                .deliveredAt(order.getDeliveredAt())
-//                .items(items)
-//                .build();
-//    }
+    //    private OrderDetailsDTO convertToOrderDetails(Order order) {
+    //        if (order == null) {
+    //            return null;
+    //        }
+    //
+    //        List<OrderItemResponse> items = order.getItems().stream()
+    //                .map(orderItem -> OrderItemResponse.builder()
+    //                        .id(orderItem.getId())
+    //                        .product(ProductResponse.builder()
+    //                                .id(orderItem.getProduct().getId())
+    //                                .name(orderItem.getProduct().getName())
+    //                                .price(orderItem.getProduct().getPrice())
+    //                                .build())
+    //                        .quantity(orderItem.getQuantity())
+    //                        .build())
+    //                .collect(Collectors.toList());
+    //
+    //        return OrderDetailsDTO.builder()
+    //                .id(order.getId())
+    //                .trackingNumber(order.getTrackingNumber())
+    //                .status(order.getStatus().name()) // Chuyển đổi enum thành String
+    //                .total(order.getTotalAmount())
+    //                .address(order.getAddress())
+    //                .mobileNumber(order.getMobileNumber())
+    //                .paymentStatus(order.getPayment() != null ? order.getPayment().getStatus().name() : null) // Kiểm
+    // tra null
+    //                .createdAt(order.getCreatedAt())
+    //                .deliveredAt(order.getDeliveredAt())
+    //                .items(items)
+    //                .build();
+    //    }
 }

@@ -1,19 +1,25 @@
 package com.xdpsx.onlineshop.entities;
 
-import com.xdpsx.onlineshop.entities.enums.OrderStatus;
-import jakarta.persistence.*;
-import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Setter @Getter
-@NoArgsConstructor @AllArgsConstructor @Builder
+import jakarta.persistence.*;
+
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import com.xdpsx.onlineshop.entities.enums.OrderStatus;
+
+import lombok.*;
+
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "orders")
 @EntityListeners(AuditingEntityListener.class)
@@ -25,7 +31,9 @@ public class Order {
     @Column(nullable = false, unique = true)
     private String trackingNumber;
 
-    @OneToMany(mappedBy = "order", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+    @OneToMany(
+            mappedBy = "order",
+            cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     @Builder.Default
     private List<OrderItem> items = new ArrayList<>();
 
@@ -56,6 +64,6 @@ public class Order {
 
     private LocalDateTime deliveredAt;
 
-    @OneToOne(mappedBy = "order",cascade = CascadeType.PERSIST)
+    @OneToOne(mappedBy = "order", cascade = CascadeType.PERSIST)
     private Payment payment;
 }

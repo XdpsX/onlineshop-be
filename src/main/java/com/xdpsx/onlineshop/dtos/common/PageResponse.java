@@ -1,10 +1,14 @@
 package com.xdpsx.onlineshop.dtos.common;
 
-import lombok.*;
-
 import java.util.Collection;
 
-@Setter @Getter @NoArgsConstructor @AllArgsConstructor @Builder
+import lombok.*;
+
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class PageResponse<T> {
     private Collection<T> items;
     private int pageNum;

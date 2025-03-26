@@ -1,15 +1,22 @@
 package com.xdpsx.onlineshop.entities;
 
-import com.xdpsx.onlineshop.entities.ids.CartItemId;
 import jakarta.persistence.*;
-import lombok.*;
+
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-@Getter @Setter
-@NoArgsConstructor @AllArgsConstructor @Builder
-@Entity @Table(name = "cart_items")
+import com.xdpsx.onlineshop.entities.ids.CartItemId;
+
+import lombok.*;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Entity
+@Table(name = "cart_items")
 @EntityListeners(AuditingEntityListener.class)
-public class CartItem extends AuditEntity{
+public class CartItem extends AuditEntity {
     @EmbeddedId
     private CartItemId id;
 

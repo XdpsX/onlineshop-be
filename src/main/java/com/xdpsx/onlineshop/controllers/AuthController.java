@@ -1,13 +1,16 @@
 package com.xdpsx.onlineshop.controllers;
 
+import jakarta.validation.Valid;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
 import com.xdpsx.onlineshop.dtos.auth.LoginRequest;
 import com.xdpsx.onlineshop.dtos.auth.RegisterRequest;
 import com.xdpsx.onlineshop.dtos.auth.TokenResponse;
 import com.xdpsx.onlineshop.services.AuthService;
-import jakarta.validation.Valid;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
@@ -15,8 +18,8 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
     private final AuthService authService;
 
-//    @Value("${app.oauth2.error-uri}")
-//    private String ERROR_URL;
+    //    @Value("${app.oauth2.error-uri}")
+    //    private String ERROR_URL;
 
     @PostMapping("/register")
     public ResponseEntity<TokenResponse> register(@Valid @RequestBody RegisterRequest request) {
@@ -30,8 +33,8 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
-//    @GetMapping("/nopage")
-//    public void nopageRedirect(HttpServletResponse response) throws IOException {
-//        response.sendRedirect(ERROR_URL);
-//    }
+    //    @GetMapping("/nopage")
+    //    public void nopageRedirect(HttpServletResponse response) throws IOException {
+    //        response.sendRedirect(ERROR_URL);
+    //    }
 }

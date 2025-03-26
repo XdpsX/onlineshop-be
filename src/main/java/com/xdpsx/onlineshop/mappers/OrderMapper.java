@@ -1,15 +1,16 @@
 package com.xdpsx.onlineshop.mappers;
 
+import java.util.List;
+
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.xdpsx.onlineshop.dtos.order.OrderDetailsDTO;
 import com.xdpsx.onlineshop.dtos.order.OrderItemResponse;
 import com.xdpsx.onlineshop.dtos.order.OrderRequest;
 import com.xdpsx.onlineshop.entities.Order;
 import com.xdpsx.onlineshop.entities.Product;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.List;
 
 @Mapper(componentModel = "spring")
 public abstract class OrderMapper {
@@ -28,15 +29,15 @@ public abstract class OrderMapper {
     public OrderDetailsDTO fromEntityToDetails(Order entity) {
         OrderDetailsDTO dto = toDetails(entity);
         List<OrderItemResponse> items = entity.getItems().stream()
-            .map(orderItem -> {
-                Product product = orderItem.getProduct();
-                return OrderItemResponse.builder()
-                        .id(orderItem.getId())
-                        .product(productMapper.fromEntityToResponse(product))
-                        .quantity(orderItem.getQuantity())
-                        .build();
-            })
-            .toList();
+                .map(orderItem -> {
+                    Product product = orderItem.getProduct();
+                    return OrderItemResponse.builder()
+                            .id(orderItem.getId())
+                            .product(productMapper.fromEntityToResponse(product))
+                            .quantity(orderItem.getQuantity())
+                            .build();
+                })
+                .toList();
         dto.setItems(items);
         return dto;
     }

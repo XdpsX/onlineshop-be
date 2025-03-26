@@ -1,13 +1,15 @@
 package com.xdpsx.onlineshop.dtos.product;
 
+import java.math.BigDecimal;
+
 import com.xdpsx.onlineshop.dtos.brand.BrandNoCatsDTO;
 import com.xdpsx.onlineshop.dtos.category.CategoryResponse;
+
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
 
-import java.math.BigDecimal;
-
-@Data @SuperBuilder
+@Data
+@SuperBuilder
 public class ProductResponse {
     private Long id;
     private String name;

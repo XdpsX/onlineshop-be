@@ -1,4 +1,3 @@
 package com.xdpsx.onlineshop.validations;
 
-public interface OnCreate {
-}
+public interface OnCreate {}

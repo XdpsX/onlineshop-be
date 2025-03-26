@@ -1,9 +1,12 @@
 package com.xdpsx.onlineshop.configs;
 
-import com.nimbusds.jose.JWSAlgorithm;
-import com.xdpsx.onlineshop.security.oauth2.CustomAuthenticationSuccessHandler;
-import com.xdpsx.onlineshop.security.oauth2.CustomOAuth2FailureHandler;
-import com.xdpsx.onlineshop.security.oauth2.CustomOAuth2UserService;
+import static com.xdpsx.onlineshop.constants.SecurityConstants.PUBLIC_ENDPOINTS;
+import static com.xdpsx.onlineshop.constants.SecurityConstants.PUBLIC_GET_ENDPOINTS;
+
+import java.util.Collections;
+import java.util.List;
+import javax.crypto.spec.SecretKeySpec;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,13 +33,10 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 
-import javax.crypto.spec.SecretKeySpec;
-
-import java.util.Collections;
-import java.util.List;
-
-import static com.xdpsx.onlineshop.constants.SecurityConstants.PUBLIC_ENDPOINTS;
-import static com.xdpsx.onlineshop.constants.SecurityConstants.PUBLIC_GET_ENDPOINTS;
+import com.nimbusds.jose.JWSAlgorithm;
+import com.xdpsx.onlineshop.security.oauth2.CustomAuthenticationSuccessHandler;
+import com.xdpsx.onlineshop.security.oauth2.CustomOAuth2FailureHandler;
+import com.xdpsx.onlineshop.security.oauth2.CustomOAuth2UserService;
 
 @Configuration
 @EnableWebSecurity
@@ -55,10 +55,9 @@ public class SecurityConfig {
             AuthenticationEntryPoint authenticationEntryPoint,
             CustomOAuth2UserService customOAuth2UserService,
             CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler,
-            CustomOAuth2FailureHandler customOAuth2FailureHandler
-    ) throws Exception {
-        http
-                .csrf(AbstractHttpConfigurer::disable)
+            CustomOAuth2FailureHandler customOAuth2FailureHandler)
+            throws Exception {
+        http.csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(request -> {
                     CorsConfiguration config = new CorsConfiguration();
                     config.setAllowedOrigins(allowedOrigins);
@@ -69,25 +68,18 @@ public class SecurityConfig {
                     config.setMaxAge(3600L);
                     return config;
                 }));
-        http.sessionManagement(session -> session
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-        );
-        http.authorizeHttpRequests(request -> request
-                .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
-                .requestMatchers(HttpMethod.GET, PUBLIC_GET_ENDPOINTS).permitAll()
-                .anyRequest().authenticated()
-        );
-        http.oauth2ResourceServer(oauth2 ->
-                oauth2
-                        .jwt(config -> config
-                                .decoder(jwtDecoder())
-                                .jwtAuthenticationConverter(jwtAuthenticationConverter())
-                        )
-                        .authenticationEntryPoint(authenticationEntryPoint)
+        http.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        http.authorizeHttpRequests(request -> request.requestMatchers(PUBLIC_ENDPOINTS)
+                .permitAll()
+                .requestMatchers(HttpMethod.GET, PUBLIC_GET_ENDPOINTS)
+                .permitAll()
+                .anyRequest()
+                .authenticated());
+        http.oauth2ResourceServer(oauth2 -> oauth2.jwt(
+                        config -> config.decoder(jwtDecoder()).jwtAuthenticationConverter(jwtAuthenticationConverter()))
+                .authenticationEntryPoint(authenticationEntryPoint));
 
-        );
-        http.oauth2Login(oauth2 -> oauth2
-                .loginPage("/auth/nopage")
+        http.oauth2Login(oauth2 -> oauth2.loginPage("/auth/nopage")
                 .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
                 .successHandler(customAuthenticationSuccessHandler)
                 .failureHandler(customOAuth2FailureHandler));
@@ -100,16 +92,15 @@ public class SecurityConfig {
     }
 
     @Bean
-    public JwtDecoder jwtDecoder(){
+    public JwtDecoder jwtDecoder() {
         SecretKeySpec secretKeySpec = new SecretKeySpec(SECRET_KEY.getBytes(), JWSAlgorithm.HS256.getName());
-        return NimbusJwtDecoder
-                .withSecretKey(secretKeySpec)
+        return NimbusJwtDecoder.withSecretKey(secretKeySpec)
                 .macAlgorithm(MacAlgorithm.HS256)
                 .build();
     }
 
     @Bean
-    public JwtAuthenticationConverter jwtAuthenticationConverter(){
+    public JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
         jwtGrantedAuthoritiesConverter.setAuthorityPrefix("");
 
@@ -130,5 +121,4 @@ public class SecurityConfig {
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }
-
 }

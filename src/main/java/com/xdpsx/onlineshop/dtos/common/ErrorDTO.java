@@ -2,7 +2,9 @@ package com.xdpsx.onlineshop.dtos.common;
 
 import lombok.*;
 
-@Setter @Getter @NoArgsConstructor
+@Setter
+@Getter
+@NoArgsConstructor
 public class ErrorDTO {
     private int status;
     private String message;

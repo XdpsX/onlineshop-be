@@ -1,10 +1,11 @@
 package com.xdpsx.onlineshop.entities.ids;
 
-import jakarta.persistence.Embeddable;
-import lombok.*;
-
 import java.io.Serializable;
 import java.util.Objects;
+
+import jakarta.persistence.Embeddable;
+
+import lombok.*;
 
 @Setter
 @Getter

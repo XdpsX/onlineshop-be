@@ -1,14 +1,15 @@
 package com.xdpsx.onlineshop.security.oauth2;
 
-import com.xdpsx.onlineshop.entities.enums.AuthProvider;
-import com.xdpsx.onlineshop.entities.enums.Role;
-import com.xdpsx.onlineshop.security.CustomUserDetails;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
+import com.xdpsx.onlineshop.entities.enums.AuthProvider;
+import com.xdpsx.onlineshop.entities.enums.Role;
+import com.xdpsx.onlineshop.security.CustomUserDetails;
+
 @Service
-public class GoogleOAuth2UserInfoExtractor implements OAuth2UserInfoExtractor{
+public class GoogleOAuth2UserInfoExtractor implements OAuth2UserInfoExtractor {
     @Override
     public CustomUserDetails extractUserInfo(OAuth2User oAuth2User) {
         CustomUserDetails customUserDetails = new CustomUserDetails();
@@ -22,7 +23,9 @@ public class GoogleOAuth2UserInfoExtractor implements OAuth2UserInfoExtractor{
 
     @Override
     public boolean accepts(OAuth2UserRequest userRequest) {
-        return AuthProvider.GOOGLE.name().equalsIgnoreCase(userRequest.getClientRegistration().getRegistrationId());
+        return AuthProvider.GOOGLE
+                .name()
+                .equalsIgnoreCase(userRequest.getClientRegistration().getRegistrationId());
     }
 
     private String retrieveAttr(String attr, OAuth2User oAuth2User) {

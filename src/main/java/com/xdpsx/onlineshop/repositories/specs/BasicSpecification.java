@@ -1,12 +1,13 @@
 package com.xdpsx.onlineshop.repositories.specs;
 
+import static com.xdpsx.onlineshop.constants.FieldConstants.*;
+
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
+
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
-
-import static com.xdpsx.onlineshop.constants.FieldConstants.*;
 
 @Component
 public class BasicSpecification<T> {
@@ -26,7 +27,6 @@ public class BasicSpecification<T> {
                 yield sortByDate(asc);
             default:
                 yield sortByDate(false);
-
         };
     }
 
@@ -41,10 +41,12 @@ public class BasicSpecification<T> {
 
     protected Specification<T> sortByDate(boolean asc) {
         return (root, query, criteriaBuilder) -> {
-            if (asc){
-                query.orderBy(criteriaBuilder.asc(criteriaBuilder.coalesce(root.get("updatedAt"), root.get("createdAt"))));
-            }else {
-                query.orderBy(criteriaBuilder.desc(criteriaBuilder.coalesce(root.get("updatedAt"), root.get("createdAt"))));
+            if (asc) {
+                query.orderBy(
+                        criteriaBuilder.asc(criteriaBuilder.coalesce(root.get("updatedAt"), root.get("createdAt"))));
+            } else {
+                query.orderBy(
+                        criteriaBuilder.desc(criteriaBuilder.coalesce(root.get("updatedAt"), root.get("createdAt"))));
             }
             return criteriaBuilder.conjunction();
         };
@@ -52,13 +54,12 @@ public class BasicSpecification<T> {
 
     protected Specification<T> sortByName(boolean asc) {
         return (root, query, criteriaBuilder) -> {
-            if (asc){
+            if (asc) {
                 query.orderBy(criteriaBuilder.asc(root.get("name")));
-            }else {
+            } else {
                 query.orderBy(criteriaBuilder.desc(root.get("name")));
             }
             return criteriaBuilder.conjunction();
         };
     }
-
 }

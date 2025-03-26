@@ -1,11 +1,11 @@
 package com.xdpsx.onlineshop.validations;
 
-import jakarta.validation.ConstraintValidator;
-import jakarta.validation.ConstraintValidatorContext;
-
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 public class SortValidator implements ConstraintValidator<SortConstraint, String> {
     private Set<String> validFields;
@@ -19,14 +19,15 @@ public class SortValidator implements ConstraintValidator<SortConstraint, String
     @Override
     public boolean isValid(String value, ConstraintValidatorContext context) {
         String actualField = value;
-        if (value.startsWith("-")){
+        if (value.startsWith("-")) {
             actualField = value.substring(1);
         }
 
         if (!validFields.contains(actualField)) {
             String message = String.join(", ", validFields);
             context.disableDefaultConstraintViolation();
-            context.buildConstraintViolationWithTemplate("Invalid sort field. Accept: " + message).addConstraintViolation();
+            context.buildConstraintViolationWithTemplate("Invalid sort field. Accept: " + message)
+                    .addConstraintViolation();
             return false;
         }
         return true;

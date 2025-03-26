@@ -1,10 +1,11 @@
 package com.xdpsx.onlineshop.mappers;
 
-import com.xdpsx.onlineshop.dtos.cart.CartItemResponse;
-import com.xdpsx.onlineshop.entities.CartItem;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import com.xdpsx.onlineshop.dtos.cart.CartItemResponse;
+import com.xdpsx.onlineshop.entities.CartItem;
 
 @Mapper(componentModel = "spring")
 public abstract class CartItemMapper {

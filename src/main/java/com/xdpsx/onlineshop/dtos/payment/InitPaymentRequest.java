@@ -1,11 +1,12 @@
 package com.xdpsx.onlineshop.dtos.payment;
 
+import java.math.BigDecimal;
+
 import lombok.Builder;
 import lombok.Data;
 
-import java.math.BigDecimal;
-
-@Data @Builder
+@Data
+@Builder
 public class InitPaymentRequest {
     private String requestId;
 

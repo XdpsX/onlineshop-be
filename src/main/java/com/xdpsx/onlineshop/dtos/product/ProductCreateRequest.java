@@ -1,16 +1,22 @@
 package com.xdpsx.onlineshop.dtos.product;
 
-import com.xdpsx.onlineshop.validations.ImgConstraint;
-import jakarta.validation.constraints.*;
-import lombok.*;
-import org.springframework.web.multipart.MultipartFile;
+import static com.xdpsx.onlineshop.constants.FileConstants.*;
 
 import java.util.List;
 
-import static com.xdpsx.onlineshop.constants.FileConstants.*;
+import jakarta.validation.constraints.*;
 
-@Getter @Setter
-@NoArgsConstructor @AllArgsConstructor @Builder
+import org.springframework.web.multipart.MultipartFile;
+
+import com.xdpsx.onlineshop.validations.ImgConstraint;
+
+import lombok.*;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ProductCreateRequest {
     @NotBlank
     @Size(max = 255)
@@ -32,7 +38,7 @@ public class ProductCreateRequest {
 
     private boolean published;
 
-    @Size(max=4096)
+    @Size(max = 4096)
     private String description;
 
     @NotNull

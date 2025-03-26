@@ -1,21 +1,24 @@
 package com.xdpsx.onlineshop.controllers;
 
-import com.xdpsx.onlineshop.dtos.brand.BrandRequest;
-import com.xdpsx.onlineshop.dtos.brand.BrandResponse;
-import com.xdpsx.onlineshop.dtos.common.PageParams;
-import com.xdpsx.onlineshop.dtos.common.PageResponse;
-import com.xdpsx.onlineshop.services.BrandService;
-import com.xdpsx.onlineshop.validations.OnCreate;
+import java.util.Map;
+
 import jakarta.validation.Valid;
 import jakarta.validation.groups.Default;
-import lombok.RequiredArgsConstructor;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
+import com.xdpsx.onlineshop.dtos.brand.BrandRequest;
+import com.xdpsx.onlineshop.dtos.brand.BrandResponse;
+import com.xdpsx.onlineshop.dtos.common.PageParams;
+import com.xdpsx.onlineshop.dtos.common.PageResponse;
+import com.xdpsx.onlineshop.services.BrandService;
+import com.xdpsx.onlineshop.validations.OnCreate;
+
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/brands")
@@ -29,7 +32,7 @@ public class BrandController {
         return ResponseEntity.status(HttpStatus.OK).body(pageResponse);
     }
 
-    @PostMapping(path="/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(path = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<BrandResponse> createBrand(
             @Validated({OnCreate.class, Default.class}) @ModelAttribute BrandRequest request) {
         BrandResponse response = brandService.createBrand(request);
@@ -37,7 +40,8 @@ public class BrandController {
     }
 
     @PutMapping("/{id}/update")
-    public ResponseEntity<BrandResponse> updateBrand(@PathVariable Integer id, @Valid @ModelAttribute BrandRequest request) {
+    public ResponseEntity<BrandResponse> updateBrand(
+            @PathVariable Integer id, @Valid @ModelAttribute BrandRequest request) {
         BrandResponse response = brandService.updateBrand(id, request);
         return ResponseEntity.ok(response);
     }
@@ -49,9 +53,7 @@ public class BrandController {
     }
 
     @GetMapping("/exists")
-    public ResponseEntity<Map<String, Boolean>> checkExistsBrand(
-            @RequestParam String name
-    ){
+    public ResponseEntity<Map<String, Boolean>> checkExistsBrand(@RequestParam String name) {
         Map<String, Boolean> exists = brandService.checkExistsBrand(name);
         return ResponseEntity.ok(exists);
     }

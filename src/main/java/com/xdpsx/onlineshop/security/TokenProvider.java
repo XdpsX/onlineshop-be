@@ -1,17 +1,19 @@
 package com.xdpsx.onlineshop.security;
 
-import com.nimbusds.jose.*;
-import com.nimbusds.jose.crypto.MACSigner;
-import com.nimbusds.jwt.JWTClaimsSet;
-import com.xdpsx.onlineshop.entities.User;
-import lombok.extern.slf4j.Slf4j;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
-import java.time.Instant;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
+import com.nimbusds.jose.*;
+import com.nimbusds.jose.crypto.MACSigner;
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.xdpsx.onlineshop.entities.User;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
@@ -22,7 +24,7 @@ public class TokenProvider {
     @Value("${app.jwt.expiration.seconds}")
     private Long EXPIRATION_SECONDS;
 
-    public String generateToken(User user){
+    public String generateToken(User user) {
         CustomUserDetails userDetails = CustomUserDetails.buildFromUser(user);
         return generateToken(userDetails);
     }
@@ -33,10 +35,15 @@ public class TokenProvider {
                 .subject(user.getUsername())
                 .issuer("xdpsx.com")
                 .issueTime(new Date())
-                .expirationTime(new Date(
-                        Instant.now().plus(EXPIRATION_SECONDS, ChronoUnit.SECONDS).toEpochMilli()
-                ))
-                .claim("scope", user.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList().get(0))
+                .expirationTime(new Date(Instant.now()
+                        .plus(EXPIRATION_SECONDS, ChronoUnit.SECONDS)
+                        .toEpochMilli()))
+                .claim(
+                        "scope",
+                        user.getAuthorities().stream()
+                                .map(GrantedAuthority::getAuthority)
+                                .toList()
+                                .get(0))
                 .build();
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());
         JWSObject jwsObject = new JWSObject(header, payload);

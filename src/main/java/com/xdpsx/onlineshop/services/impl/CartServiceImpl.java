@@ -1,5 +1,9 @@
 package com.xdpsx.onlineshop.services.impl;
 
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
 import com.xdpsx.onlineshop.dtos.cart.CartItemRequest;
 import com.xdpsx.onlineshop.dtos.cart.CartItemResponse;
 import com.xdpsx.onlineshop.entities.CartItem;
@@ -12,10 +16,8 @@ import com.xdpsx.onlineshop.repositories.CartItemRepository;
 import com.xdpsx.onlineshop.repositories.ProductRepository;
 import com.xdpsx.onlineshop.repositories.UserRepository;
 import com.xdpsx.onlineshop.services.CartService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
-import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -30,8 +32,7 @@ public class CartServiceImpl implements CartService {
         User user = getUser(userEmail);
         Product product = getProduct(request);
         CartItemId cartItemId = new CartItemId(user.getId(), product.getId());
-        CartItem cartItem = cartItemRepository.findById(cartItemId)
-                .orElse(null);
+        CartItem cartItem = cartItemRepository.findById(cartItemId).orElse(null);
         if (cartItem == null) {
             CartItem newCartItem = CartItem.builder()
                     .id(cartItemId)
@@ -39,8 +40,8 @@ public class CartServiceImpl implements CartService {
                     .user(user)
                     .product(product)
                     .build();
-             return cartItemMapper.fromEntityToResponse(cartItemRepository.save(newCartItem));
-        }else {
+            return cartItemMapper.fromEntityToResponse(cartItemRepository.save(newCartItem));
+        } else {
             cartItem.setQuantity(cartItem.getQuantity() + request.getQuantity());
             return cartItemMapper.fromEntityToResponse(cartItemRepository.save(cartItem));
         }
@@ -49,16 +50,15 @@ public class CartServiceImpl implements CartService {
     @Override
     public void removeCartItem(String userEmail, Long productId) {
         User user = getUser(userEmail);
-        CartItemId cartItemId = CartItemId.builder()
-                .productId(productId)
-                .userId(user.getId())
-                .build();
+        CartItemId cartItemId =
+                CartItemId.builder().productId(productId).userId(user.getId()).build();
         CartItem cartItem = getCartItem(cartItemId);
         cartItemRepository.delete(cartItem);
     }
 
     private CartItem getCartItem(CartItemId cartItemId) {
-        return cartItemRepository.findById(cartItemId)
+        return cartItemRepository
+                .findById(cartItemId)
                 .orElseThrow(() -> new ResourceNotFoundException("Can not found Cart item"));
     }
 
@@ -66,9 +66,7 @@ public class CartServiceImpl implements CartService {
     public List<CartItemResponse> getCart(String userEmail) {
         User user = getUser(userEmail);
         List<CartItem> cartItems = cartItemRepository.findNewestByUserId(user.getId());
-        return cartItems.stream()
-                .map(cartItemMapper::fromEntityToResponse)
-                .toList();
+        return cartItems.stream().map(cartItemMapper::fromEntityToResponse).toList();
     }
 
     @Override
@@ -87,12 +85,15 @@ public class CartServiceImpl implements CartService {
     }
 
     private Product getProduct(CartItemRequest request) {
-        return productRepository.findProductById(request.getProductId())
-                .orElseThrow(() -> new ResourceNotFoundException("Product with id=%s not found!".formatted(request.getProductId())));
+        return productRepository
+                .findProductById(request.getProductId())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Product with id=%s not found!".formatted(request.getProductId())));
     }
 
     private User getUser(String userEmail) {
-        return userRepository.findByEmail(userEmail)
+        return userRepository
+                .findByEmail(userEmail)
                 .orElseThrow(() -> new ResourceNotFoundException("User with email=%s not found".formatted(userEmail)));
     }
 }

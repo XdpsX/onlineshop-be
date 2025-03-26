@@ -1,13 +1,14 @@
 package com.xdpsx.onlineshop.mappers;
 
-import com.xdpsx.onlineshop.dtos.product.*;
-import com.xdpsx.onlineshop.entities.Product;
-import com.xdpsx.onlineshop.utils.CloudinaryUploader;
+import java.util.ArrayList;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.ArrayList;
+import com.xdpsx.onlineshop.dtos.product.*;
+import com.xdpsx.onlineshop.entities.Product;
+import com.xdpsx.onlineshop.utils.CloudinaryUploader;
 
 @Mapper(componentModel = "spring")
 public abstract class ProductMapper {
@@ -31,14 +32,14 @@ public abstract class ProductMapper {
     }
 
     @Mapping(target = "mainImage", ignore = true)
-    @Mapping(source = "entity.images", target="images", ignore = true)
+    @Mapping(source = "entity.images", target = "images", ignore = true)
     protected abstract ProductDetailsDTO toDetailsDTO(Product entity);
 
     public ProductDetailsDTO fromEntityToDetailsDTO(Product entity) {
         ProductDetailsDTO dto = toDetailsDTO(entity);
         dto.setMainImage(uploader.getFileUrl(entity.getMainImage()));
         dto.setImages(new ArrayList<>());
-        for (var image: entity.getImages()) {
+        for (var image : entity.getImages()) {
             ProductImageDTO imageDTO = new ProductImageDTO(image.getId(), uploader.getFileUrl(image.getUrl()));
             dto.getImages().add(imageDTO);
         }

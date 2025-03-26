@@ -1,10 +1,14 @@
 package com.xdpsx.onlineshop.entities;
 
 import jakarta.persistence.*;
+
 import lombok.*;
 
-@Getter @Setter
-@NoArgsConstructor @AllArgsConstructor @Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "product_images")
 public class ProductImage {

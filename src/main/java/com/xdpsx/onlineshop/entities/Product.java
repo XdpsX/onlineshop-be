@@ -1,20 +1,25 @@
 package com.xdpsx.onlineshop.entities;
 
-import jakarta.persistence.*;
-import lombok.*;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
-@Getter @Setter
-@NoArgsConstructor @AllArgsConstructor @Builder
+import jakarta.persistence.*;
+
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import lombok.*;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "products")
 @EntityListeners(AuditingEntityListener.class)
-public class Product extends AuditEntity{
+public class Product extends AuditEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -48,7 +53,10 @@ public class Product extends AuditEntity{
     private Brand brand;
 
     @Builder.Default
-    @OneToMany(mappedBy = "product", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, orphanRemoval = true)
+    @OneToMany(
+            mappedBy = "product",
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE},
+            orphanRemoval = true)
     private List<ProductImage> images = new ArrayList<>();
 
     public BigDecimal getDiscountedPrice() {
@@ -56,7 +64,8 @@ public class Product extends AuditEntity{
             BigDecimal discountAmount = price.multiply(BigDecimal.valueOf(discountPercent / 100));
             BigDecimal discountedPrice = price.subtract(discountAmount);
 
-            return discountedPrice.divide(BigDecimal.valueOf(100000), 0, RoundingMode.HALF_UP)
+            return discountedPrice
+                    .divide(BigDecimal.valueOf(100000), 0, RoundingMode.HALF_UP)
                     .multiply(BigDecimal.valueOf(100000));
         }
         return null;

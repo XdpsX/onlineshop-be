@@ -1,5 +1,14 @@
 package com.xdpsx.onlineshop.controllers;
 
+import java.util.List;
+import java.util.Map;
+
+import jakarta.validation.Valid;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
 import com.xdpsx.onlineshop.dtos.brand.BrandNoCatsDTO;
 import com.xdpsx.onlineshop.dtos.category.CategoryRequest;
 import com.xdpsx.onlineshop.dtos.category.CategoryResponse;
@@ -9,14 +18,8 @@ import com.xdpsx.onlineshop.dtos.product.ProductResponse;
 import com.xdpsx.onlineshop.services.BrandService;
 import com.xdpsx.onlineshop.services.CategoryService;
 import com.xdpsx.onlineshop.services.ProductService;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Map;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/categories")
@@ -55,8 +58,7 @@ public class CategoryController {
 
     @PutMapping("/{id}/update")
     public ResponseEntity<CategoryResponse> updateCategory(
-            @PathVariable Integer id,
-            @Valid @RequestBody CategoryRequest request) {
+            @PathVariable Integer id, @Valid @RequestBody CategoryRequest request) {
         CategoryResponse updatedCategory = categoryService.updateCategory(id, request);
         return ResponseEntity.ok(updatedCategory);
     }
@@ -68,10 +70,7 @@ public class CategoryController {
     }
 
     @GetMapping("/exists")
-    public ResponseEntity<Map<String, Boolean>> checkExistsCat(
-            @RequestParam String name,
-            @RequestParam String slug
-    ){
+    public ResponseEntity<Map<String, Boolean>> checkExistsCat(@RequestParam String name, @RequestParam String slug) {
         Map<String, Boolean> exists = categoryService.checkExistsCat(name, slug);
         return ResponseEntity.ok(exists);
     }
@@ -84,12 +83,9 @@ public class CategoryController {
             @RequestParam(required = false) List<Integer> brandIds,
             @RequestParam(required = false) String sort,
             @RequestParam(required = false) Double minPrice,
-            @RequestParam(required = false) Double maxPrice
-    ) {
+            @RequestParam(required = false) Double maxPrice) {
         PageResponse<ProductResponse> response = productService.getProductsByCategoryId(
-                categoryId,
-                pageNum, pageSize, brandIds, sort, minPrice, maxPrice
-        );
+                categoryId, pageNum, pageSize, brandIds, sort, minPrice, maxPrice);
         return ResponseEntity.ok(response);
     }
 }

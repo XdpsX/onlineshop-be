@@ -1,5 +1,14 @@
 package com.xdpsx.onlineshop.services.impl;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
+
 import com.xdpsx.onlineshop.dtos.category.CategoryRequest;
 import com.xdpsx.onlineshop.dtos.category.CategoryResponse;
 import com.xdpsx.onlineshop.dtos.common.PageParams;
@@ -14,15 +23,8 @@ import com.xdpsx.onlineshop.repositories.CategoryRepository;
 import com.xdpsx.onlineshop.repositories.specs.BasicSpecification;
 import com.xdpsx.onlineshop.services.CategoryService;
 import com.xdpsx.onlineshop.utils.I18nUtils;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -36,19 +38,17 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public List<CategoryResponse> listAllCategories() {
-        return categoryRepository
-                .findAll(spec.getSortSpec("name"))
-                .stream()
+        return categoryRepository.findAll(spec.getSortSpec("name")).stream()
                 .map(categoryMapper::fromEntityToResponse)
                 .collect(Collectors.toList());
     }
 
     @Override
     public CategoryResponse createCategory(CategoryRequest request) {
-        if (categoryRepository.existsByName(request.getName())){
+        if (categoryRepository.existsByName(request.getName())) {
             throw new DuplicateException("Category with name=%s already exists".formatted(request.getName()));
         }
-        if (categoryRepository.existsBySlug(request.getSlug())){
+        if (categoryRepository.existsBySlug(request.getSlug())) {
             throw new DuplicateException("Category with slug=%s already exists".formatted(request.getSlug()));
         }
         Category category = categoryMapper.fromRequestToEntity(request);
@@ -58,20 +58,21 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryResponse updateCategory(Integer id, CategoryRequest request) {
-        Category existingCat = categoryRepository.findById(id)
+        Category existingCat = categoryRepository
+                .findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Category with id=%s not found".formatted(id)));
 
         // Update name
-        if (!existingCat.getName().equals(request.getName())){
-            if (categoryRepository.existsByName(request.getName())){
+        if (!existingCat.getName().equals(request.getName())) {
+            if (categoryRepository.existsByName(request.getName())) {
                 throw new DuplicateException("Category with name=%s already exists".formatted(request.getName()));
             }
             existingCat.setName(request.getName());
         }
 
         // Update slug
-        if (!existingCat.getSlug().equals(request.getSlug())){
-            if (categoryRepository.existsBySlug(request.getSlug())){
+        if (!existingCat.getSlug().equals(request.getSlug())) {
+            if (categoryRepository.existsBySlug(request.getSlug())) {
                 throw new DuplicateException("Category with slug=%s already exists".formatted(request.getSlug()));
             }
             existingCat.setSlug(request.getSlug());
@@ -83,10 +84,11 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void deleteCategory(Integer id) {
-        Category existingCat = categoryRepository.findById(id)
+        Category existingCat = categoryRepository
+                .findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Category with id=%s not found".formatted(id)));
         long countCategories = categoryRepository.countCategoriesInOtherTables(id);
-        if (countCategories > 0){
+        if (countCategories > 0) {
             throw new BadRequestException(i18nUtils.getCatCannotDeleteMsg(existingCat.getName()));
         }
         categoryRepository.delete(existingCat);
@@ -96,8 +98,7 @@ public class CategoryServiceImpl implements CategoryService {
     public PageResponse<CategoryResponse> listCategoriesByPage(PageParams params) {
         Page<Category> categoryPage = categoryRepository.findAll(
                 spec.getFiltersSpec(params.getSearch(), params.getSort()),
-                PageRequest.of(params.getPageNum() - 1, params.getPageSize())
-        );
+                PageRequest.of(params.getPageNum() - 1, params.getPageSize()));
         return pageMapper.toCategoryPageResponse(categoryPage);
     }
 
@@ -105,14 +106,16 @@ public class CategoryServiceImpl implements CategoryService {
     public Map<String, Boolean> checkExistsCat(String name, String slug) {
         Map<String, Boolean> exists = new HashMap<>();
         exists.put("nameExists", categoryRepository.existsByName(name));
-        exists.put("slugExists",categoryRepository.existsBySlug(slug));
+        exists.put("slugExists", categoryRepository.existsBySlug(slug));
         return exists;
     }
 
     @Override
     public CategoryResponse getCategoryBySlug(String categorySlug) {
-        Category category = categoryRepository.findBySlug(categorySlug)
-                .orElseThrow(() -> new ResourceNotFoundException("Category with slug=%s not found".formatted(categorySlug)));
+        Category category = categoryRepository
+                .findBySlug(categorySlug)
+                .orElseThrow(
+                        () -> new ResourceNotFoundException("Category with slug=%s not found".formatted(categorySlug)));
         return categoryMapper.fromEntityToResponse(category);
     }
 }

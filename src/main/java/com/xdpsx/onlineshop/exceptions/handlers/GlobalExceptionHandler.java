@@ -1,9 +1,10 @@
 package com.xdpsx.onlineshop.exceptions.handlers;
 
-import com.xdpsx.onlineshop.dtos.common.ErrorDTO;
-import com.xdpsx.onlineshop.dtos.common.ErrorDetails;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -13,8 +14,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import com.xdpsx.onlineshop.dtos.common.ErrorDTO;
+import com.xdpsx.onlineshop.dtos.common.ErrorDetails;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestControllerAdvice
@@ -22,7 +25,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AccessDeniedException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    public ErrorDTO handleAccessDenied(HttpServletRequest request, AccessDeniedException e){
+    public ErrorDTO handleAccessDenied(HttpServletRequest request, AccessDeniedException e) {
         log.error(e.getMessage(), e);
         ErrorDTO errorDTO = new ErrorDTO();
         errorDTO.setStatus(HttpStatus.FORBIDDEN.value());
@@ -32,7 +35,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BadCredentialsException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public ErrorDTO handleBadCredentials(HttpServletRequest request, BadCredentialsException e){
+    public ErrorDTO handleBadCredentials(HttpServletRequest request, BadCredentialsException e) {
         log.error(e.getMessage(), e);
         ErrorDTO errorDTO = new ErrorDTO();
         errorDTO.setStatus(HttpStatus.UNAUTHORIZED.value());
@@ -49,8 +52,8 @@ public class GlobalExceptionHandler {
         error.setMessage("Validation Error");
 
         List<FieldError> errors = e.getBindingResult().getFieldErrors();
-        error.setDetails(errors.stream()
-                .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage)));
+        error.setDetails(
+                errors.stream().collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage)));
         return error;
     }
 

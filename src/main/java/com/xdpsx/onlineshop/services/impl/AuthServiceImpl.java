@@ -1,5 +1,11 @@
 package com.xdpsx.onlineshop.services.impl;
 
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
 import com.xdpsx.onlineshop.dtos.auth.LoginRequest;
 import com.xdpsx.onlineshop.dtos.auth.RegisterRequest;
 import com.xdpsx.onlineshop.dtos.auth.TokenResponse;
@@ -11,12 +17,8 @@ import com.xdpsx.onlineshop.repositories.UserRepository;
 import com.xdpsx.onlineshop.security.CustomUserDetails;
 import com.xdpsx.onlineshop.security.TokenProvider;
 import com.xdpsx.onlineshop.services.AuthService;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -46,8 +48,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public TokenResponse login(LoginRequest request) {
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-        );
+                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
         CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
         String accessToken = tokenProvider.generateToken(user);
         return TokenResponse.builder().accessToken(accessToken).build();

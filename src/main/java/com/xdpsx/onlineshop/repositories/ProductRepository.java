@@ -1,11 +1,12 @@
 package com.xdpsx.onlineshop.repositories;
 
-import com.xdpsx.onlineshop.entities.Product;
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 
-import java.util.Optional;
+import com.xdpsx.onlineshop.entities.Product;
 
 public interface ProductRepository extends JpaRepository<Product, Long>, JpaSpecificationExecutor<Product> {
     boolean existsBySlug(String slug);

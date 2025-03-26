@@ -1,13 +1,19 @@
 package com.xdpsx.onlineshop.entities;
 
+import jakarta.persistence.*;
+
 import com.xdpsx.onlineshop.entities.enums.AuthProvider;
 import com.xdpsx.onlineshop.entities.enums.Role;
-import jakarta.persistence.*;
+
 import lombok.*;
 
-@Setter @Getter
-@NoArgsConstructor @AllArgsConstructor @Builder
-@Entity @Table(name = "users")
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@Entity
+@Table(name = "users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

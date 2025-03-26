@@ -1,14 +1,19 @@
 package com.xdpsx.onlineshop.entities;
 
-import com.xdpsx.onlineshop.entities.enums.PaymentMethod;
-import com.xdpsx.onlineshop.entities.enums.PaymentStatus;
-import jakarta.persistence.*;
-import lombok.*;
-
 import java.time.LocalDateTime;
 
-@Setter @Getter
-@NoArgsConstructor @AllArgsConstructor @Builder
+import jakarta.persistence.*;
+
+import com.xdpsx.onlineshop.entities.enums.PaymentMethod;
+import com.xdpsx.onlineshop.entities.enums.PaymentStatus;
+
+import lombok.*;
+
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "payments")
 public class Payment {
@@ -27,5 +32,4 @@ public class Payment {
     private PaymentStatus status;
 
     private LocalDateTime paymentDate;
-
 }

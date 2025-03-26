@@ -1,15 +1,18 @@
 package com.xdpsx.onlineshop.services.impl;
 
-import com.xdpsx.onlineshop.utils.EncodingUtil;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+
 import jakarta.annotation.PostConstruct;
-import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
+import com.xdpsx.onlineshop.utils.EncodingUtil;
+
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
@@ -20,8 +23,7 @@ public class CryptoService {
     @Value("${payment.vnpay.secret-key}")
     private String secretKey;
 
-    public CryptoService() throws NoSuchAlgorithmException {
-    }
+    public CryptoService() throws NoSuchAlgorithmException {}
 
     @PostConstruct
     void init() throws InvalidKeyException {
@@ -29,12 +31,10 @@ public class CryptoService {
         mac.init(secretKeySpec);
     }
 
-
     public String sign(String data) {
         try {
             return EncodingUtil.toHexString(mac.doFinal(data.getBytes()));
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException("VNPAY_SIGNING_FAILED");
         }
     }

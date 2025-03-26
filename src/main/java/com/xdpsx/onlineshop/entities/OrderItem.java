@@ -1,10 +1,14 @@
 package com.xdpsx.onlineshop.entities;
 
 import jakarta.persistence.*;
+
 import lombok.*;
 
-@Setter @Getter
-@NoArgsConstructor @AllArgsConstructor @Builder
+@Setter
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Entity
 @Table(name = "order_items")
 public class OrderItem {

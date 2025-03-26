@@ -1,20 +1,22 @@
 package com.xdpsx.onlineshop.services.impl;
 
+import java.math.BigDecimal;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+
 import com.xdpsx.onlineshop.constants.Symbol;
 import com.xdpsx.onlineshop.constants.VNPayParams;
 import com.xdpsx.onlineshop.dtos.payment.InitPaymentRequest;
 import com.xdpsx.onlineshop.dtos.payment.InitPaymentResponse;
 import com.xdpsx.onlineshop.services.PaymentService;
 import com.xdpsx.onlineshop.utils.DateUtil;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
-import java.math.BigDecimal;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
 
 @Slf4j
 @Service
@@ -41,13 +43,13 @@ public class VNPayService implements PaymentService {
 
     @Override
     public InitPaymentResponse init(InitPaymentRequest request) {
-        var amount = request.getAmount().multiply(BigDecimal.valueOf(DEFAULT_MULTIPLIER));  // 1. amount * 100
-        var txnRef = request.getTxnRef();                       // 2. bookingId
-        var returnUrl = buildReturnUrl(txnRef);                 // 3. FE redirect by returnUrl
+        var amount = request.getAmount().multiply(BigDecimal.valueOf(DEFAULT_MULTIPLIER)); // 1. amount * 100
+        var txnRef = request.getTxnRef(); // 2. bookingId
+        var returnUrl = buildReturnUrl(txnRef); // 3. FE redirect by returnUrl
         var vnCalendar = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
         var createdDate = DateUtil.formatVnTime(vnCalendar);
         vnCalendar.add(Calendar.MINUTE, paymentTimeout);
-        var expiredDate = DateUtil.formatVnTime(vnCalendar);    // 4. expiredDate for secure
+        var expiredDate = DateUtil.formatVnTime(vnCalendar); // 4. expiredDate for secure
 
         var ipAddress = request.getIpAddress();
         var orderInfo = buildPaymentDetail(request);
@@ -76,9 +78,7 @@ public class VNPayService implements PaymentService {
 
         var initPaymentUrl = buildInitPaymentUrl(params);
         log.debug("[request_id={}] Init payment url: {}", requestId, initPaymentUrl);
-        return InitPaymentResponse.builder()
-                .vnpUrl(initPaymentUrl)
-                .build();
+        return InitPaymentResponse.builder().vnpUrl(initPaymentUrl).build();
     }
 
     public boolean verifyIpn(Map<String, String> params) {
@@ -94,7 +94,7 @@ public class VNPayService implements PaymentService {
             var fieldName = itr.next();
             var fieldValue = params.get(fieldName);
             if ((fieldValue != null) && (!fieldValue.isEmpty())) {
-                //Build hash data
+                // Build hash data
                 hashPayload.append(fieldName);
                 hashPayload.append(Symbol.EQUAL);
                 hashPayload.append(URLEncoder.encode(fieldValue, StandardCharsets.US_ASCII));
@@ -121,7 +121,7 @@ public class VNPayService implements PaymentService {
         var hashPayload = new StringBuilder();
         var query = new StringBuilder();
         var fieldNames = new ArrayList<>(params.keySet());
-        Collections.sort(fieldNames);   // 1. Sort field names
+        Collections.sort(fieldNames); // 1. Sort field names
 
         var itr = fieldNames.iterator();
         while (itr.hasNext()) {
@@ -154,5 +154,4 @@ public class VNPayService implements PaymentService {
 
         return initPaymentPrefixUrl + "?" + query;
     }
-
 }

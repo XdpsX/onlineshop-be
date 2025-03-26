@@ -1,20 +1,29 @@
 package com.xdpsx.onlineshop.repositories.specs;
 
-import com.xdpsx.onlineshop.entities.Product;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Component;
+import static com.xdpsx.onlineshop.constants.FieldConstants.*;
 
 import java.util.List;
 
-import static com.xdpsx.onlineshop.constants.FieldConstants.*;
+import jakarta.persistence.criteria.CriteriaBuilder;
+
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.stereotype.Component;
+
+import com.xdpsx.onlineshop.entities.Product;
 
 @Component
 public class ProductSpecification extends BasicSpecification<Product> {
 
-    public Specification<Product> getFiltersSpec(String name, String sort, Boolean hasPublished,
-                                                 Double minPrice, Double maxPrice, Boolean hasDiscount, Boolean inStock,
-                                                 Integer categoryId, Integer brandId) {
+    public Specification<Product> getFiltersSpec(
+            String name,
+            String sort,
+            Boolean hasPublished,
+            Double minPrice,
+            Double maxPrice,
+            Boolean hasDiscount,
+            Boolean inStock,
+            Integer categoryId,
+            Integer brandId) {
         return Specification.where(hasName(name))
                 .and(getSortSpec(sort))
                 .and(hasPublished(hasPublished))
@@ -41,7 +50,6 @@ public class ProductSpecification extends BasicSpecification<Product> {
                 yield sortByDate(asc);
             default:
                 yield sortByDate(false);
-
         };
     }
 
@@ -75,7 +83,7 @@ public class ProductSpecification extends BasicSpecification<Product> {
             if (hasDiscount == null) return criteriaBuilder.conjunction();
             if (hasDiscount) {
                 return criteriaBuilder.greaterThan(root.get("discountPercent"), 0);
-            }else {
+            } else {
                 return criteriaBuilder.equal(root.get("discountPercent"), 0);
             }
         };
@@ -111,7 +119,8 @@ public class ProductSpecification extends BasicSpecification<Product> {
             if (brandIds == null || brandIds.isEmpty()) {
                 return criteriaBuilder.conjunction();
             }
-            CriteriaBuilder.In<Integer> inClause = criteriaBuilder.in(root.get("brand").get("id"));
+            CriteriaBuilder.In<Integer> inClause =
+                    criteriaBuilder.in(root.get("brand").get("id"));
             for (Integer id : brandIds) {
                 inClause.value(id);
             }
@@ -119,7 +128,7 @@ public class ProductSpecification extends BasicSpecification<Product> {
         };
     }
 
-    public Specification<Product> sortByPrice (boolean asc){
+    public Specification<Product> sortByPrice(boolean asc) {
         return (root, query, criteriaBuilder) -> {
             if (asc) {
                 query.orderBy(criteriaBuilder.asc(root.get("price")));

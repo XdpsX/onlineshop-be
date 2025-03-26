@@ -1,13 +1,15 @@
 package com.xdpsx.onlineshop.controllers;
 
-import com.xdpsx.onlineshop.dtos.user.UserProfile;
-import com.xdpsx.onlineshop.services.UserService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.xdpsx.onlineshop.dtos.user.UserProfile;
+import com.xdpsx.onlineshop.services.UserService;
+
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor

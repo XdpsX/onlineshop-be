@@ -1,18 +1,20 @@
 package com.xdpsx.onlineshop.security.oauth2;
 
-import com.xdpsx.onlineshop.entities.User;
-import com.xdpsx.onlineshop.entities.enums.Role;
-import com.xdpsx.onlineshop.repositories.UserRepository;
-import com.xdpsx.onlineshop.security.CustomUserDetails;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import com.xdpsx.onlineshop.entities.User;
+import com.xdpsx.onlineshop.entities.enums.Role;
+import com.xdpsx.onlineshop.repositories.UserRepository;
+import com.xdpsx.onlineshop.security.CustomUserDetails;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +33,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             throw new InternalAuthenticationServiceException("The OAuth2 provider is not supported yet");
         }
 
-        CustomUserDetails customUserDetails = oAuth2UserInfoExtractorOptional.get().extractUserInfo(oAuth2User);
+        CustomUserDetails customUserDetails =
+                oAuth2UserInfoExtractorOptional.get().extractUserInfo(oAuth2User);
         User user = upsertUser(customUserDetails);
         customUserDetails.setId(user.getId());
         return customUserDetails;

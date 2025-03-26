@@ -1,19 +1,25 @@
 package com.xdpsx.onlineshop.dtos.brand;
 
-import com.xdpsx.onlineshop.validations.ImgConstraint;
-import com.xdpsx.onlineshop.validations.OnCreate;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
-import lombok.*;
-import org.springframework.web.multipart.MultipartFile;
+import static com.xdpsx.onlineshop.constants.FileConstants.BRAND_IMG_WIDTH;
 
 import java.util.Set;
 
-import static com.xdpsx.onlineshop.constants.FileConstants.BRAND_IMG_WIDTH;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
-@Getter @Setter
-@NoArgsConstructor @AllArgsConstructor @Builder
+import org.springframework.web.multipart.MultipartFile;
+
+import com.xdpsx.onlineshop.validations.ImgConstraint;
+import com.xdpsx.onlineshop.validations.OnCreate;
+
+import lombok.*;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class BrandRequest {
     @NotBlank
     @Size(max = 64)

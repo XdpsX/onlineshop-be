@@ -1,14 +1,15 @@
 package com.xdpsx.onlineshop.services.impl;
 
+import org.springframework.stereotype.Service;
+
 import com.xdpsx.onlineshop.dtos.user.UserProfile;
 import com.xdpsx.onlineshop.entities.User;
 import com.xdpsx.onlineshop.exceptions.ResourceNotFoundException;
 import com.xdpsx.onlineshop.mappers.UserMapper;
 import com.xdpsx.onlineshop.repositories.UserRepository;
 import com.xdpsx.onlineshop.services.UserService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -18,7 +19,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserProfile getUserByEmail(String email) {
-        User user = userRepository.findByEmail(email)
+        User user = userRepository
+                .findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User with email=%s not found".formatted(email)));
         return userMapper.fromEntityToProfile(user);
     }

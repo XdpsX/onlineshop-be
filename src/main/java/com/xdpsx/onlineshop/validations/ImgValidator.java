@@ -1,14 +1,16 @@
 package com.xdpsx.onlineshop.validations;
 
-import com.xdpsx.onlineshop.constants.FileConstants;
-import jakarta.validation.ConstraintValidator;
-import jakarta.validation.ConstraintValidatorContext;
-import org.springframework.web.multipart.MultipartFile;
-
-import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.List;
+import javax.imageio.ImageIO;
+
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
+
+import org.springframework.web.multipart.MultipartFile;
+
+import com.xdpsx.onlineshop.constants.FileConstants;
 
 public class ImgValidator implements ConstraintValidator<ImgConstraint, Object> {
     private int minWidth;
@@ -33,12 +35,15 @@ public class ImgValidator implements ConstraintValidator<ImgConstraint, Object> 
                 for (int i = 0; i < files.size(); i++) {
                     MultipartFile curFile = (MultipartFile) files.get(i);
                     if (validateImageType(curFile)) {
-                        buildNewMessage(context, "ERROR in Image %s: Only PNG or JPG images are supported".formatted(i));
+                        buildNewMessage(
+                                context, "ERROR in Image %s: Only PNG or JPG images are supported".formatted(i));
                         return false;
                     }
 
                     if (validateImageWidth(curFile)) {
-                        buildNewMessage(context, "ERROR in Image %s: Image width must be at least ".formatted(i) + minWidth + " pixels");
+                        buildNewMessage(
+                                context,
+                                "ERROR in Image %s: Image width must be at least ".formatted(i) + minWidth + " pixels");
                         return false;
                     }
                 }

@@ -1,7 +1,9 @@
 package com.xdpsx.onlineshop.dtos.order;
 
-import com.xdpsx.onlineshop.entities.enums.OrderStatus;
 import jakarta.validation.constraints.NotNull;
+
+import com.xdpsx.onlineshop.entities.enums.OrderStatus;
+
 import lombok.Data;
 
 @Data

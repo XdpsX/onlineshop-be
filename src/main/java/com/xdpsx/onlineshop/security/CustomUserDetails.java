@@ -1,24 +1,29 @@
 package com.xdpsx.onlineshop.security;
 
-import com.xdpsx.onlineshop.entities.User;
-import com.xdpsx.onlineshop.entities.enums.AuthProvider;
-import com.xdpsx.onlineshop.entities.enums.Role;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.oauth2.core.user.OAuth2User;
+import static com.xdpsx.onlineshop.constants.SecurityConstants.ROLE_PREFIX;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import static com.xdpsx.onlineshop.constants.SecurityConstants.ROLE_PREFIX;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
-@Data @Builder @NoArgsConstructor @AllArgsConstructor
+import com.xdpsx.onlineshop.entities.User;
+import com.xdpsx.onlineshop.entities.enums.AuthProvider;
+import com.xdpsx.onlineshop.entities.enums.Role;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class CustomUserDetails implements UserDetails, OAuth2User {
     private Long id;
     private String name;

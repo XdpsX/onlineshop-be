@@ -1,10 +1,10 @@
 package com.xdpsx.onlineshop.dtos.order;
 
-import lombok.Data;
-import lombok.experimental.SuperBuilder;
-
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+
+import lombok.Data;
+import lombok.experimental.SuperBuilder;
 
 @Data
 @SuperBuilder

@@ -1,19 +1,21 @@
 package com.xdpsx.onlineshop.utils;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
+
+import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
 public class I18nUtils {
     private final MessageSource messageSource;
 
-    public String getCatCannotDeleteMsg(String name){
+    public String getCatCannotDeleteMsg(String name) {
         return getMessage("category.can-not-delete", name);
     }
-    public String getBrandCannotDeleteMsg(String name){
+
+    public String getBrandCannotDeleteMsg(String name) {
         return getMessage("brand.can-not-delete", name);
     }
 

@@ -3,7 +3,8 @@ package com.xdpsx.onlineshop.dtos.user;
 import lombok.Builder;
 import lombok.Data;
 
-@Data @Builder
+@Data
+@Builder
 public class UserProfile {
     private Long id;
     private String name;
