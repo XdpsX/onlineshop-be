@@ -10,10 +10,11 @@
 	</parent>
 	<groupId>com.xdpsx</groupId>
 	<artifactId>onlineshop-api</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>${revision}</version>
 	<name>onlineshop</name>
 	<description>Backend system for Online Shop</description>
 	<properties>
+		<revision>0.0.1-SNAPSHOT</revision>
 		<java.version>17</java.version>
 		<springdoc-openapi.version>2.5.0</springdoc-openapi.version>
 		<mapstruct.version>1.5.5.Final</mapstruct.version>
