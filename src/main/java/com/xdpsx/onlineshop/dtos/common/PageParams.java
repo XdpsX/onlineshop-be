@@ -13,6 +13,8 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class PageParams extends AbstractPageParams {
+    private String search;
+
     @SortConstraint(fields = {FIELD_NAME, FIELD_DATE})
     private String sort = DEFAULT_SORT_FIELD;
 }
