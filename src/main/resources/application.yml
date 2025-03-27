@@ -1,9 +1,13 @@
+server:
+  port: 8080
+
 spring:
 
   #  # uncomment this code if you are using .env file to define environment variables
   #  config:
   #    import: optional:file:.env[.properties]
 
+  name: onlineshop
   datasource:
     url: jdbc:mysql://${DB_HOST}:${DB_PORT}/onlineshop
     username: ${DB_USER}
@@ -28,6 +32,19 @@ spring:
             scope:
               - email
               - profile
+
+#springdoc:
+#  api-docs:
+#    enabled: true
+#  swagger-ui:
+#    enabled: true
+openapi:
+  service:
+    api-docs: onlineshop-be
+    server: http://localhost:${server.port}
+    title: Backend service
+    version: 1.0.0
+    description: "API documents for OnlineShop Backend"
 
 cloudinary:
   api:
