@@ -15,6 +15,8 @@ import lombok.EqualsAndHashCode;
 @Data
 @Builder
 public class ProductParams extends AbstractPageParams {
+    private String search;
+
     @SortConstraint(fields = {FIELD_NAME, FIELD_DATE, FIELD_PRICE})
     private String sort;
 

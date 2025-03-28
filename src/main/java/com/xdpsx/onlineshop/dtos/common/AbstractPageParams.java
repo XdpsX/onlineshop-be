@@ -19,5 +19,4 @@ public abstract class AbstractPageParams {
     @Max(value = MAX_ITEMS_PER_PAGE)
     private Integer pageSize = DEFAULT_ITEMS_PER_PAGE;
 
-    private String search;
 }
