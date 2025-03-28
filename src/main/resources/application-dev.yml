@@ -41,7 +41,7 @@ openapi:
     api-docs: onlineshop-be
     server: http://localhost:${server.port}
     title: Backend service
-    version: ${REVISION}
+    version: ${REVISION:1.0.0}
     description: "API documents for OnlineShop Backend"
 
 cloudinary:

@@ -8,5 +8,5 @@ spring:
   application:
     name: onlineshop
   profiles:
-    active: ${SPRING_PROFILES_ACTIVE}
+    active: ${SPRING_PROFILES_ACTIVE:dev}
 
