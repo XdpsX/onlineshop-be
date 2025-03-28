@@ -1,0 +1,71 @@
+spring:
+  #  # uncomment this code if you are using .env file to define environment variables
+  #  config:
+  #    import: optional:file:.env[.properties]
+
+  datasource:
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/onlineshop
+    username: ${DB_USER:xdpsx}
+    password: ${DB_PASSWORD:xdpsxpass}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: none
+#      cache:
+#        use_second_level_cache: true
+#        region.factory_class: org.hibernate.cache.jcache.JCacheRegionFactory
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  liquibase:
+    enabled: true
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            scope:
+              - email
+              - profile
+
+#springdoc:
+#  api-docs:
+#    enabled: true
+#  swagger-ui:
+#    enabled: true
+openapi:
+  service:
+    api-docs: onlineshop-be
+    server: http://localhost:${server.port}
+    title: Backend service
+    version: ${REVISION:1.0.0}
+    description: "API documents for OnlineShop Backend"
+
+cloudinary:
+  api:
+    key: ${CLOUDINARY_API_KEY}
+    secret: ${CLOUDINARY_API_SECRET}
+  cloud:
+    name: ${CLOUDINARY_CLOUD_NAME}
+
+app:
+  jwt:
+    secret: AxdbTQmW/abSjS3TpqhS2rHHUTtK8ESb0xq9uueSj34=
+    expiration:
+      seconds: 3600
+  cors:
+    allowed-origins: http://localhost:3000,http://localhost:3001
+  oauth2:
+    redirect-uri: http://localhost:3001/oauth2/redirect
+    error-uri: http://localhost:3001/login
+
+payment:
+  vnpay:
+    tmn-code: ${VNPAY_TMN_CODE}
+    secret-key: ${VNPAY_SECRET_KEY}
+    init-payment-url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+    return-url: http://localhost:3001/payments/%s/redirect
+    timeout: 15 # in minutes
