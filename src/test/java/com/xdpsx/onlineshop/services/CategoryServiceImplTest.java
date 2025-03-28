@@ -20,7 +20,6 @@ import com.xdpsx.onlineshop.exceptions.ResourceNotFoundException;
 import com.xdpsx.onlineshop.mappers.CategoryMapper;
 import com.xdpsx.onlineshop.repositories.CategoryRepository;
 import com.xdpsx.onlineshop.services.impl.CategoryServiceImpl;
-import com.xdpsx.onlineshop.utils.I18nUtils;
 
 @ExtendWith(MockitoExtension.class)
 public class CategoryServiceImplTest {
@@ -29,9 +28,6 @@ public class CategoryServiceImplTest {
 
     @Mock
     private CategoryMapper categoryMapper;
-
-    @Mock
-    private I18nUtils i18nUtils;
 
     @InjectMocks
     private CategoryServiceImpl categoryService;
@@ -194,7 +190,6 @@ public class CategoryServiceImplTest {
         when(categoryRepository.findById(categoryId)).thenReturn(java.util.Optional.of(existingCategory));
         when(categoryRepository.countCategoriesInOtherTables(existingCategory.getId()))
                 .thenReturn(1L);
-        when(i18nUtils.getCatCannotDeleteMsg(existingCategory.getName())).thenReturn(msg);
 
         BadRequestException exception =
                 assertThrows(BadRequestException.class, () -> categoryService.deleteCategory(categoryId));

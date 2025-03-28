@@ -32,7 +32,6 @@ import com.xdpsx.onlineshop.repositories.CategoryRepository;
 import com.xdpsx.onlineshop.repositories.specs.BasicSpecification;
 import com.xdpsx.onlineshop.services.BrandService;
 import com.xdpsx.onlineshop.utils.CloudinaryUploader;
-import com.xdpsx.onlineshop.utils.I18nUtils;
 
 import lombok.RequiredArgsConstructor;
 
@@ -40,7 +39,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class BrandServiceImpl implements BrandService {
     private final CloudinaryUploader uploader;
-    private final I18nUtils i18nUtils;
     private final BrandMapper brandMapper;
     private final PageMapper pageMapper;
     private final BrandRepository brandRepository;

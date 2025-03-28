@@ -29,7 +29,6 @@ import com.xdpsx.onlineshop.repositories.BrandRepository;
 import com.xdpsx.onlineshop.repositories.CategoryRepository;
 import com.xdpsx.onlineshop.services.impl.BrandServiceImpl;
 import com.xdpsx.onlineshop.utils.CloudinaryUploader;
-import com.xdpsx.onlineshop.utils.I18nUtils;
 
 @ExtendWith(MockitoExtension.class)
 class BrandServiceImplTest {
@@ -41,9 +40,6 @@ class BrandServiceImplTest {
 
     @Mock
     private CloudinaryUploader uploader;
-
-    @Mock
-    private I18nUtils i18nUtils;
 
     @Mock
     private BrandMapper brandMapper;
@@ -322,7 +318,6 @@ class BrandServiceImplTest {
                 Brand.builder().id(brandId).name("Brand 1").logo("brand-1.jpg").build();
         when(brandRepository.findById(brandId)).thenReturn(Optional.of(brand));
         //        when(brandRepository.countBrandsInOtherTables(brandId)).thenReturn(1L);
-        when(i18nUtils.getBrandCannotDeleteMsg(anyString())).thenReturn("Cannot delete brand in use");
 
         BadRequestException exception = assertThrows(BadRequestException.class, () -> brandService.deleteBrand(1));
 
