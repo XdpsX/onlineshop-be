@@ -14,7 +14,6 @@ import com.xdpsx.onlineshop.dtos.category.CategoryResponse;
 import com.xdpsx.onlineshop.dtos.common.PageParams;
 import com.xdpsx.onlineshop.dtos.common.PageResponse;
 import com.xdpsx.onlineshop.entities.Category;
-import com.xdpsx.onlineshop.exceptions.BadRequestException;
 import com.xdpsx.onlineshop.exceptions.DuplicateException;
 import com.xdpsx.onlineshop.exceptions.ResourceNotFoundException;
 import com.xdpsx.onlineshop.mappers.CategoryMapper;
@@ -22,14 +21,12 @@ import com.xdpsx.onlineshop.mappers.PageMapper;
 import com.xdpsx.onlineshop.repositories.CategoryRepository;
 import com.xdpsx.onlineshop.repositories.specs.BasicSpecification;
 import com.xdpsx.onlineshop.services.CategoryService;
-import com.xdpsx.onlineshop.utils.I18nUtils;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
-    private final I18nUtils i18nUtils;
     private final CategoryMapper categoryMapper;
     private final PageMapper pageMapper;
     private final CategoryRepository categoryRepository;
@@ -89,7 +86,7 @@ public class CategoryServiceImpl implements CategoryService {
                 .orElseThrow(() -> new ResourceNotFoundException("Category with id=%s not found".formatted(id)));
         long countCategories = categoryRepository.countCategoriesInOtherTables(id);
         if (countCategories > 0) {
-            throw new BadRequestException(i18nUtils.getCatCannotDeleteMsg(existingCat.getName()));
+            //            throw new BadRequestException(i18nUtils.getCatCannotDeleteMsg(existingCat.getName()));
         }
         categoryRepository.delete(existingCat);
     }

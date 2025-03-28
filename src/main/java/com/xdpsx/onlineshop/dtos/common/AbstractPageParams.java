@@ -18,5 +18,4 @@ public abstract class AbstractPageParams {
     @Min(value = MIN_ITEMS_PER_PAGE)
     @Max(value = MAX_ITEMS_PER_PAGE)
     private Integer pageSize = DEFAULT_ITEMS_PER_PAGE;
-
 }
