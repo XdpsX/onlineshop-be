@@ -1,7 +1,7 @@
---liquibase formatted sql
+-- liquibase formatted sql
 
---changeset xdpsx:1
---comment: Create all tables
+-- changeset xdpsx:1
+-- comment: Create all tables
 CREATE TABLE IF NOT EXISTS categories (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(128) NOT NULL UNIQUE,
