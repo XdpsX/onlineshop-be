@@ -5,11 +5,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.xdpsx.onlineshop.dtos.category.CreateCategoryDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import com.xdpsx.onlineshop.dtos.category.CategoryRequest;
 import com.xdpsx.onlineshop.dtos.category.CategoryResponse;
 import com.xdpsx.onlineshop.dtos.common.PageParams;
 import com.xdpsx.onlineshop.dtos.common.PageResponse;
@@ -34,14 +34,14 @@ public class CategoryServiceImpl implements CategoryService {
     private final BasicSpecification<Category> spec;
 
     @Override
-    public List<CategoryResponse> listAllCategories() {
+    public List<CategoryResponse> getAllCategories() {
         return categoryRepository.findAll(spec.getSortSpec("name")).stream()
                 .map(categoryMapper::fromEntityToResponse)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public CategoryResponse createCategory(CategoryRequest request) {
+    public CategoryResponse createCategory(CreateCategoryDTO request) {
         if (categoryRepository.existsByName(request.getName())) {
             throw new DuplicateException("Category with name=%s already exists".formatted(request.getName()));
         }
@@ -51,7 +51,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public CategoryResponse updateCategory(Integer id, CategoryRequest request) {
+    public CategoryResponse updateCategory(Integer id, CreateCategoryDTO request) {
         Category existingCat = categoryRepository
                 .findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Category with id=%s not found".formatted(id)));
@@ -81,7 +81,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public PageResponse<CategoryResponse> listCategoriesByPage(PageParams params) {
+    public PageResponse<CategoryResponse> getCategoriesPage(PageParams params) {
         Page<Category> categoryPage = categoryRepository.findAll(
                 spec.getFiltersSpec(params.getSearch(), params.getSort()),
                 PageRequest.of(params.getPageNum() - 1, params.getPageSize()));

@@ -10,16 +10,15 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CategoryRequest {
+public class CreateCategoryDTO {
     @NotBlank
     @Size(max = 128)
     private String name;
 
-    @NotBlank
     @Size(max = 255)
-    private String slug;
+    private String image;
 
-    public void setSlug(String slug) {
-        this.slug = slug.toLowerCase().replace(" ", "");
-    }
+    private boolean publicFlg;
+
+    private Integer parentId;
 }
