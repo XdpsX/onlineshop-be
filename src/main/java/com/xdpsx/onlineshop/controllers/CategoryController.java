@@ -40,11 +40,6 @@ public class CategoryController {
         return ResponseEntity.ok(categoryService.listAllCategories());
     }
 
-    @GetMapping("/{categorySlug}")
-    public ResponseEntity<CategoryResponse> getCategoryBySlug(@PathVariable("categorySlug") String categorySlug) {
-        return ResponseEntity.ok(categoryService.getCategoryBySlug(categorySlug));
-    }
-
     @GetMapping("/{categoryId}/brands")
     public ResponseEntity<List<BrandNoCatsDTO>> getBrandsByCategoryId(@PathVariable Integer categoryId) {
         return ResponseEntity.ok(brandService.listBrandsByCategoryId(categoryId));

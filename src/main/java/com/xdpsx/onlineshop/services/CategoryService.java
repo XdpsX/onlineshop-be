@@ -20,6 +20,4 @@ public interface CategoryService {
     PageResponse<CategoryResponse> listCategoriesByPage(PageParams params);
 
     Map<String, Boolean> checkExistsCat(String name, String slug);
-
-    CategoryResponse getCategoryBySlug(String categorySlug);
 }

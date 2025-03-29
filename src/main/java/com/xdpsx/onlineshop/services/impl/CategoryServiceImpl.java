@@ -45,9 +45,6 @@ public class CategoryServiceImpl implements CategoryService {
         if (categoryRepository.existsByName(request.getName())) {
             throw new DuplicateException("Category with name=%s already exists".formatted(request.getName()));
         }
-        if (categoryRepository.existsBySlug(request.getSlug())) {
-            throw new DuplicateException("Category with slug=%s already exists".formatted(request.getSlug()));
-        }
         Category category = categoryMapper.fromRequestToEntity(request);
         Category savedCategory = categoryRepository.save(category);
         return categoryMapper.fromEntityToResponse(savedCategory);
@@ -65,14 +62,6 @@ public class CategoryServiceImpl implements CategoryService {
                 throw new DuplicateException("Category with name=%s already exists".formatted(request.getName()));
             }
             existingCat.setName(request.getName());
-        }
-
-        // Update slug
-        if (!existingCat.getSlug().equals(request.getSlug())) {
-            if (categoryRepository.existsBySlug(request.getSlug())) {
-                throw new DuplicateException("Category with slug=%s already exists".formatted(request.getSlug()));
-            }
-            existingCat.setSlug(request.getSlug());
         }
 
         Category savedCategory = categoryRepository.save(existingCat);
@@ -103,16 +92,6 @@ public class CategoryServiceImpl implements CategoryService {
     public Map<String, Boolean> checkExistsCat(String name, String slug) {
         Map<String, Boolean> exists = new HashMap<>();
         exists.put("nameExists", categoryRepository.existsByName(name));
-        exists.put("slugExists", categoryRepository.existsBySlug(slug));
         return exists;
-    }
-
-    @Override
-    public CategoryResponse getCategoryBySlug(String categorySlug) {
-        Category category = categoryRepository
-                .findBySlug(categorySlug)
-                .orElseThrow(
-                        () -> new ResourceNotFoundException("Category with slug=%s not found".formatted(categorySlug)));
-        return categoryMapper.fromEntityToResponse(category);
     }
 }
