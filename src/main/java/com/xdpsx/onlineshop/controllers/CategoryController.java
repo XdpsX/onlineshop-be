@@ -3,15 +3,15 @@ package com.xdpsx.onlineshop.controllers;
 import java.util.List;
 import java.util.Map;
 
-import com.xdpsx.onlineshop.dtos.category.CreateCategoryDTO;
 import jakarta.validation.Valid;
 
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import com.xdpsx.onlineshop.constants.APIMessage;
+import com.xdpsx.onlineshop.constants.messages.SMessage;
 import com.xdpsx.onlineshop.dtos.category.CategoryResponse;
+import com.xdpsx.onlineshop.dtos.category.CreateCategoryDTO;
 import com.xdpsx.onlineshop.dtos.common.APIResponse;
 import com.xdpsx.onlineshop.dtos.common.PageParams;
 import com.xdpsx.onlineshop.dtos.common.PageResponse;
@@ -51,20 +51,20 @@ public class CategoryController {
     @ResponseStatus(HttpStatus.CREATED)
     public APIResponse<CategoryResponse> createCategory(@Valid @RequestBody CreateCategoryDTO request) {
         CategoryResponse data = categoryService.createCategory(request);
-        return new APIResponse<>(HttpStatus.CREATED, data, APIMessage.CREATE_SUCCESSFUL);
+        return new APIResponse<>(HttpStatus.CREATED, data, SMessage.CREATE_SUCCESSFULLY);
     }
 
     @PutMapping("/categories/{id}/update")
     public APIResponse<CategoryResponse> updateCategory(
             @PathVariable Integer id, @Valid @RequestBody CreateCategoryDTO request) {
         CategoryResponse data = categoryService.updateCategory(id, request);
-        return APIResponse.ok(data, APIMessage.UPDATE_SUCCESSFUL);
+        return APIResponse.ok(data, SMessage.UPDATE_SUCCESSFULLY);
     }
 
     @DeleteMapping("/categories/{id}/delete")
     public APIResponse<Void> deleteCategory(@PathVariable Integer id) {
         categoryService.deleteCategory(id);
-        return APIResponse.noContent(APIMessage.DELETE_SUCCESSFUL);
+        return APIResponse.noContent(SMessage.DELETE_SUCCESSFULLY);
     }
 
     //    @GetMapping("/categories/{categoryId}/products")

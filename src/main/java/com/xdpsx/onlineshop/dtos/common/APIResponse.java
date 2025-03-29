@@ -2,7 +2,8 @@ package com.xdpsx.onlineshop.dtos.common;
 
 import org.springframework.http.HttpStatus;
 
-import com.xdpsx.onlineshop.constants.APIMessage;
+import com.xdpsx.onlineshop.constants.messages.APIMessage;
+import com.xdpsx.onlineshop.constants.messages.SMessage;
 
 public record APIResponse<T>(int status, String message, T data) {
 
@@ -11,7 +12,7 @@ public record APIResponse<T>(int status, String message, T data) {
     }
 
     public static <T> APIResponse<T> ok(T data) {
-        return new APIResponse<>(HttpStatus.OK, data, APIMessage.SUCCESS);
+        return new APIResponse<>(HttpStatus.OK, data, SMessage.SUCCESS);
     }
 
     public static <T> APIResponse<T> ok(T data, APIMessage message) {
@@ -19,7 +20,7 @@ public record APIResponse<T>(int status, String message, T data) {
     }
 
     public static <T> APIResponse<T> noContent() {
-        return new APIResponse<>(HttpStatus.OK, null, APIMessage.SUCCESS);
+        return new APIResponse<>(HttpStatus.OK, null, SMessage.SUCCESS);
     }
 
     public static <T> APIResponse<T> noContent(APIMessage message) {
