@@ -1,9 +1,12 @@
 package com.xdpsx.onlineshop.entities;
 
-import com.xdpsx.onlineshop.entities.enums.MediaResourceType;
 import jakarta.persistence.*;
-import lombok.*;
+
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import com.xdpsx.onlineshop.entities.enums.MediaResourceType;
+
+import lombok.*;
 
 @Getter
 @Setter
@@ -13,7 +16,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Entity
 @Table(name = "media")
 @EntityListeners(AuditingEntityListener.class)
-public class Media extends AuditEntity{
+public class Media extends AuditEntity {
     @Id
     @Column(length = 30, nullable = false)
     private String id;
@@ -38,5 +41,4 @@ public class Media extends AuditEntity{
 
     @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT FALSE")
     private boolean deleteFlg;
-
 }

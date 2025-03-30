@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.cloudinary.Transformation;
 import com.cloudinary.utils.ObjectUtils;
 import com.xdpsx.onlineshop.dtos.common.PageResponse;
+import com.xdpsx.onlineshop.dtos.media.CloudinaryUploadResponse;
 import com.xdpsx.onlineshop.dtos.product.*;
 import com.xdpsx.onlineshop.entities.Brand;
 import com.xdpsx.onlineshop.entities.Category;
@@ -247,9 +248,9 @@ public class ProductServiceImpl implements ProductService {
 
     private void uploadProductImages(List<MultipartFile> files, Product product) {
         for (MultipartFile file : files) {
-            String fileUrl = uploader.uploadFile(file, uploadOptions);
+            CloudinaryUploadResponse response = uploader.uploadFile(file, uploadOptions);
             ProductImage productImage =
-                    ProductImage.builder().url(fileUrl).product(product).build();
+                    ProductImage.builder().url(response.url()).product(product).build();
             product.getImages().add(productImage);
         }
     }
