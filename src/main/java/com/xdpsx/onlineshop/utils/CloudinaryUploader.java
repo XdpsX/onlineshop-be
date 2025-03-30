@@ -8,6 +8,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.xdpsx.onlineshop.dtos.media.CloudinaryUploadResponse;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,13 +19,14 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CloudinaryUploader {
     private final Cloudinary cloudinary;
+    private final ObjectMapper objectMapper;
 
-    public String uploadFile(MultipartFile file, Map uploadOptions) {
+    public CloudinaryUploadResponse uploadFile(MultipartFile file, Map uploadOptions) {
         try {
-            Map response = this.cloudinary.uploader().upload(file.getBytes(), uploadOptions);
-            return (String) response.get("public_id");
+            Map response = cloudinary.uploader().upload(file.getBytes(), uploadOptions);
+            return objectMapper.convertValue(response, CloudinaryUploadResponse.class);
         } catch (IOException io) {
-            throw new RuntimeException("Uploading image is failed!");
+            throw new RuntimeException("Uploading image failed!", io);
         }
     }
 

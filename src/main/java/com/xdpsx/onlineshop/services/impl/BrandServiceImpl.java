@@ -21,6 +21,7 @@ import com.xdpsx.onlineshop.dtos.brand.BrandRequest;
 import com.xdpsx.onlineshop.dtos.brand.BrandResponse;
 import com.xdpsx.onlineshop.dtos.common.PageParams;
 import com.xdpsx.onlineshop.dtos.common.PageResponse;
+import com.xdpsx.onlineshop.dtos.media.CloudinaryUploadResponse;
 import com.xdpsx.onlineshop.entities.Brand;
 import com.xdpsx.onlineshop.entities.Category;
 import com.xdpsx.onlineshop.exceptions.DuplicateException;
@@ -71,8 +72,8 @@ public class BrandServiceImpl implements BrandService {
         List<Category> categories = fetchCategories(request.getCategoryIds());
         brand.setCategories(categories);
 
-        String publicId = uploader.uploadFile(request.getLogo(), uploadOptions);
-        brand.setLogo(publicId);
+        CloudinaryUploadResponse response = uploader.uploadFile(request.getLogo(), uploadOptions);
+        brand.setLogo(response.url());
 
         Brand savedBrand = brandRepository.save(brand);
         return brandMapper.fromEntityToResponse(savedBrand);
@@ -102,8 +103,8 @@ public class BrandServiceImpl implements BrandService {
         // Update logo
         if (request.getLogo() != null) {
             String oldPublicId = existingBrand.getLogo();
-            String newPublicId = uploader.uploadFile(request.getLogo(), uploadOptions);
-            existingBrand.setLogo(newPublicId);
+            CloudinaryUploadResponse response = uploader.uploadFile(request.getLogo(), uploadOptions);
+            existingBrand.setLogo(response.url());
             uploader.deleteFile(oldPublicId);
         }
 

@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import com.xdpsx.onlineshop.dtos.category.CreateCategoryDTO;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.xdpsx.onlineshop.dtos.category.CategoryResponse;
+import com.xdpsx.onlineshop.dtos.category.CreateCategoryDTO;
 import com.xdpsx.onlineshop.entities.Category;
 import com.xdpsx.onlineshop.exceptions.BadRequestException;
 import com.xdpsx.onlineshop.exceptions.ResourceNotFoundException;
@@ -35,15 +35,10 @@ public class CategoryServiceImplTest {
     @DisplayName("Create category successfully")
     @Test
     void testCreateCategory_ShouldSaveCategory() {
-        CreateCategoryDTO request = CreateCategoryDTO.builder()
-                .name("Test Category")
-                .build();
-        Category category =
-                Category.builder().name("Test Category").build();
-        Category savedCategory = Category.builder()
-                .id(1)
-                .name("Test Category")
-                .build();
+        CreateCategoryDTO request =
+                CreateCategoryDTO.builder().name("Test Category").build();
+        Category category = Category.builder().name("Test Category").build();
+        Category savedCategory = Category.builder().id(1).name("Test Category").build();
         CategoryResponse expectedResponse = CategoryResponse.builder()
                 .id(1)
                 .name("Test Category")
@@ -77,17 +72,12 @@ public class CategoryServiceImplTest {
     @Test
     void testUpdateCategory_ShouldUpdateCategory() {
         Integer categoryId = 1;
-        CreateCategoryDTO request = CreateCategoryDTO.builder()
-                .name("Updated Category")
-                .build();
-        Category existingCategory = Category.builder()
-                .id(1)
-                .name("Old Category")
-                .build();
-        Category updatedCategory = Category.builder()
-                .id(1)
-                .name("Updated Category")
-                .build();
+        CreateCategoryDTO request =
+                CreateCategoryDTO.builder().name("Updated Category").build();
+        Category existingCategory =
+                Category.builder().id(1).name("Old Category").build();
+        Category updatedCategory =
+                Category.builder().id(1).name("Updated Category").build();
         CategoryResponse expectedResponse = CategoryResponse.builder()
                 .id(1)
                 .name("Updated Category")
@@ -122,13 +112,10 @@ public class CategoryServiceImplTest {
     //    @Test
     void testUpdateCategory_WhenCategoryWithSameNameExists_ShouldThrowBadRequestException() {
         Integer categoryId = 1;
-        CreateCategoryDTO request = CreateCategoryDTO.builder()
-                .name("Existing Category")
-                .build();
-        Category existingCategory = Category.builder()
-                .id(1)
-                .name("Old Category")
-                .build();
+        CreateCategoryDTO request =
+                CreateCategoryDTO.builder().name("Existing Category").build();
+        Category existingCategory =
+                Category.builder().id(1).name("Old Category").build();
 
         when(categoryRepository.findById(categoryId)).thenReturn(java.util.Optional.of(existingCategory));
         when(categoryRepository.existsByName(request.getName())).thenReturn(true);
@@ -141,10 +128,8 @@ public class CategoryServiceImplTest {
     @Test
     void testDeleteCategory_ShouldDeleteCategory() {
         Integer categoryId = 1;
-        Category existingCategory = Category.builder()
-                .id(1)
-                .name("Category To Delete")
-                .build();
+        Category existingCategory =
+                Category.builder().id(1).name("Category To Delete").build();
 
         when(categoryRepository.findById(categoryId)).thenReturn(java.util.Optional.of(existingCategory));
         when(categoryRepository.countCategoriesInOtherTables(existingCategory.getId()))
@@ -171,10 +156,8 @@ public class CategoryServiceImplTest {
     void testDeleteCategory_WhenCategoryInUser_ShouldThrowBadRequestException() {
         Integer categoryId = 1;
         String msg = "Category is in use";
-        Category existingCategory = Category.builder()
-                .id(1)
-                .name("Category To Delete")
-                .build();
+        Category existingCategory =
+                Category.builder().id(1).name("Category To Delete").build();
 
         when(categoryRepository.findById(categoryId)).thenReturn(java.util.Optional.of(existingCategory));
         when(categoryRepository.countCategoriesInOtherTables(existingCategory.getId()))
