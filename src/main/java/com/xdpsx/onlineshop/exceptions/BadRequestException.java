@@ -1,7 +1,13 @@
 package com.xdpsx.onlineshop.exceptions;
 
-public class BadRequestException extends RuntimeException {
-    public BadRequestException(String message) {
-        super(message);
+import com.xdpsx.onlineshop.constants.messages.APIMessage;
+
+public class BadRequestException extends APIException {
+    public BadRequestException(String message, Object... args) {
+        super(message, args);
+    }
+
+    public BadRequestException(APIMessage apiMessage, Object... args) {
+        super(apiMessage.message(), args);
     }
 }

@@ -23,7 +23,7 @@ import com.xdpsx.onlineshop.dtos.category.CategoryResponse;
 import com.xdpsx.onlineshop.entities.Brand;
 import com.xdpsx.onlineshop.entities.Category;
 import com.xdpsx.onlineshop.exceptions.BadRequestException;
-import com.xdpsx.onlineshop.exceptions.ResourceNotFoundException;
+import com.xdpsx.onlineshop.exceptions.NotFoundException;
 import com.xdpsx.onlineshop.mappers.BrandMapper;
 import com.xdpsx.onlineshop.repositories.BrandRepository;
 import com.xdpsx.onlineshop.repositories.CategoryRepository;
@@ -131,7 +131,7 @@ class BrandServiceImplTest {
         when(brandMapper.fromRequestToEntity(brandRequest)).thenReturn(brand);
         when(categoryRepository.findById(category1.getId())).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> brandService.createBrand(brandRequest));
+        assertThrows(NotFoundException.class, () -> brandService.createBrand(brandRequest));
 
         verify(uploader, never()).uploadFile(any(MultipartFile.class), anyMap());
         verify(brandRepository, never()).save(any());
@@ -229,7 +229,7 @@ class BrandServiceImplTest {
 
         when(brandRepository.findById(brandId)).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> brandService.updateBrand(brandId, brandRequest));
+        assertThrows(NotFoundException.class, () -> brandService.updateBrand(brandId, brandRequest));
 
         verify(uploader, never()).uploadFile(any(MultipartFile.class), anyMap());
         verify(brandRepository, never()).save(any());
@@ -278,7 +278,7 @@ class BrandServiceImplTest {
         when(brandRepository.existsByName(brandRequest.getName())).thenReturn(false);
         when(categoryRepository.findById(category2.getId())).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> brandService.updateBrand(brandId, brandRequest));
+        assertThrows(NotFoundException.class, () -> brandService.updateBrand(brandId, brandRequest));
 
         verify(uploader, never()).uploadFile(any(MultipartFile.class), anyMap());
         verify(brandRepository, never()).save(any());
@@ -305,7 +305,7 @@ class BrandServiceImplTest {
         Integer brandId = 1;
         when(brandRepository.findById(brandId)).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> brandService.deleteBrand(brandId));
+        assertThrows(NotFoundException.class, () -> brandService.deleteBrand(brandId));
         //        verify(brandRepository, never()).delete(any());
         verify(uploader, never()).deleteFile(anyString());
     }

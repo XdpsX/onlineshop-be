@@ -10,7 +10,7 @@ import com.xdpsx.onlineshop.entities.CartItem;
 import com.xdpsx.onlineshop.entities.Product;
 import com.xdpsx.onlineshop.entities.User;
 import com.xdpsx.onlineshop.entities.ids.CartItemId;
-import com.xdpsx.onlineshop.exceptions.ResourceNotFoundException;
+import com.xdpsx.onlineshop.exceptions.NotFoundException;
 import com.xdpsx.onlineshop.mappers.CartItemMapper;
 import com.xdpsx.onlineshop.repositories.CartItemRepository;
 import com.xdpsx.onlineshop.repositories.ProductRepository;
@@ -59,7 +59,7 @@ public class CartServiceImpl implements CartService {
     private CartItem getCartItem(CartItemId cartItemId) {
         return cartItemRepository
                 .findById(cartItemId)
-                .orElseThrow(() -> new ResourceNotFoundException("Can not found Cart item"));
+                .orElseThrow(() -> new NotFoundException("Can not found Cart item"));
     }
 
     @Override
@@ -87,13 +87,13 @@ public class CartServiceImpl implements CartService {
     private Product getProduct(CartItemRequest request) {
         return productRepository
                 .findProductById(request.getProductId())
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Product with id=%s not found!".formatted(request.getProductId())));
+                .orElseThrow(
+                        () -> new NotFoundException("Product with id=%s not found!".formatted(request.getProductId())));
     }
 
     private User getUser(String userEmail) {
         return userRepository
                 .findByEmail(userEmail)
-                .orElseThrow(() -> new ResourceNotFoundException("User with email=%s not found".formatted(userEmail)));
+                .orElseThrow(() -> new NotFoundException("User with email=%s not found".formatted(userEmail)));
     }
 }

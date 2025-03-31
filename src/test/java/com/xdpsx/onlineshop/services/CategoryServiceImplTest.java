@@ -16,7 +16,7 @@ import com.xdpsx.onlineshop.dtos.category.CategoryResponse;
 import com.xdpsx.onlineshop.dtos.category.CreateCategoryDTO;
 import com.xdpsx.onlineshop.entities.Category;
 import com.xdpsx.onlineshop.exceptions.BadRequestException;
-import com.xdpsx.onlineshop.exceptions.ResourceNotFoundException;
+import com.xdpsx.onlineshop.exceptions.NotFoundException;
 import com.xdpsx.onlineshop.mappers.CategoryMapper;
 import com.xdpsx.onlineshop.repositories.CategoryRepository;
 import com.xdpsx.onlineshop.services.impl.CategoryServiceImpl;
@@ -104,7 +104,7 @@ public class CategoryServiceImplTest {
 
         when(categoryRepository.findById(categoryId)).thenReturn(java.util.Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> categoryService.updateCategory(categoryId, request));
+        assertThrows(NotFoundException.class, () -> categoryService.updateCategory(categoryId, request));
         verify(categoryRepository, never()).save(any(Category.class));
     }
 
@@ -147,7 +147,7 @@ public class CategoryServiceImplTest {
 
         when(categoryRepository.findById(categoryId)).thenReturn(java.util.Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> categoryService.deleteCategory(categoryId));
+        assertThrows(NotFoundException.class, () -> categoryService.deleteCategory(categoryId));
         verify(categoryRepository, never()).delete(any(Category.class));
     }
 

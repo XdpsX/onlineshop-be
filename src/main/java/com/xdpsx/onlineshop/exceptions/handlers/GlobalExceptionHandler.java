@@ -1,9 +1,7 @@
 package com.xdpsx.onlineshop.exceptions.handlers;
 
-import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
-
-import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
@@ -14,8 +12,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.xdpsx.onlineshop.constants.messages.EMessage;
 import com.xdpsx.onlineshop.dtos.common.ErrorDTO;
-import com.xdpsx.onlineshop.dtos.common.ErrorDetails;
+import com.xdpsx.onlineshop.dtos.common.ErrorDetailsDTO;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -25,45 +24,38 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AccessDeniedException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    public ErrorDTO handleAccessDenied(HttpServletRequest request, AccessDeniedException e) {
+    public ErrorDTO handleAccessDeniedException(AccessDeniedException e) {
         log.error(e.getMessage(), e);
-        ErrorDTO errorDTO = new ErrorDTO();
-        errorDTO.setStatus(HttpStatus.FORBIDDEN.value());
-        errorDTO.setMessage(e.getMessage());
-        return errorDTO;
+        return new ErrorDTO(HttpStatus.FORBIDDEN, e.getMessage());
     }
 
     @ExceptionHandler(BadCredentialsException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public ErrorDTO handleBadCredentials(HttpServletRequest request, BadCredentialsException e) {
-        log.error(e.getMessage(), e);
-        ErrorDTO errorDTO = new ErrorDTO();
-        errorDTO.setStatus(HttpStatus.UNAUTHORIZED.value());
-        errorDTO.setMessage("Wrong email or password"); // e.getMessage() = "Bad credentials"
-        return errorDTO;
+    public ErrorDTO handleBadCredentialsException(BadCredentialsException e) {
+        log.error(e.getMessage(), e); // e.getMessage() = "Bad credentials"
+        return new ErrorDTO(HttpStatus.UNAUTHORIZED, EMessage.BAD_CREDENTIALS);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorDetails handleMethodArgumentNotValid(HttpServletRequest request, MethodArgumentNotValidException e) {
+    public ErrorDetailsDTO handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         log.error(e.getMessage(), e);
-        ErrorDetails error = new ErrorDetails();
-        error.setStatus(HttpStatus.BAD_REQUEST.value());
-        error.setMessage("Validation Error");
+        ErrorDetailsDTO error = new ErrorDetailsDTO(HttpStatus.BAD_REQUEST, EMessage.BAD_VALIDATION);
 
-        List<FieldError> errors = e.getBindingResult().getFieldErrors();
-        error.setDetails(
-                errors.stream().collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage)));
+        Map<String, String> fieldErrors = e.getBindingResult().getFieldErrors().stream()
+                .filter(fieldError -> fieldError.getDefaultMessage() != null)
+                .collect(Collectors.toMap(
+                        FieldError::getField,
+                        FieldError::getDefaultMessage,
+                        (existingMessage, newMessage) -> existingMessage + "; " + newMessage));
+        error.setFieldErrors(fieldErrors);
         return error;
     }
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ErrorDTO handleException(HttpServletRequest request, Exception e) {
+    public ErrorDTO handleException(Exception e) {
         log.error(e.getMessage(), e);
-        ErrorDTO error = new ErrorDTO();
-        error.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-        error.setMessage(e.getMessage());
-        return error;
+        return new ErrorDTO(HttpStatus.INTERNAL_SERVER_ERROR, EMessage.SERVER_ERROR);
     }
 }
