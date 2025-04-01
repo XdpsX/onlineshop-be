@@ -22,7 +22,7 @@ import com.xdpsx.onlineshop.entities.enums.OrderStatus;
 import com.xdpsx.onlineshop.entities.enums.PaymentMethod;
 import com.xdpsx.onlineshop.entities.enums.PaymentStatus;
 import com.xdpsx.onlineshop.exceptions.BadRequestException;
-import com.xdpsx.onlineshop.exceptions.ResourceNotFoundException;
+import com.xdpsx.onlineshop.exceptions.NotFoundException;
 import com.xdpsx.onlineshop.mappers.OrderMapper;
 import com.xdpsx.onlineshop.repositories.CartItemRepository;
 import com.xdpsx.onlineshop.repositories.OrderRepository;
@@ -103,7 +103,7 @@ public class OrderServiceImpl implements OrderService {
         User user = getUser(userEmail);
         Order order = orderRepository
                 .findById(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException("Order id=%s not found".formatted(orderId)));
+                .orElseThrow(() -> new NotFoundException("Order id=%s not found".formatted(orderId)));
         if (!user.getId().equals(order.getUser().getId())) {
             throw new BadRequestException("You are not authorized to pay this order");
         }
@@ -135,7 +135,7 @@ public class OrderServiceImpl implements OrderService {
     public OrderDetailsDTO getOrderById(Long orderId) {
         Order order = orderRepository
                 .findById(orderId)
-                .orElseThrow(() -> new ResourceNotFoundException("Order with id=%s not found".formatted(orderId)));
+                .orElseThrow(() -> new NotFoundException("Order with id=%s not found".formatted(orderId)));
         return orderMapper.fromEntityToDetails(order);
     }
 
@@ -160,7 +160,7 @@ public class OrderServiceImpl implements OrderService {
     public OrderDTO updateOrderStatus(Long id, OrderStatusUpdate request) {
         Order order = orderRepository
                 .findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Order with id=%s not found".formatted(id)));
+                .orElseThrow(() -> new NotFoundException("Order with id=%s not found".formatted(id)));
         order.setStatus(request.getStatus());
         if (request.getStatus().equals(OrderStatus.DELIVERED)) {
             order.setDeliveredAt(LocalDateTime.now());
@@ -174,15 +174,15 @@ public class OrderServiceImpl implements OrderService {
         User user = getUser(name);
         Order order = orderRepository
                 .findByUserIdAndTrackingNumber(user.getId(), trackingNumber)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Order with tracking number=%s not found".formatted(trackingNumber)));
+                .orElseThrow(() ->
+                        new NotFoundException("Order with tracking number=%s not found".formatted(trackingNumber)));
         return orderMapper.fromEntityToDetails(order);
     }
 
     private User getUser(String userEmail) {
         return userRepository
                 .findByEmail(userEmail)
-                .orElseThrow(() -> new ResourceNotFoundException("User with email=%s not found".formatted(userEmail)));
+                .orElseThrow(() -> new NotFoundException("User with email=%s not found".formatted(userEmail)));
     }
 
     private OrderDTO convertToDTO(Order savedOrder) {

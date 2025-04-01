@@ -25,7 +25,7 @@ import com.xdpsx.onlineshop.dtos.media.CloudinaryUploadResponse;
 import com.xdpsx.onlineshop.entities.Brand;
 import com.xdpsx.onlineshop.entities.Category;
 import com.xdpsx.onlineshop.exceptions.DuplicateException;
-import com.xdpsx.onlineshop.exceptions.ResourceNotFoundException;
+import com.xdpsx.onlineshop.exceptions.NotFoundException;
 import com.xdpsx.onlineshop.mappers.BrandMapper;
 import com.xdpsx.onlineshop.mappers.PageMapper;
 import com.xdpsx.onlineshop.repositories.BrandRepository;
@@ -84,7 +84,7 @@ public class BrandServiceImpl implements BrandService {
     public BrandResponse updateBrand(Integer id, BrandRequest request) {
         Brand existingBrand = brandRepository
                 .findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Brand with id=%s not found".formatted(id)));
+                .orElseThrow(() -> new NotFoundException("Brand with id=%s not found".formatted(id)));
 
         // Update name
         if (!existingBrand.getName().equals(request.getName())) {
@@ -117,7 +117,7 @@ public class BrandServiceImpl implements BrandService {
     public void deleteBrand(Integer id) {
         Brand existingBrand = brandRepository
                 .findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Brand with id=%s not found".formatted(id)));
+                .orElseThrow(() -> new NotFoundException("Brand with id=%s not found".formatted(id)));
         //        long countBrands = brandRepository.countBrandsInOtherTables(id);
         //        if (countBrands > 0){
         //            throw new BadRequestException(i18nUtils.getBrandCannotDeleteMsg(existingBrand.getName()));
@@ -138,8 +138,7 @@ public class BrandServiceImpl implements BrandService {
     public List<BrandNoCatsDTO> listBrandsByCategoryId(Integer categoryId) {
         Category category = categoryRepository
                 .findById(categoryId)
-                .orElseThrow(
-                        () -> new ResourceNotFoundException("Category with id=%s not found".formatted(categoryId)));
+                .orElseThrow(() -> new NotFoundException("Category with id=%s not found".formatted(categoryId)));
         //        List<Brand> brands = category.getBrands();
         List<Brand> brands = brandRepository.findBrandsByCategoryId(category.getId());
         return brands.stream().map(brandMapper::fromEntityToNotCatsDTO).collect(Collectors.toList());
@@ -149,8 +148,8 @@ public class BrandServiceImpl implements BrandService {
         return categoryIds.stream()
                 .map(categoryId -> categoryRepository
                         .findById(categoryId)
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException("Category with id=%s not found".formatted(categoryId))))
+                        .orElseThrow(
+                                () -> new NotFoundException("Category with id=%s not found".formatted(categoryId))))
                 .collect(Collectors.toList());
     }
 }
