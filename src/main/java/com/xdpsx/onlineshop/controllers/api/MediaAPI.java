@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.xdpsx.onlineshop.dtos.common.APIResponse;
-import com.xdpsx.onlineshop.dtos.common.ErrorDetails;
+import com.xdpsx.onlineshop.dtos.common.ErrorDetailsDTO;
 import com.xdpsx.onlineshop.dtos.media.CreateMediaDTO;
 import com.xdpsx.onlineshop.dtos.media.ViewMediaDTO;
 
@@ -28,7 +28,7 @@ public interface MediaAPI {
         @ApiResponse(
                 responseCode = "400",
                 description = "Bad Request",
-                content = @Content(schema = @Schema(implementation = ErrorDetails.class)))
+                content = @Content(schema = @Schema(implementation = ErrorDetailsDTO.class)))
     })
     APIResponse<ViewMediaDTO> createMedia(@RequestParam String resource, @Valid @ModelAttribute CreateMediaDTO request);
 }

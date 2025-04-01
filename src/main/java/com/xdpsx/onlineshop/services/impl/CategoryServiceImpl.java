@@ -15,7 +15,7 @@ import com.xdpsx.onlineshop.dtos.common.PageParams;
 import com.xdpsx.onlineshop.dtos.common.PageResponse;
 import com.xdpsx.onlineshop.entities.Category;
 import com.xdpsx.onlineshop.exceptions.DuplicateException;
-import com.xdpsx.onlineshop.exceptions.ResourceNotFoundException;
+import com.xdpsx.onlineshop.exceptions.NotFoundException;
 import com.xdpsx.onlineshop.mappers.CategoryMapper;
 import com.xdpsx.onlineshop.mappers.PageMapper;
 import com.xdpsx.onlineshop.repositories.CategoryRepository;
@@ -54,7 +54,7 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryResponse updateCategory(Integer id, CreateCategoryDTO request) {
         Category existingCat = categoryRepository
                 .findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Category with id=%s not found".formatted(id)));
+                .orElseThrow(() -> new NotFoundException("Category with id=%s not found".formatted(id)));
 
         // Update name
         if (!existingCat.getName().equals(request.getName())) {
@@ -72,7 +72,7 @@ public class CategoryServiceImpl implements CategoryService {
     public void deleteCategory(Integer id) {
         Category existingCat = categoryRepository
                 .findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Category with id=%s not found".formatted(id)));
+                .orElseThrow(() -> new NotFoundException("Category with id=%s not found".formatted(id)));
         long countCategories = categoryRepository.countCategoriesInOtherTables(id);
         if (countCategories > 0) {
             //            throw new BadRequestException(i18nUtils.getCatCannotDeleteMsg(existingCat.getName()));

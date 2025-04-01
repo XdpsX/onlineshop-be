@@ -24,7 +24,7 @@ import com.xdpsx.onlineshop.entities.Product;
 import com.xdpsx.onlineshop.entities.ProductImage;
 import com.xdpsx.onlineshop.exceptions.BadRequestException;
 import com.xdpsx.onlineshop.exceptions.DuplicateException;
-import com.xdpsx.onlineshop.exceptions.ResourceNotFoundException;
+import com.xdpsx.onlineshop.exceptions.NotFoundException;
 import com.xdpsx.onlineshop.mappers.PageMapper;
 import com.xdpsx.onlineshop.mappers.ProductMapper;
 import com.xdpsx.onlineshop.repositories.BrandRepository;
@@ -74,7 +74,7 @@ public class ProductServiceImpl implements ProductService {
     public ProductDetailsDTO getProductById(Long id) {
         Product product = productRepository
                 .findProductById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Product with id=%s not found!".formatted(id)));
+                .orElseThrow(() -> new NotFoundException("Product with id=%s not found!".formatted(id)));
         return productMapper.fromEntityToDetailsDTO(product);
     }
 
@@ -82,7 +82,7 @@ public class ProductServiceImpl implements ProductService {
     public ProductDetailsDTO getProductBySlug(String slug) {
         Product product = productRepository
                 .findProductBySlug(slug)
-                .orElseThrow(() -> new ResourceNotFoundException("Product with slug=%s not found!".formatted(slug)));
+                .orElseThrow(() -> new NotFoundException("Product with slug=%s not found!".formatted(slug)));
         return productMapper.fromEntityToDetailsDTO(product);
     }
 
@@ -93,12 +93,12 @@ public class ProductServiceImpl implements ProductService {
         }
         Category category = categoryRepository
                 .findById(request.getCategoryId())
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Category with id=%s not found!".formatted(request.getCategoryId())));
+                .orElseThrow(() ->
+                        new NotFoundException("Category with id=%s not found!".formatted(request.getCategoryId())));
         Brand brand = brandRepository
                 .findById(request.getBrandId())
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Brand with id=%s not found!".formatted(request.getBrandId())));
+                .orElseThrow(
+                        () -> new NotFoundException("Brand with id=%s not found!".formatted(request.getBrandId())));
 
         Product product = productMapper.fromCreateRequestToEntity(request);
         product.setCategory(category);
@@ -118,7 +118,7 @@ public class ProductServiceImpl implements ProductService {
     public ProductResponse updateProduct(Long id, ProductUpdateRequest request) {
         Product product = productRepository
                 .findProductById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Product with id=%s not found!".formatted(id)));
+                .orElseThrow(() -> new NotFoundException("Product with id=%s not found!".formatted(id)));
 
         product.setName(request.getName());
         product.setPrice(request.getPrice());
@@ -137,16 +137,16 @@ public class ProductServiceImpl implements ProductService {
         if (request.getCategoryId() != null && !product.getCategory().getId().equals(request.getCategoryId())) {
             Category category = categoryRepository
                     .findById(request.getCategoryId())
-                    .orElseThrow(() -> new ResourceNotFoundException(
-                            "Category with id=%s not found!".formatted(request.getCategoryId())));
+                    .orElseThrow(() ->
+                            new NotFoundException("Category with id=%s not found!".formatted(request.getCategoryId())));
             product.setCategory(category);
         }
 
         if (request.getBrandId() != null && !product.getBrand().getId().equals(request.getBrandId())) {
             Brand brand = brandRepository
                     .findById(request.getBrandId())
-                    .orElseThrow(() -> new ResourceNotFoundException(
-                            "Brand with id=%s not found!".formatted(request.getBrandId())));
+                    .orElseThrow(
+                            () -> new NotFoundException("Brand with id=%s not found!".formatted(request.getBrandId())));
             product.setBrand(brand);
         }
 
@@ -184,7 +184,7 @@ public class ProductServiceImpl implements ProductService {
     public void deleteProduct(Long id) {
         Product product = productRepository
                 .findProductById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Product with id=%s not found!".formatted(id)));
+                .orElseThrow(() -> new NotFoundException("Product with id=%s not found!".formatted(id)));
         productRepository.delete(product);
         for (ProductImage productImage : product.getImages()) {
             uploader.deleteFile(productImage.getUrl());
@@ -195,7 +195,7 @@ public class ProductServiceImpl implements ProductService {
     public void publishProduct(Long id, boolean status) {
         Product product = productRepository
                 .findProductById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Product with id=%s not found!".formatted(id)));
+                .orElseThrow(() -> new NotFoundException("Product with id=%s not found!".formatted(id)));
         product.setPublished(status);
         productRepository.save(product);
     }
@@ -234,8 +234,7 @@ public class ProductServiceImpl implements ProductService {
             Double maxPrice) {
         Category category = categoryRepository
                 .findById(categoryId)
-                .orElseThrow(
-                        () -> new ResourceNotFoundException("Category with id=%s not found!".formatted(categoryId)));
+                .orElseThrow(() -> new NotFoundException("Category with id=%s not found!".formatted(categoryId)));
         Specification<Product> prodSpec = Specification.where(spec.belongsToCategory(categoryId))
                 .and(spec.belongsToBrands(brandIds))
                 .and(spec.hasPublished(true))
