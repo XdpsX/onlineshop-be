@@ -15,9 +15,6 @@ public class CreateCategoryDTO {
     @Size(max = 128)
     private String name;
 
-    @Size(max = 255)
-    private String image;
-
     private boolean publicFlg;
 
     private Integer parentId;

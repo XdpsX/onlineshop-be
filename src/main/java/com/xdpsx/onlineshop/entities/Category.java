@@ -26,10 +26,11 @@ public class Category {
     @Column(length = 128, nullable = false, unique = true)
     private String name;
 
-    @Column
-    private String image;
-
     private boolean publicFlg;
+
+    @OneToOne
+    @JoinColumn(name = "image_id", referencedColumnName = "id")
+    private Media image;
 
     @ManyToOne
     @JoinColumn(name = "parent_id", referencedColumnName = "id")
