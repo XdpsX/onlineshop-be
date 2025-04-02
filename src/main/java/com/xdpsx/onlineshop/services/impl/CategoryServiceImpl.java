@@ -6,14 +6,15 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.xdpsx.onlineshop.constants.messages.EMessage;
+import com.xdpsx.onlineshop.dtos.category.CategoryRequestDTO;
 import com.xdpsx.onlineshop.entities.Media;
+import com.xdpsx.onlineshop.exceptions.InUseException;
 import com.xdpsx.onlineshop.repositories.MediaRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.xdpsx.onlineshop.dtos.category.CategoryResponse;
-import com.xdpsx.onlineshop.dtos.category.CreateCategoryDTO;
 import com.xdpsx.onlineshop.dtos.common.PageParams;
 import com.xdpsx.onlineshop.dtos.common.PageResponse;
 import com.xdpsx.onlineshop.entities.Category;
@@ -26,6 +27,7 @@ import com.xdpsx.onlineshop.repositories.specs.BasicSpecification;
 import com.xdpsx.onlineshop.services.CategoryService;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -44,7 +46,8 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public CategoryResponse createCategory(CreateCategoryDTO request) {
+    @Transactional
+    public CategoryResponse createCategory(CategoryRequestDTO request) {
         Category category = CategoryMapper.INSTANCE.toEntity(request);
 
         if (categoryRepository.existsByName(request.name())) {
@@ -69,33 +72,86 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public CategoryResponse updateCategory(Integer id, CreateCategoryDTO request) {
-        Category existingCat = categoryRepository
+    @Transactional
+    public CategoryResponse updateCategory(Integer id, CategoryRequestDTO request) {
+        Category category = categoryRepository
                 .findById(id)
-                .orElseThrow(() -> new NotFoundException("Category with id=%s not found".formatted(id)));
+                .orElseThrow(() -> new NotFoundException(EMessage.NOT_FOUND, id));
 
         // Update name
-        if (!existingCat.getName().equals(request.name())) {
+        if (!category.getName().equals(request.name())) {
             if (categoryRepository.existsByName(request.name())) {
                 throw new DuplicateException(EMessage.DATA_EXISTS, request.name());
             }
-            existingCat.setName(request.name());
+            category.setName(request.name());
         }
 
-        Category savedCategory = categoryRepository.save(existingCat);
+        category.setPublicFlg(request.publicFlg());
+        // Update image
+        updateCategoryImage(category, request.imageId());
+
+        // Update parent
+        if (!isSameParent(category, request.parentId())) {
+            category.setParent(getParentCategory(request.parentId()));
+        }
+
+        Category savedCategory = categoryRepository.save(category);
         return CategoryMapper.INSTANCE.toResponse(savedCategory);
     }
 
+    private void updateCategoryImage(Category category, String newImageId) {
+        Media oldImage = category.getImage();
+
+        if (oldImage == null && newImageId == null) return;
+
+        // If have old image:
+        // 1. No new image (newImageId == null) => Delete old image
+        // 2. New image != old image => Delete old image
+        if (oldImage != null && !oldImage.getId().equals(newImageId)) {
+            oldImage.setDeleteFlg(true);
+            mediaRepository.save(oldImage);
+            category.setImage(null);
+        }
+
+        // if have new image and new image != old image => Update image
+        if (newImageId != null && (oldImage == null || !oldImage.getId().equals(newImageId))) {
+            Media newImage = mediaRepository.findById(newImageId)
+                    .orElseThrow(() -> new NotFoundException(EMessage.NOT_FOUND, newImageId));
+
+            newImage.setTempFlg(false);
+            mediaRepository.save(newImage);
+
+            category.setImage(newImage);
+        }
+    }
+
+    private boolean isSameParent(Category category, Integer newParentId) {
+        return (category.getParent() == null && newParentId == null) ||
+                (category.getParent() != null && category.getParent().getId().equals(newParentId));
+    }
+
+    private Category getParentCategory(Integer parentId) {
+        return (parentId == null) ? null :
+                categoryRepository.findById(parentId)
+                        .orElseThrow(() -> new NotFoundException(EMessage.NOT_FOUND, parentId));
+    }
+
     @Override
+    @Transactional
     public void deleteCategory(Integer id) {
-        Category existingCat = categoryRepository
+        Category category = categoryRepository
                 .findById(id)
-                .orElseThrow(() -> new NotFoundException("Category with id=%s not found".formatted(id)));
+                .orElseThrow(() -> new NotFoundException(EMessage.NOT_FOUND, id));
         long countCategories = categoryRepository.countCategoriesInOtherTables(id);
         if (countCategories > 0) {
-            //            throw new BadRequestException(i18nUtils.getCatCannotDeleteMsg(existingCat.getName()));
+            throw new InUseException(EMessage.IN_USE);
         }
-        categoryRepository.delete(existingCat);
+        if (category.getImage() != null) {
+            Media image = category.getImage();
+            image.setDeleteFlg(true);
+            mediaRepository.save(image);
+        }
+        categoryRepository.delete(category);
     }
 
     @Override

@@ -3,6 +3,7 @@ package com.xdpsx.onlineshop.controllers;
 import java.util.List;
 import java.util.Map;
 
+import com.xdpsx.onlineshop.dtos.category.CategoryRequestDTO;
 import jakarta.validation.Valid;
 
 import org.springdoc.core.annotations.ParameterObject;
@@ -11,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 
 import com.xdpsx.onlineshop.constants.messages.SMessage;
 import com.xdpsx.onlineshop.dtos.category.CategoryResponse;
-import com.xdpsx.onlineshop.dtos.category.CreateCategoryDTO;
 import com.xdpsx.onlineshop.dtos.common.APIResponse;
 import com.xdpsx.onlineshop.dtos.common.PageParams;
 import com.xdpsx.onlineshop.dtos.common.PageResponse;
@@ -49,14 +49,14 @@ public class CategoryController {
 
     @PostMapping("/categories/create")
     @ResponseStatus(HttpStatus.CREATED)
-    public APIResponse<CategoryResponse> createCategory(@Valid @RequestBody CreateCategoryDTO request) {
+    public APIResponse<CategoryResponse> createCategory(@Valid @RequestBody CategoryRequestDTO request) {
         CategoryResponse data = categoryService.createCategory(request);
         return new APIResponse<>(HttpStatus.CREATED, data, SMessage.CREATE_SUCCESSFULLY);
     }
 
     @PutMapping("/categories/{id}/update")
     public APIResponse<CategoryResponse> updateCategory(
-            @PathVariable Integer id, @Valid @RequestBody CreateCategoryDTO request) {
+            @PathVariable Integer id, @Valid @RequestBody CategoryRequestDTO request) {
         CategoryResponse data = categoryService.updateCategory(id, request);
         return APIResponse.ok(data, SMessage.UPDATE_SUCCESSFULLY);
     }
