@@ -5,6 +5,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.xdpsx.onlineshop.constants.messages.EMessage;
+import com.xdpsx.onlineshop.entities.Media;
+import com.xdpsx.onlineshop.repositories.MediaRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -27,27 +30,42 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
-    private final CategoryMapper categoryMapper;
     private final PageMapper pageMapper;
     private final CategoryRepository categoryRepository;
+    private final MediaRepository mediaRepository;
 
     private final BasicSpecification<Category> spec;
 
     @Override
     public List<CategoryResponse> getAllCategories() {
         return categoryRepository.findAll(spec.getSortSpec("name")).stream()
-                .map(categoryMapper::fromEntityToResponse)
+                .map(CategoryMapper.INSTANCE::toResponse)
                 .collect(Collectors.toList());
     }
 
     @Override
     public CategoryResponse createCategory(CreateCategoryDTO request) {
-        if (categoryRepository.existsByName(request.getName())) {
-            throw new DuplicateException("Category with name=%s already exists".formatted(request.getName()));
+        Category category = CategoryMapper.INSTANCE.toEntity(request);
+
+        if (categoryRepository.existsByName(request.name())) {
+            throw new DuplicateException(EMessage.DATA_EXISTS, request.name());
         }
-        Category category = categoryMapper.fromRequestToEntity(request);
+
+        if (request.parentId() != null) {
+            Category parent = categoryRepository.findById(request.parentId())
+                    .orElseThrow(() -> new NotFoundException(EMessage.NOT_FOUND, request.parentId()));
+            category.setParent(parent);
+        }
+
+        if (request.imageId() != null) {
+            Media image = mediaRepository.findById(request.imageId())
+                    .orElseThrow(() -> new NotFoundException(EMessage.NOT_FOUND, request.imageId()));
+            image.setTempFlg(false);
+            category.setImage(image);
+        }
+
         Category savedCategory = categoryRepository.save(category);
-        return categoryMapper.fromEntityToResponse(savedCategory);
+        return CategoryMapper.INSTANCE.toResponse(savedCategory);
     }
 
     @Override
@@ -57,15 +75,15 @@ public class CategoryServiceImpl implements CategoryService {
                 .orElseThrow(() -> new NotFoundException("Category with id=%s not found".formatted(id)));
 
         // Update name
-        if (!existingCat.getName().equals(request.getName())) {
-            if (categoryRepository.existsByName(request.getName())) {
-                throw new DuplicateException("Category with name=%s already exists".formatted(request.getName()));
+        if (!existingCat.getName().equals(request.name())) {
+            if (categoryRepository.existsByName(request.name())) {
+                throw new DuplicateException(EMessage.DATA_EXISTS, request.name());
             }
-            existingCat.setName(request.getName());
+            existingCat.setName(request.name());
         }
 
         Category savedCategory = categoryRepository.save(existingCat);
-        return categoryMapper.fromEntityToResponse(savedCategory);
+        return CategoryMapper.INSTANCE.toResponse(savedCategory);
     }
 
     @Override

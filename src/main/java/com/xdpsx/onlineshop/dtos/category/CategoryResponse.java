@@ -10,5 +10,4 @@ import lombok.*;
 public class CategoryResponse {
     private Integer id;
     private String name;
-    private String slug;
 }

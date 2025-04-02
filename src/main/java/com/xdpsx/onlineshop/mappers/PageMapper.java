@@ -25,7 +25,7 @@ public class PageMapper {
     private final ProductMapper productMapper;
 
     public PageResponse<CategoryResponse> toCategoryPageResponse(Page<Category> categoryPage) {
-        return toPageResponse(categoryPage, categoryMapper::fromEntityToResponse);
+        return toPageResponse(categoryPage, categoryMapper::toResponse);
     }
 
     public PageResponse<BrandResponse> toBrandPageResponse(Page<Brand> brandPage) {

@@ -3,7 +3,10 @@ package com.xdpsx.onlineshop.constants.messages;
 public enum EMessage implements APIMessage {
     SERVER_ERROR("E_MESSAGE_0001"),
     BAD_CREDENTIALS("E_MESSAGE_0002"),
-    BAD_VALIDATION("E_MESSAGE_0003");
+    BAD_VALIDATION("E_MESSAGE_0003"),
+    DATA_EXISTS("E_MESSAGE_0004"),
+    NOT_FOUND("E_MESSAGE_0005"),
+    ;
 
     private final String message;
 
