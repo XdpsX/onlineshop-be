@@ -1,12 +1,10 @@
 package com.xdpsx.onlineshop.entities;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import jakarta.persistence.*;
 
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import lombok.experimental.SuperBuilder;
 
 import lombok.*;
 
@@ -14,11 +12,10 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 @Entity
 @Table(name = "categories")
-@EntityListeners(AuditingEntityListener.class)
-public class Category {
+public class Category extends AuditEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -43,10 +40,4 @@ public class Category {
     @ManyToMany(mappedBy = "categories")
     private List<Brand> brands;
 
-    @CreatedDate
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @Column(insertable = false)
-    private LocalDateTime updatedAt;
 }

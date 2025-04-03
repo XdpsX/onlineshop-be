@@ -3,7 +3,9 @@ package com.xdpsx.onlineshop.controllers;
 import java.util.List;
 import java.util.Map;
 
-import com.xdpsx.onlineshop.dtos.category.CategoryRequestDTO;
+import com.xdpsx.onlineshop.dtos.category.CreateCategoryDTO;
+import com.xdpsx.onlineshop.dtos.category.UpdateCategoryDTO;
+import com.xdpsx.onlineshop.dtos.common.ModifyExclusiveDTO;
 import jakarta.validation.Valid;
 
 import org.springdoc.core.annotations.ParameterObject;
@@ -49,21 +51,21 @@ public class CategoryController {
 
     @PostMapping("/categories/create")
     @ResponseStatus(HttpStatus.CREATED)
-    public APIResponse<CategoryResponse> createCategory(@Valid @RequestBody CategoryRequestDTO request) {
+    public APIResponse<CategoryResponse> createCategory(@Valid @RequestBody CreateCategoryDTO request) {
         CategoryResponse data = categoryService.createCategory(request);
         return new APIResponse<>(HttpStatus.CREATED, data, SMessage.CREATE_SUCCESSFULLY);
     }
 
     @PutMapping("/categories/{id}/update")
     public APIResponse<CategoryResponse> updateCategory(
-            @PathVariable Integer id, @Valid @RequestBody CategoryRequestDTO request) {
+            @PathVariable Integer id, @Valid @RequestBody UpdateCategoryDTO request) {
         CategoryResponse data = categoryService.updateCategory(id, request);
         return APIResponse.ok(data, SMessage.UPDATE_SUCCESSFULLY);
     }
 
     @DeleteMapping("/categories/{id}/delete")
-    public APIResponse<Void> deleteCategory(@PathVariable Integer id) {
-        categoryService.deleteCategory(id);
+    public APIResponse<Void> deleteCategory(@PathVariable Integer id, @Valid @RequestBody ModifyExclusiveDTO request) {
+        categoryService.deleteCategory(id, request);
         return APIResponse.noContent(SMessage.DELETE_SUCCESSFULLY);
     }
 

@@ -1,6 +1,6 @@
 package com.xdpsx.onlineshop.mappers;
 
-import com.xdpsx.onlineshop.dtos.category.CategoryRequestDTO;
+import com.xdpsx.onlineshop.dtos.category.CreateCategoryDTO;
 import org.mapstruct.Mapper;
 
 import com.xdpsx.onlineshop.dtos.category.CategoryResponse;
@@ -19,7 +19,7 @@ public interface CategoryMapper {
     @Mapping(target = "brands", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    Category toEntity(CategoryRequestDTO request);
+    Category toEntity(CreateCategoryDTO request);
 
     CategoryResponse toResponse(Category entity);
 }

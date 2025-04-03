@@ -1,15 +1,12 @@
 package com.xdpsx.onlineshop.exceptions.handlers;
 
-import com.xdpsx.onlineshop.exceptions.InUseException;
+import com.xdpsx.onlineshop.exceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.xdpsx.onlineshop.dtos.common.ErrorDTO;
-import com.xdpsx.onlineshop.exceptions.BadRequestException;
-import com.xdpsx.onlineshop.exceptions.DuplicateException;
-import com.xdpsx.onlineshop.exceptions.NotFoundException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -17,7 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 @RestControllerAdvice
 public class CustomExceptionHandler {
 
-    @ExceptionHandler({DuplicateException.class, InUseException.class})
+    @ExceptionHandler({DuplicateException.class, InUseException.class, ModifyExclusiveException.class})
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorDTO handleDuplicateException(DuplicateException e) {
         log.error(e.getMessage(), e);

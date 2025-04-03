@@ -6,9 +6,12 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.xdpsx.onlineshop.constants.messages.EMessage;
-import com.xdpsx.onlineshop.dtos.category.CategoryRequestDTO;
+import com.xdpsx.onlineshop.dtos.category.CreateCategoryDTO;
+import com.xdpsx.onlineshop.dtos.category.UpdateCategoryDTO;
+import com.xdpsx.onlineshop.dtos.common.ModifyExclusiveDTO;
 import com.xdpsx.onlineshop.entities.Media;
 import com.xdpsx.onlineshop.exceptions.InUseException;
+import com.xdpsx.onlineshop.exceptions.ModifyExclusiveException;
 import com.xdpsx.onlineshop.repositories.MediaRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -47,7 +50,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
-    public CategoryResponse createCategory(CategoryRequestDTO request) {
+    public CategoryResponse createCategory(CreateCategoryDTO request) {
         Category category = CategoryMapper.INSTANCE.toEntity(request);
 
         if (categoryRepository.existsByName(request.name())) {
@@ -73,10 +76,14 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
-    public CategoryResponse updateCategory(Integer id, CategoryRequestDTO request) {
+    public CategoryResponse updateCategory(Integer id, UpdateCategoryDTO request) {
         Category category = categoryRepository
                 .findById(id)
                 .orElseThrow(() -> new NotFoundException(EMessage.NOT_FOUND, id));
+
+        if (!request.lastRetrievedAt().isAfter(category.getUpdatedAt())) {
+            throw new ModifyExclusiveException(EMessage.MODIFY_EXCLUSIVE);
+        }
 
         // Update name
         if (!category.getName().equals(request.name())) {
@@ -138,10 +145,13 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
-    public void deleteCategory(Integer id) {
+    public void deleteCategory(Integer id, ModifyExclusiveDTO request) {
         Category category = categoryRepository
                 .findById(id)
                 .orElseThrow(() -> new NotFoundException(EMessage.NOT_FOUND, id));
+        if (!request.lastRetrievedAt().isAfter(category.getUpdatedAt())) {
+            throw new ModifyExclusiveException(EMessage.MODIFY_EXCLUSIVE);
+        }
         long countCategories = categoryRepository.countCategoriesInOtherTables(id);
         if (countCategories > 0) {
             throw new InUseException(EMessage.IN_USE);
