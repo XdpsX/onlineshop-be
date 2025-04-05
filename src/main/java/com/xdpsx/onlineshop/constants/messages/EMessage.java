@@ -8,6 +8,7 @@ public enum EMessage implements APIMessage {
     NOT_FOUND("E_MESSAGE_0005"),
     IN_USE("E_MESSAGE_0006"),
     MODIFY_EXCLUSIVE("E_MESSAGE_0007"),
+    INVALID_RESOURCE_TYPE("E_MESSAGE_0008"),
     ;
 
     private final String message;

@@ -14,9 +14,16 @@ import lombok.extern.slf4j.Slf4j;
 @RestControllerAdvice
 public class CustomExceptionHandler {
 
+    @ExceptionHandler(InvalidResourceTypeException.class)
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    public ErrorDTO handleInvalidMediaResourceException(InvalidResourceTypeException e) {
+        log.error(e.getMessage(), e);
+        return new ErrorDTO(HttpStatus.UNPROCESSABLE_ENTITY, e.getMessage(), e.getArgs());
+    }
+
     @ExceptionHandler({DuplicateException.class, InUseException.class, ModifyExclusiveException.class})
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorDTO handleDuplicateException(DuplicateException e) {
+    public ErrorDTO handleConflictException(APIException e) {
         log.error(e.getMessage(), e);
         return new ErrorDTO(HttpStatus.CONFLICT, e.getMessage(), e.getArgs());
     }

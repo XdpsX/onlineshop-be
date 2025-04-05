@@ -10,8 +10,8 @@ import com.xdpsx.onlineshop.dtos.category.CreateCategoryDTO;
 import com.xdpsx.onlineshop.dtos.category.UpdateCategoryDTO;
 import com.xdpsx.onlineshop.dtos.common.ModifyExclusiveDTO;
 import com.xdpsx.onlineshop.entities.Media;
-import com.xdpsx.onlineshop.exceptions.InUseException;
-import com.xdpsx.onlineshop.exceptions.ModifyExclusiveException;
+import com.xdpsx.onlineshop.entities.enums.MediaResourceType;
+import com.xdpsx.onlineshop.exceptions.*;
 import com.xdpsx.onlineshop.repositories.MediaRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,8 +21,6 @@ import com.xdpsx.onlineshop.dtos.category.CategoryResponse;
 import com.xdpsx.onlineshop.dtos.common.PageParams;
 import com.xdpsx.onlineshop.dtos.common.PageResponse;
 import com.xdpsx.onlineshop.entities.Category;
-import com.xdpsx.onlineshop.exceptions.DuplicateException;
-import com.xdpsx.onlineshop.exceptions.NotFoundException;
 import com.xdpsx.onlineshop.mappers.CategoryMapper;
 import com.xdpsx.onlineshop.mappers.PageMapper;
 import com.xdpsx.onlineshop.repositories.CategoryRepository;
@@ -66,6 +64,9 @@ public class CategoryServiceImpl implements CategoryService {
         if (request.imageId() != null) {
             Media image = mediaRepository.findById(request.imageId())
                     .orElseThrow(() -> new NotFoundException(EMessage.NOT_FOUND, request.imageId()));
+            if (!image.getResourceType().equals(MediaResourceType.CATEGORY)) {
+                throw new InvalidResourceTypeException(EMessage.INVALID_RESOURCE_TYPE);
+            }
             image.setTempFlg(false);
             category.setImage(image);
         }
@@ -81,7 +82,7 @@ public class CategoryServiceImpl implements CategoryService {
                 .findById(id)
                 .orElseThrow(() -> new NotFoundException(EMessage.NOT_FOUND, id));
 
-        if (!request.lastRetrievedAt().isAfter(category.getUpdatedAt())) {
+        if (category.getUpdatedAt() != null && !request.lastRetrievedAt().isAfter(category.getUpdatedAt())) {
             throw new ModifyExclusiveException(EMessage.MODIFY_EXCLUSIVE);
         }
 
@@ -124,6 +125,9 @@ public class CategoryServiceImpl implements CategoryService {
         if (newImageId != null && (oldImage == null || !oldImage.getId().equals(newImageId))) {
             Media newImage = mediaRepository.findById(newImageId)
                     .orElseThrow(() -> new NotFoundException(EMessage.NOT_FOUND, newImageId));
+            if (!newImage.getResourceType().equals(MediaResourceType.CATEGORY)) {
+                throw new InvalidResourceTypeException(EMessage.INVALID_RESOURCE_TYPE);
+            }
 
             newImage.setTempFlg(false);
             mediaRepository.save(newImage);
