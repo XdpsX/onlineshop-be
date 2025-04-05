@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.xdpsx.onlineshop.constants.messages.SMessage;
@@ -82,4 +83,24 @@ public class CategoryController {
     //                categoryId, pageNum, pageSize, brandIds, sort, minPrice, maxPrice);
     //        return ResponseEntity.ok(response);
     //    }
+
+    // NOTE: Experimental 1
+    // page=1&size=10&sort=name:asc|desc
+    public ResponseEntity<?> getAllCategoriesWithSortExp(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "name:asc") String sort) {
+//        return ResponseEntity.ok(categoryService.getAllCategoriesWithSortExp(page, size, sort));
+        return ResponseEntity.ok(null);
+    }
+
+    // NOTE: Experimental 2
+    // page=1&size=10&sorts=name:asc,field:desc
+    public ResponseEntity<?> getAllCategoriesWithMultiSortsExp(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "name:asc") String... sorts) {
+        return ResponseEntity.ok(null);
+    }
+
 }

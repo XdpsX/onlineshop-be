@@ -1,12 +1,18 @@
 package com.xdpsx.onlineshop.services.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import com.xdpsx.onlineshop.repositories.exp.SearchExpCriteria;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +35,7 @@ import com.xdpsx.onlineshop.repositories.specs.BasicSpecification;
 import com.xdpsx.onlineshop.services.CategoryService;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.util.StringUtils;
 
 @Service
 @RequiredArgsConstructor
@@ -186,4 +193,50 @@ public class CategoryServiceImpl implements CategoryService {
         exists.put("nameExists", categoryRepository.existsByName(name));
         return exists;
     }
+
+    // NOTE: Experimental 1
+    // page=1&size=10&sort=name:asc|desc
+    public void getAllCategoriesWithSortExp(int page, int size, String sort) {
+        List<Sort.Order> sorts = new ArrayList<>();
+
+        if (StringUtils.hasText(sort)) {
+            // name:asc|desc
+            Pattern pattern = Pattern.compile("(\\w+?)(:)(.*)");
+            Matcher matcher = pattern.matcher(sort);
+            if (matcher.find()) {
+                if (matcher.group(3).equals("asc")) {
+                    sorts.add(new Sort.Order(Sort.Direction.ASC, matcher.group(1)));
+                } else {
+                    sorts.add(new Sort.Order(Sort.Direction.DESC, matcher.group(1)));
+                }
+            }
+        }
+
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by(sorts));
+        Page<Category> categories = categoryRepository.findAll(pageable);
+//        categories.stream().map()
+    }
+
+    // NOTE: Experimental 2
+    public void getAllCategoriesWithMultiSortsExp(int page, int size, String... sorts) {
+        List<Sort.Order> orderSorts = new ArrayList<>();
+
+        for (String sort: sorts) {
+            // name:asc|desc
+            Pattern pattern = Pattern.compile("(\\w+?)(:)(.*)");
+            Matcher matcher = pattern.matcher(sort);
+            if (matcher.find()) {
+                if (matcher.group(3).equals("asc")) {
+                    orderSorts.add(new Sort.Order(Sort.Direction.ASC, matcher.group(1)));
+                } else {
+                    orderSorts.add(new Sort.Order(Sort.Direction.DESC, matcher.group(1)));
+                }
+            }
+        }
+
+
+        Pageable pageable = PageRequest.of(page - 1, size, Sort.by(orderSorts));
+        Page<Category> categories = categoryRepository.findAll(pageable);
+    }
+
 }
