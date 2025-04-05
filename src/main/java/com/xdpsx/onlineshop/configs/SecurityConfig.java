@@ -75,9 +75,8 @@ public class SecurityConfig {
                 .permitAll()
                 .anyRequest()
                 // TODO: remove after refactoring
-//                .authenticated()
-                        .permitAll()
-        );
+                //                .authenticated()
+                .permitAll());
         http.oauth2ResourceServer(oauth2 -> oauth2.jwt(
                         config -> config.decoder(jwtDecoder()).jwtAuthenticationConverter(jwtAuthenticationConverter()))
                 .authenticationEntryPoint(authenticationEntryPoint));

@@ -1,12 +1,12 @@
 package com.xdpsx.onlineshop.mappers;
 
-import com.xdpsx.onlineshop.dtos.category.CreateCategoryDTO;
 import org.mapstruct.Mapper;
-
-import com.xdpsx.onlineshop.dtos.category.CategoryResponse;
-import com.xdpsx.onlineshop.entities.Category;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
+
+import com.xdpsx.onlineshop.dtos.category.CategoryResponse;
+import com.xdpsx.onlineshop.dtos.category.CreateCategoryDTO;
+import com.xdpsx.onlineshop.entities.Category;
 
 @Mapper
 public interface CategoryMapper {

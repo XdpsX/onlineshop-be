@@ -4,9 +4,8 @@ import java.util.List;
 
 import jakarta.persistence.*;
 
-import lombok.experimental.SuperBuilder;
-
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
@@ -15,7 +14,7 @@ import lombok.*;
 @SuperBuilder
 @Entity
 @Table(name = "categories")
-public class Category extends AuditEntity{
+public class Category extends AuditEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -29,7 +28,7 @@ public class Category extends AuditEntity{
     @JoinColumn(name = "image_id", referencedColumnName = "id")
     private Media image;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id", referencedColumnName = "id")
     private Category parent;
 
@@ -39,5 +38,4 @@ public class Category extends AuditEntity{
 
     @ManyToMany(mappedBy = "categories")
     private List<Brand> brands;
-
 }
