@@ -14,7 +14,7 @@ import java.util.function.Consumer;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SearchCriteriaQueryConsumer implements Consumer<SearchExpCriteria> {
+public class SearchCriteriaQueryExpConsumer implements Consumer<SearchExpCriteria> {
     private CriteriaBuilder builder;
     private Predicate predicate;
     private Root root;

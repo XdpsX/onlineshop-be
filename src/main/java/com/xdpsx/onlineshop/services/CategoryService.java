@@ -11,6 +11,8 @@ import com.xdpsx.onlineshop.dtos.common.PageParams;
 import com.xdpsx.onlineshop.dtos.common.PageResponse;
 
 public interface CategoryService {
+    PageResponse<CategoryResponse> getCategoriesPage(PageParams params);
+
     List<CategoryResponse> getAllCategories();
 
     CategoryResponse createCategory(CreateCategoryDTO request);
@@ -19,7 +21,6 @@ public interface CategoryService {
 
     void deleteCategory(Integer id, ModifyExclusiveDTO request);
 
-    PageResponse<CategoryResponse> getCategoriesPage(PageParams params);
 
     Map<String, Boolean> checkExistsCat(String name, String slug);
 }

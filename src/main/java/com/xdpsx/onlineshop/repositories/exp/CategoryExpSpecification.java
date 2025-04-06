@@ -12,9 +12,9 @@ import org.springframework.lang.NonNull;
 
 @Getter
 @AllArgsConstructor
-public class CategorySpecification implements Specification<Category> {
+public class CategoryExpSpecification implements Specification<Category> {
 
-    private SpecSearchCriteria criteria;
+    private SpecSearchExpCriteria criteria;
 
     @Override
     public Predicate toPredicate(@NonNull final Root<Category> root, @NonNull final CriteriaQuery<?> query, @NonNull final CriteriaBuilder builder) {

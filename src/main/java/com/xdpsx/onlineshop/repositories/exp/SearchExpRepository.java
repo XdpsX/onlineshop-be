@@ -129,7 +129,7 @@ public class SearchExpRepository {
         Root<Category> root = query.from(Category.class);
 
         Predicate predicate = criteriaBuilder.conjunction();
-        SearchCriteriaQueryConsumer queryConsumer = new SearchCriteriaQueryConsumer(criteriaBuilder, predicate, root);
+        SearchCriteriaQueryExpConsumer queryConsumer = new SearchCriteriaQueryExpConsumer(criteriaBuilder, predicate, root);
 
         // Join Example
 //        if (StringUtils.hasLength("brand-1")) {
@@ -175,7 +175,7 @@ public class SearchExpRepository {
         for (String u : names) {
             Matcher matcher = pattern.matcher(u);
             if (matcher.find()) {
-                SpecSearchCriteria searchCriteria = new SpecSearchCriteria(matcher.group(1), matcher.group(2), matcher.group(3), matcher.group(4), matcher.group(5));
+                SpecSearchExpCriteria searchCriteria = new SpecSearchExpCriteria(matcher.group(1), matcher.group(2), matcher.group(3), matcher.group(4), matcher.group(5));
                 userPreList.add(toCategoryPredicate(categoryRoot, builder, searchCriteria));
             }
         }
@@ -184,7 +184,7 @@ public class SearchExpRepository {
         for (String a : brands) {
             Matcher matcher = pattern.matcher(a);
             if (matcher.find()) {
-                SpecSearchCriteria searchCriteria = new SpecSearchCriteria(matcher.group(1), matcher.group(2), matcher.group(3), matcher.group(4), matcher.group(5));
+                SpecSearchExpCriteria searchCriteria = new SpecSearchExpCriteria(matcher.group(1), matcher.group(2), matcher.group(3), matcher.group(4), matcher.group(5));
                 addressPreList.add(toBrandPredicate(brandRoot, builder, searchCriteria));
             }
         }
@@ -210,7 +210,7 @@ public class SearchExpRepository {
 //                .build();
     }
 
-    private Predicate toCategoryPredicate(Root<Category> root, CriteriaBuilder builder, SpecSearchCriteria criteria) {
+    private Predicate toCategoryPredicate(Root<Category> root, CriteriaBuilder builder, SpecSearchExpCriteria criteria) {
         return switch (criteria.getOperation()) {
             case EQUALITY -> builder.equal(root.get(criteria.getKey()), criteria.getValue());
             case NEGATION -> builder.notEqual(root.get(criteria.getKey()), criteria.getValue());
@@ -223,7 +223,7 @@ public class SearchExpRepository {
         };
     }
 
-    private Predicate toBrandPredicate(Join<Brand, User> root, CriteriaBuilder builder, SpecSearchCriteria criteria) {
+    private Predicate toBrandPredicate(Join<Brand, User> root, CriteriaBuilder builder, SpecSearchExpCriteria criteria) {
         return switch (criteria.getOperation()) {
             case EQUALITY -> builder.equal(root.get(criteria.getKey()), criteria.getValue());
             case NEGATION -> builder.notEqual(root.get(criteria.getKey()), criteria.getValue());
@@ -248,7 +248,7 @@ public class SearchExpRepository {
         for (String u : names) {
             Matcher matcher = pattern.matcher(u);
             if (matcher.find()) {
-                SpecSearchCriteria searchCriteria = new SpecSearchCriteria(matcher.group(1), matcher.group(2), matcher.group(3), matcher.group(4), matcher.group(5));
+                SpecSearchExpCriteria searchCriteria = new SpecSearchExpCriteria(matcher.group(1), matcher.group(2), matcher.group(3), matcher.group(4), matcher.group(5));
                 userPreList.add(toCategoryPredicate(categoryRoot, builder, searchCriteria));
             }
         }
@@ -257,7 +257,7 @@ public class SearchExpRepository {
         for (String a : brands) {
             Matcher matcher = pattern.matcher(a);
             if (matcher.find()) {
-                SpecSearchCriteria searchCriteria = new SpecSearchCriteria(matcher.group(1), matcher.group(2), matcher.group(3), matcher.group(4), matcher.group(5));
+                SpecSearchExpCriteria searchCriteria = new SpecSearchExpCriteria(matcher.group(1), matcher.group(2), matcher.group(3), matcher.group(4), matcher.group(5));
                 addressPreList.add(toBrandPredicate(brandRoot, builder, searchCriteria));
             }
         }

@@ -4,27 +4,27 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import static com.xdpsx.onlineshop.repositories.exp.SearchOperation.*;
+import static com.xdpsx.onlineshop.repositories.exp.SearchExpOperation.*;
 
 @Getter
 @Setter
 @NoArgsConstructor
-public class SpecSearchCriteria {
+public class SpecSearchExpCriteria {
 
     private String key;
-    private SearchOperation operation;
+    private SearchExpOperation operation;
     private Object value;
     private boolean orPredicate;
 
 
-    public SpecSearchCriteria(final String key, final SearchOperation operation, final Object value) {
+    public SpecSearchExpCriteria(final String key, final SearchExpOperation operation, final Object value) {
         super();
         this.key = key;
         this.operation = operation;
         this.value = value;
     }
 
-    public SpecSearchCriteria(final String orPredicate, final String key, final SearchOperation operation, final Object value) {
+    public SpecSearchExpCriteria(final String orPredicate, final String key, final SearchExpOperation operation, final Object value) {
         super();
         this.orPredicate = orPredicate != null && orPredicate.equals(OR_PREDICATE_FLAG);
         this.key = key;
@@ -32,24 +32,24 @@ public class SpecSearchCriteria {
         this.value = value;
     }
 
-    public SpecSearchCriteria(String key, String operation, String prefix, String value, String suffix) {
-        SearchOperation searchOperation = SearchOperation.getSimpleOperation(operation.charAt(0));
-        if (searchOperation != null) {
-            if (searchOperation == EQUALITY) { // the operation may be complex operation
+    public SpecSearchExpCriteria(String key, String operation, String prefix, String value, String suffix) {
+        SearchExpOperation searchExpOperation = SearchExpOperation.getSimpleOperation(operation.charAt(0));
+        if (searchExpOperation != null) {
+            if (searchExpOperation == EQUALITY) { // the operation may be complex operation
                 final boolean startWithAsterisk = prefix != null && prefix.contains(ZERO_OR_MORE_REGEX);
                 final boolean endWithAsterisk = suffix != null && suffix.contains(ZERO_OR_MORE_REGEX);
 
                 if (startWithAsterisk && endWithAsterisk) {
-                    searchOperation = CONTAINS;
+                    searchExpOperation = CONTAINS;
                 } else if (startWithAsterisk) {
-                    searchOperation = ENDS_WITH;
+                    searchExpOperation = ENDS_WITH;
                 } else if (endWithAsterisk) {
-                    searchOperation = STARTS_WITH;
+                    searchExpOperation = STARTS_WITH;
                 }
             }
         }
         this.key = key;
-        this.operation = searchOperation;
+        this.operation = searchExpOperation;
         this.value = value;
     }
 

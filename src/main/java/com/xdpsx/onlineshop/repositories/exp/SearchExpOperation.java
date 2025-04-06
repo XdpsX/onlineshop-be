@@ -1,6 +1,6 @@
 package com.xdpsx.onlineshop.repositories.exp;
 
-public enum SearchOperation {
+public enum SearchExpOperation {
     EQUALITY, NEGATION, GREATER_THAN, LESS_THAN, LIKE, STARTS_WITH, ENDS_WITH, CONTAINS;
 
     public static final String[] SIMPLE_OPERATION_SET = { ":", "!", ">", "<", "~" };
@@ -17,7 +17,7 @@ public enum SearchOperation {
 
     public static final String RIGHT_PARENTHESIS = ")";
 
-    public static SearchOperation getSimpleOperation(final char input) {
+    public static SearchExpOperation getSimpleOperation(final char input) {
         return switch (input) {
             case ':' -> EQUALITY;
             case '!' -> NEGATION;

@@ -5,7 +5,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import com.xdpsx.onlineshop.repositories.exp.CategorySpecificationBuilder;
+import com.xdpsx.onlineshop.repositories.exp.CategoryExpSpecificationBuilder;
 import com.xdpsx.onlineshop.repositories.exp.SearchExpRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -44,6 +44,14 @@ public class CategoryServiceImpl implements CategoryService {
 
     private final BasicSpecification<Category> spec;
     private final SearchExpRepository searchExpRepository;
+
+    @Override
+    public PageResponse<CategoryResponse> getCategoriesPage(PageParams params) {
+        Page<Category> categoryPage = categoryRepository.findAll(
+                spec.getFiltersSpec(params.getSearch(), params.getSort()),
+                PageRequest.of(params.getPageNum() - 1, params.getPageSize()));
+        return pageMapper.toCategoryPageResponse(categoryPage);
+    }
 
     @Override
     public List<CategoryResponse> getAllCategories() {
@@ -179,14 +187,6 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public PageResponse<CategoryResponse> getCategoriesPage(PageParams params) {
-        Page<Category> categoryPage = categoryRepository.findAll(
-                spec.getFiltersSpec(params.getSearch(), params.getSort()),
-                PageRequest.of(params.getPageNum() - 1, params.getPageSize()));
-        return pageMapper.toCategoryPageResponse(categoryPage);
-    }
-
-    @Override
     public Map<String, Boolean> checkExistsCat(String name, String slug) {
         Map<String, Boolean> exists = new HashMap<>();
         exists.put("nameExists", categoryRepository.existsByName(name));
@@ -242,7 +242,7 @@ public class CategoryServiceImpl implements CategoryService {
         if (user != null && address != null) {
 //            return searchExpRepository.searchCategoryByCriteriaWithJoin(pageable, user, address);
         } else if (user != null) {
-            CategorySpecificationBuilder builder = new CategorySpecificationBuilder();
+            CategoryExpSpecificationBuilder builder = new CategoryExpSpecificationBuilder();
             String SEARCH_SPEC_OPERATOR = "(\\w+?)([<:>~!])(.*)(\\p{Punct}?)(\\p{Punct}?)";
             Pattern pattern = Pattern.compile(SEARCH_SPEC_OPERATOR);
             for (String s : user) {
