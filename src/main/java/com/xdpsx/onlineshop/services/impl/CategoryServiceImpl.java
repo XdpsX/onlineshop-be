@@ -1,14 +1,12 @@
 package com.xdpsx.onlineshop.services.impl;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import com.xdpsx.onlineshop.repositories.exp.SearchExpCriteria;
+import com.xdpsx.onlineshop.repositories.exp.CategorySpecificationBuilder;
+import com.xdpsx.onlineshop.repositories.exp.SearchExpRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -45,6 +43,7 @@ public class CategoryServiceImpl implements CategoryService {
     private final MediaRepository mediaRepository;
 
     private final BasicSpecification<Category> spec;
+    private final SearchExpRepository searchExpRepository;
 
     @Override
     public List<CategoryResponse> getAllCategories() {
@@ -237,6 +236,28 @@ public class CategoryServiceImpl implements CategoryService {
 
         Pageable pageable = PageRequest.of(page - 1, size, Sort.by(orderSorts));
         Page<Category> categories = categoryRepository.findAll(pageable);
+    }
+
+    public void advanceSearchWithSpecifications(Pageable pageable, String[] user, String[] address) {
+        if (user != null && address != null) {
+//            return searchExpRepository.searchCategoryByCriteriaWithJoin(pageable, user, address);
+        } else if (user != null) {
+            CategorySpecificationBuilder builder = new CategorySpecificationBuilder();
+            String SEARCH_SPEC_OPERATOR = "(\\w+?)([<:>~!])(.*)(\\p{Punct}?)(\\p{Punct}?)";
+            Pattern pattern = Pattern.compile(SEARCH_SPEC_OPERATOR);
+            for (String s : user) {
+                Matcher matcher = pattern.matcher(s);
+                if (matcher.find()) {
+                    builder.with(matcher.group(1), matcher.group(2), matcher.group(4), matcher.group(3), matcher.group(5));
+                }
+            }
+
+            Page<Category> categories = categoryRepository.findAll(Objects.requireNonNull(builder.build()), pageable);
+
+//            return convertToPageResponse(categories, pageable);
+        }
+
+//        return convertToPageResponse(categoryRepository.findAll(pageable), pageable);
     }
 
 }

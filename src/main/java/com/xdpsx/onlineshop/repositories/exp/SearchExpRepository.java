@@ -2,6 +2,7 @@ package com.xdpsx.onlineshop.repositories.exp;
 
 import com.xdpsx.onlineshop.entities.Brand;
 import com.xdpsx.onlineshop.entities.Category;
+import com.xdpsx.onlineshop.entities.User;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
@@ -9,6 +10,7 @@ import jakarta.persistence.criteria.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
@@ -159,5 +161,114 @@ public class SearchExpRepository {
                 .setFirstResult(page)
                 .setMaxResults(size)
                 .getResultList();
+    }
+
+    public void searchCategoryByCriteriaWithJoin(Pageable pageable, String[] names, String[] brands) {
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Category> query = builder.createQuery(Category.class);
+        Root<Category> categoryRoot = query.from(Category.class);
+        Join<Brand, User> brandRoot = categoryRoot.join("addresses");
+
+        List<Predicate> userPreList = new ArrayList<>();
+        String SEARCH_SPEC_OPERATOR = "(\\w+?)([<:>~!])(.*)(\\p{Punct}?)(\\p{Punct}?)";
+        Pattern pattern = Pattern.compile(SEARCH_SPEC_OPERATOR);
+        for (String u : names) {
+            Matcher matcher = pattern.matcher(u);
+            if (matcher.find()) {
+                SpecSearchCriteria searchCriteria = new SpecSearchCriteria(matcher.group(1), matcher.group(2), matcher.group(3), matcher.group(4), matcher.group(5));
+                userPreList.add(toCategoryPredicate(categoryRoot, builder, searchCriteria));
+            }
+        }
+
+        List<Predicate> addressPreList = new ArrayList<>();
+        for (String a : brands) {
+            Matcher matcher = pattern.matcher(a);
+            if (matcher.find()) {
+                SpecSearchCriteria searchCriteria = new SpecSearchCriteria(matcher.group(1), matcher.group(2), matcher.group(3), matcher.group(4), matcher.group(5));
+                addressPreList.add(toBrandPredicate(brandRoot, builder, searchCriteria));
+            }
+        }
+
+        Predicate userPre = builder.or(userPreList.toArray(new Predicate[0]));
+        Predicate addPre = builder.or(addressPreList.toArray(new Predicate[0]));
+        Predicate finalPre = builder.and(userPre, addPre);
+
+        query.where(finalPre);
+
+        List<Category> categories = entityManager.createQuery(query)
+                .setFirstResult(pageable.getPageNumber())
+                .setMaxResults(pageable.getPageSize())
+                .getResultList();
+
+        long count = countCategoryJoinBrand(names, brands);
+
+//        return PageResponse.builder()
+//                .page(pageable.getPageNumber())
+//                .size(pageable.getPageSize())
+//                .total(count)
+//                .items(users)
+//                .build();
+    }
+
+    private Predicate toCategoryPredicate(Root<Category> root, CriteriaBuilder builder, SpecSearchCriteria criteria) {
+        return switch (criteria.getOperation()) {
+            case EQUALITY -> builder.equal(root.get(criteria.getKey()), criteria.getValue());
+            case NEGATION -> builder.notEqual(root.get(criteria.getKey()), criteria.getValue());
+            case GREATER_THAN -> builder.greaterThan(root.get(criteria.getKey()), criteria.getValue().toString());
+            case LESS_THAN -> builder.lessThan(root.get(criteria.getKey()), criteria.getValue().toString());
+            case LIKE -> builder.like(root.get(criteria.getKey()), "%" + criteria.getValue().toString() + "%");
+            case STARTS_WITH -> builder.like(root.get(criteria.getKey()), criteria.getValue() + "%");
+            case ENDS_WITH -> builder.like(root.get(criteria.getKey()), "%" + criteria.getValue());
+            case CONTAINS -> builder.like(root.get(criteria.getKey()), "%" + criteria.getValue() + "%");
+        };
+    }
+
+    private Predicate toBrandPredicate(Join<Brand, User> root, CriteriaBuilder builder, SpecSearchCriteria criteria) {
+        return switch (criteria.getOperation()) {
+            case EQUALITY -> builder.equal(root.get(criteria.getKey()), criteria.getValue());
+            case NEGATION -> builder.notEqual(root.get(criteria.getKey()), criteria.getValue());
+            case GREATER_THAN -> builder.greaterThan(root.get(criteria.getKey()), criteria.getValue().toString());
+            case LESS_THAN -> builder.lessThan(root.get(criteria.getKey()), criteria.getValue().toString());
+            case LIKE -> builder.like(root.get(criteria.getKey()), "%" + criteria.getValue().toString() + "%");
+            case STARTS_WITH -> builder.like(root.get(criteria.getKey()), criteria.getValue() + "%");
+            case ENDS_WITH -> builder.like(root.get(criteria.getKey()), "%" + criteria.getValue());
+            case CONTAINS -> builder.like(root.get(criteria.getKey()), "%" + criteria.getValue() + "%");
+        };
+    }
+
+    private long countCategoryJoinBrand(String[] names, String[] brands) {
+        CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Long> query = builder.createQuery(Long.class);
+        Root<Category> categoryRoot = query.from(Category.class);
+        Join<Brand, User> brandRoot = categoryRoot.join("addresses");
+
+        List<Predicate> userPreList = new ArrayList<>();
+        String SEARCH_SPEC_OPERATOR = "(\\w+?)([<:>~!])(.*)(\\p{Punct}?)(\\p{Punct}?)";
+        Pattern pattern = Pattern.compile(SEARCH_SPEC_OPERATOR);
+        for (String u : names) {
+            Matcher matcher = pattern.matcher(u);
+            if (matcher.find()) {
+                SpecSearchCriteria searchCriteria = new SpecSearchCriteria(matcher.group(1), matcher.group(2), matcher.group(3), matcher.group(4), matcher.group(5));
+                userPreList.add(toCategoryPredicate(categoryRoot, builder, searchCriteria));
+            }
+        }
+
+        List<Predicate> addressPreList = new ArrayList<>();
+        for (String a : brands) {
+            Matcher matcher = pattern.matcher(a);
+            if (matcher.find()) {
+                SpecSearchCriteria searchCriteria = new SpecSearchCriteria(matcher.group(1), matcher.group(2), matcher.group(3), matcher.group(4), matcher.group(5));
+                addressPreList.add(toBrandPredicate(brandRoot, builder, searchCriteria));
+            }
+        }
+
+        Predicate userPre = builder.or(userPreList.toArray(new Predicate[0]));
+        Predicate addPre = builder.or(addressPreList.toArray(new Predicate[0]));
+        Predicate finalPre = builder.and(userPre, addPre);
+
+        query.select(builder.count(categoryRoot));
+        query.where(finalPre);
+
+        return entityManager.createQuery(query).getSingleResult();
     }
 }
