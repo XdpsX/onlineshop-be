@@ -1,16 +1,17 @@
 -- liquibase formatted sql
 
--- changeset xdpsx:issue-11
--- comment: Update media table
-CREATE TABLE IF NOT EXISTS media (
-    id VARCHAR(30) NOT NULL PRIMARY KEY, -- display_name in cloudinary
-    external_id VARCHAR(50) NOT NULL UNIQUE, -- public_id in cloudinary
-    url VARCHAR(255) NOT NULL,
-    caption VARCHAR(100),
-    content_type VARCHAR(30) NOT NULL,
-    resource_type TINYINT(1) NOT NULL,
-    temp_flg BOOLEAN DEFAULT FALSE,
-    delete_flg BOOLEAN DEFAULT FALSE,
-    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP
-);
+-- changeset xdpsx:issue-9
+-- comment: Update categories table
+ALTER TABLE categories
+DROP COLUMN slug;
+
+ALTER TABLE categories
+MODIFY COLUMN created_at TIMESTAMP NOT NULL,
+MODIFY COLUMN updated_at TIMESTAMP;
+
+ALTER TABLE categories
+ADD COLUMN public_flg BOOLEAN NOT NULL DEFAULT FALSE AFTER name,
+ADD COLUMN image_id VARCHAR(30) AFTER public_flg,
+ADD COLUMN parent_id INT AFTER image_id,
+ADD CONSTRAINT fk_category_media FOREIGN KEY (image_id) REFERENCES media(id) ON DELETE SET NULL,
+ADD CONSTRAINT fk_parent_category FOREIGN KEY (parent_id) REFERENCES categories(id) ON DELETE SET NULL;

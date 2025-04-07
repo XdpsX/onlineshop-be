@@ -74,7 +74,9 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, PUBLIC_GET_ENDPOINTS)
                 .permitAll()
                 .anyRequest()
-                .authenticated());
+                // TODO: remove after refactoring
+                //                .authenticated()
+                .permitAll());
         http.oauth2ResourceServer(oauth2 -> oauth2.jwt(
                         config -> config.decoder(jwtDecoder()).jwtAuthenticationConverter(jwtAuthenticationConverter()))
                 .authenticationEntryPoint(authenticationEntryPoint));

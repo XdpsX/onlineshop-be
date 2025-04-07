@@ -6,9 +6,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.xdpsx.onlineshop.dtos.common.ErrorDTO;
-import com.xdpsx.onlineshop.exceptions.BadRequestException;
-import com.xdpsx.onlineshop.exceptions.DuplicateException;
-import com.xdpsx.onlineshop.exceptions.NotFoundException;
+import com.xdpsx.onlineshop.exceptions.*;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -16,9 +14,16 @@ import lombok.extern.slf4j.Slf4j;
 @RestControllerAdvice
 public class CustomExceptionHandler {
 
-    @ExceptionHandler(DuplicateException.class)
+    @ExceptionHandler(InvalidResourceTypeException.class)
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    public ErrorDTO handleInvalidMediaResourceException(InvalidResourceTypeException e) {
+        log.error(e.getMessage(), e);
+        return new ErrorDTO(HttpStatus.UNPROCESSABLE_ENTITY, e.getMessage(), e.getArgs());
+    }
+
+    @ExceptionHandler({DuplicateException.class, InUseException.class, ModifyExclusiveException.class})
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorDTO handleDuplicateException(DuplicateException e) {
+    public ErrorDTO handleConflictException(APIException e) {
         log.error(e.getMessage(), e);
         return new ErrorDTO(HttpStatus.CONFLICT, e.getMessage(), e.getArgs());
     }
