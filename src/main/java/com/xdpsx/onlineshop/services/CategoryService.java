@@ -1,25 +1,24 @@
 package com.xdpsx.onlineshop.services;
 
 import java.util.List;
-import java.util.Map;
 
-import com.xdpsx.onlineshop.dtos.category.CategoryResponse;
-import com.xdpsx.onlineshop.dtos.category.CreateCategoryDTO;
-import com.xdpsx.onlineshop.dtos.category.UpdateCategoryDTO;
+import com.xdpsx.onlineshop.dtos.category.*;
+import com.xdpsx.onlineshop.dtos.common.CheckExistResponse;
 import com.xdpsx.onlineshop.dtos.common.ModifyExclusiveDTO;
-import com.xdpsx.onlineshop.dtos.common.PageParams;
 import com.xdpsx.onlineshop.dtos.common.PageResponse;
 
 public interface CategoryService {
-    List<CategoryResponse> getAllCategories();
+    PageResponse<AdminCategoryResponse> getAdminCategories(AdminCategoryFilter filter);
 
-    CategoryResponse createCategory(CreateCategoryDTO request);
+    AdminCategoryResponse getCategory(Integer categoryId);
 
-    CategoryResponse updateCategory(Integer id, UpdateCategoryDTO request);
+    List<CategoryTreeResponse> getCategoryTree(CategoryTreeFilter filter);
+
+    CategoryResponse createCategory(CreateCategoryRequest request);
+
+    CheckExistResponse checkCategoryExist(CategoryExistRequest request);
+
+    CategoryResponse updateCategory(Integer id, UpdateCategoryRequest request);
 
     void deleteCategory(Integer id, ModifyExclusiveDTO request);
-
-    PageResponse<CategoryResponse> getCategoriesPage(PageParams params);
-
-    Map<String, Boolean> checkExistsCat(String name, String slug);
 }

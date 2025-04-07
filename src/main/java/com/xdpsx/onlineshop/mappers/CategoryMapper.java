@@ -4,8 +4,10 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
+import com.xdpsx.onlineshop.dtos.category.AdminCategoryResponse;
 import com.xdpsx.onlineshop.dtos.category.CategoryResponse;
-import com.xdpsx.onlineshop.dtos.category.CreateCategoryDTO;
+import com.xdpsx.onlineshop.dtos.category.CategoryTreeResponse;
+import com.xdpsx.onlineshop.dtos.category.CreateCategoryRequest;
 import com.xdpsx.onlineshop.entities.Category;
 
 @Mapper
@@ -19,7 +21,14 @@ public interface CategoryMapper {
     @Mapping(target = "brands", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
-    Category toEntity(CreateCategoryDTO request);
+    Category toEntity(CreateCategoryRequest request);
+
+    @Mapping(target = "image", source = "entity.image.url")
+    @Mapping(target = "parent", source = "entity.parent")
+    AdminCategoryResponse toAdminCategoryResponse(Category entity);
 
     CategoryResponse toResponse(Category entity);
+
+    @Mapping(target = "children", ignore = true)
+    CategoryTreeResponse toCategoryTreeResponse(Category entity);
 }

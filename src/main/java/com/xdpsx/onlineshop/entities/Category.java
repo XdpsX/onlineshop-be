@@ -38,4 +38,6 @@ public class Category extends AuditEntity {
 
     @ManyToMany(mappedBy = "categories")
     private List<Brand> brands;
+
+    public static final int MAX_DEPTH = 3;
 }

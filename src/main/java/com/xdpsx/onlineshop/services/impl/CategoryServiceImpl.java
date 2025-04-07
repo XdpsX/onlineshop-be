@@ -1,21 +1,18 @@
 package com.xdpsx.onlineshop.services.impl;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.xdpsx.onlineshop.dtos.common.CheckExistResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.xdpsx.onlineshop.constants.messages.EMessage;
-import com.xdpsx.onlineshop.dtos.category.CategoryResponse;
-import com.xdpsx.onlineshop.dtos.category.CreateCategoryDTO;
-import com.xdpsx.onlineshop.dtos.category.UpdateCategoryDTO;
+import com.xdpsx.onlineshop.dtos.category.*;
 import com.xdpsx.onlineshop.dtos.common.ModifyExclusiveDTO;
-import com.xdpsx.onlineshop.dtos.common.PageParams;
 import com.xdpsx.onlineshop.dtos.common.PageResponse;
 import com.xdpsx.onlineshop.entities.Category;
 import com.xdpsx.onlineshop.entities.Media;
@@ -25,7 +22,7 @@ import com.xdpsx.onlineshop.mappers.CategoryMapper;
 import com.xdpsx.onlineshop.mappers.PageMapper;
 import com.xdpsx.onlineshop.repositories.CategoryRepository;
 import com.xdpsx.onlineshop.repositories.MediaRepository;
-import com.xdpsx.onlineshop.repositories.specs.BasicSpecification;
+import com.xdpsx.onlineshop.repositories.specs.CategorySpecification;
 import com.xdpsx.onlineshop.services.CategoryService;
 
 import lombok.RequiredArgsConstructor;
@@ -33,22 +30,53 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class CategoryServiceImpl implements CategoryService {
-    private final PageMapper pageMapper;
     private final CategoryRepository categoryRepository;
     private final MediaRepository mediaRepository;
 
-    private final BasicSpecification<Category> spec;
+    @Override
+    public PageResponse<AdminCategoryResponse> getAdminCategories(AdminCategoryFilter filter) {
+        Specification<Category> spec = CategorySpecification.getInstance()
+                .buildAdminCategoriesSpec(filter.getName(), filter.getPublicFlg(), filter.getSort(), filter.getLevel());
+        Page<Category> categoryPage =
+                categoryRepository.findAll(spec, PageRequest.of(filter.getPageNum() - 1, filter.getPageSize()));
+        return PageMapper.toPageResponse(categoryPage, CategoryMapper.INSTANCE::toAdminCategoryResponse);
+    }
 
     @Override
-    public List<CategoryResponse> getAllCategories() {
-        return categoryRepository.findAll(spec.getSortSpec("name")).stream()
-                .map(CategoryMapper.INSTANCE::toResponse)
+    public AdminCategoryResponse getCategory(Integer categoryId) {
+        Category category = categoryRepository
+                .findPublicByIdWithParent(categoryId)
+                .orElseThrow(() -> new NotFoundException(EMessage.NOT_FOUND, categoryId));
+        return CategoryMapper.INSTANCE.toAdminCategoryResponse(category);
+    }
+
+    @Override
+    public List<CategoryTreeResponse> getCategoryTree(CategoryTreeFilter filter) {
+        List<Category> roots = categoryRepository.findAll(
+                CategorySpecification.getInstance().buildCategoryTreeSpec(null, filter.sort()));
+        return roots.stream()
+                .map(c -> buildTree(c, 1, filter.maxLevel(), filter.sort()))
                 .collect(Collectors.toList());
+    }
+
+    private CategoryTreeResponse buildTree(Category category, int level, Integer maxLevel, String sort) {
+        CategoryTreeResponse dto = CategoryMapper.INSTANCE.toCategoryTreeResponse(category);
+
+        if (maxLevel != null && level >= maxLevel) return dto;
+
+        List<Category> children =
+                categoryRepository.findAll(CategorySpecification.getInstance().buildCategoryTreeSpec(category, sort));
+
+        dto.setChildren(children.stream()
+                .map(child -> buildTree(child, level + 1, maxLevel, sort))
+                .collect(Collectors.toList()));
+
+        return dto;
     }
 
     @Override
     @Transactional
-    public CategoryResponse createCategory(CreateCategoryDTO request) {
+    public CategoryResponse createCategory(CreateCategoryRequest request) {
         Category category = CategoryMapper.INSTANCE.toEntity(request);
 
         if (categoryRepository.existsByName(request.name())) {
@@ -57,8 +85,9 @@ public class CategoryServiceImpl implements CategoryService {
 
         if (request.parentId() != null) {
             Category parent = categoryRepository
-                    .findById(request.parentId())
+                    .findPublicByIdWithParent(request.parentId())
                     .orElseThrow(() -> new NotFoundException(EMessage.NOT_FOUND, request.parentId()));
+            checkCategoryDepth(parent);
             category.setParent(parent);
         }
 
@@ -78,8 +107,13 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    public CheckExistResponse checkCategoryExist(CategoryExistRequest request) {
+        return new CheckExistResponse("name", categoryRepository.existsByName(request.name()));
+    }
+
+    @Override
     @Transactional
-    public CategoryResponse updateCategory(Integer id, UpdateCategoryDTO request) {
+    public CategoryResponse updateCategory(Integer id, UpdateCategoryRequest request) {
         Category category = categoryRepository
                 .findByIdWithParent(id)
                 .orElseThrow(() -> new NotFoundException(EMessage.NOT_FOUND, id));
@@ -102,11 +136,29 @@ public class CategoryServiceImpl implements CategoryService {
 
         // Update parent
         if (!isSameParent(category, request.parentId())) {
-            category.setParent(getParentCategory(request.parentId()));
+            Category newParent = getParentCategory(request.parentId());
+            checkCategoryDepth(newParent);
+            category.setParent(newParent);
         }
 
         Category savedCategory = categoryRepository.save(category);
         return CategoryMapper.INSTANCE.toResponse(savedCategory);
+    }
+
+    private int getDepth(Category category) {
+        int depth = 0;
+        while (category != null) {
+            depth++;
+            category = category.getParent();
+        }
+        return depth;
+    }
+
+    private void checkCategoryDepth(Category category) {
+        int depth = getDepth(category);
+        if (depth >= Category.MAX_DEPTH) {
+            throw new BadRequestException(EMessage.INVALID_DEPTH, Category.MAX_DEPTH);
+        }
     }
 
     private void updateCategoryImage(Category category, String newImageId) {
@@ -148,7 +200,7 @@ public class CategoryServiceImpl implements CategoryService {
         return (parentId == null)
                 ? null
                 : categoryRepository
-                        .findById(parentId)
+                        .findPublicByIdWithParent(parentId)
                         .orElseThrow(() -> new NotFoundException(EMessage.NOT_FOUND, parentId));
     }
 
@@ -170,20 +222,5 @@ public class CategoryServiceImpl implements CategoryService {
             mediaRepository.save(image);
         }
         categoryRepository.delete(category);
-    }
-
-    @Override
-    public PageResponse<CategoryResponse> getCategoriesPage(PageParams params) {
-        Page<Category> categoryPage = categoryRepository.findAll(
-                spec.getFiltersSpec(params.getSearch(), params.getSort()),
-                PageRequest.of(params.getPageNum() - 1, params.getPageSize()));
-        return pageMapper.toCategoryPageResponse(categoryPage);
-    }
-
-    @Override
-    public Map<String, Boolean> checkExistsCat(String name, String slug) {
-        Map<String, Boolean> exists = new HashMap<>();
-        exists.put("nameExists", categoryRepository.existsByName(name));
-        return exists;
     }
 }
