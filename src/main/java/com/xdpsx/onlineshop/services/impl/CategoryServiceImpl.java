@@ -3,7 +3,6 @@ package com.xdpsx.onlineshop.services.impl;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.xdpsx.onlineshop.dtos.common.CheckExistResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
@@ -12,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.xdpsx.onlineshop.constants.messages.EMessage;
 import com.xdpsx.onlineshop.dtos.category.*;
+import com.xdpsx.onlineshop.dtos.common.CheckExistResponse;
 import com.xdpsx.onlineshop.dtos.common.ModifyExclusiveDTO;
 import com.xdpsx.onlineshop.dtos.common.PageResponse;
 import com.xdpsx.onlineshop.entities.Category;

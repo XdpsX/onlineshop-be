@@ -2,7 +2,6 @@ package com.xdpsx.onlineshop.controllers;
 
 import java.util.List;
 
-import com.xdpsx.onlineshop.dtos.common.CheckExistResponse;
 import jakarta.validation.Valid;
 
 import org.springdoc.core.annotations.ParameterObject;
@@ -10,8 +9,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import com.xdpsx.onlineshop.constants.messages.SMessage;
+import com.xdpsx.onlineshop.controllers.docs.CategoryAPI;
 import com.xdpsx.onlineshop.dtos.category.*;
 import com.xdpsx.onlineshop.dtos.common.APIResponse;
+import com.xdpsx.onlineshop.dtos.common.CheckExistResponse;
 import com.xdpsx.onlineshop.dtos.common.ModifyExclusiveDTO;
 import com.xdpsx.onlineshop.dtos.common.PageResponse;
 import com.xdpsx.onlineshop.services.CategoryService;
@@ -20,7 +21,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-public class CategoryController {
+public class CategoryController implements CategoryAPI {
     private final CategoryService categoryService;
 
     @GetMapping("/admin/categories")
