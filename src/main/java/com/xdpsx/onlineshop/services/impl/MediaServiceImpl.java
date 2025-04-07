@@ -7,11 +7,13 @@ import javax.imageio.ImageIO;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.xdpsx.onlineshop.constants.messages.EMessage;
 import com.xdpsx.onlineshop.dtos.media.CloudinaryUploadResponse;
 import com.xdpsx.onlineshop.dtos.media.CreateMediaDTO;
 import com.xdpsx.onlineshop.dtos.media.ViewMediaDTO;
 import com.xdpsx.onlineshop.entities.Media;
 import com.xdpsx.onlineshop.entities.enums.MediaResourceType;
+import com.xdpsx.onlineshop.exceptions.BadRequestException;
 import com.xdpsx.onlineshop.mappers.MediaMapper;
 import com.xdpsx.onlineshop.repositories.MediaRepository;
 import com.xdpsx.onlineshop.services.MediaService;
@@ -56,8 +58,7 @@ public class MediaServiceImpl implements MediaService {
 
             int width = image.getWidth();
             if (width < resourceType.minWidth()) {
-                throw new IllegalArgumentException(
-                        "Image width is too small. Minimum required: " + resourceType.minWidth() + "px");
+                throw new BadRequestException(EMessage.INVALID_IMAGE_WIDTH, resourceType.minWidth());
             }
 
         } catch (IOException e) {

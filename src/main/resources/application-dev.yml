@@ -38,6 +38,8 @@ spring:
 #    enabled: true
 #  swagger-ui:
 #    enabled: true
+springdoc:
+  override-with-generic-response: off
 openapi:
   service:
     api-docs: onlineshop-be

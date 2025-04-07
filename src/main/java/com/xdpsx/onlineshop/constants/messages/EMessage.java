@@ -10,6 +10,7 @@ public enum EMessage implements APIMessage {
     MODIFY_EXCLUSIVE("E_MESSAGE_0007"),
     INVALID_RESOURCE_TYPE("E_MESSAGE_0008"),
     INVALID_DEPTH("E_MESSAGE_0009"),
+    INVALID_IMAGE_WIDTH("E_MESSAGE_0010"),
     ;
 
     private final String message;

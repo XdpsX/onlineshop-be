@@ -7,7 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 import com.xdpsx.onlineshop.constants.messages.SMessage;
-import com.xdpsx.onlineshop.controllers.api.MediaAPI;
+import com.xdpsx.onlineshop.controllers.docs.MediaAPI;
 import com.xdpsx.onlineshop.dtos.common.APIResponse;
 import com.xdpsx.onlineshop.dtos.media.CreateMediaDTO;
 import com.xdpsx.onlineshop.dtos.media.ViewMediaDTO;
