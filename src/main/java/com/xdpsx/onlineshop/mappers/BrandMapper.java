@@ -15,7 +15,6 @@ public abstract class BrandMapper {
     @Autowired
     private CloudinaryUploader uploader;
 
-    @Mapping(target = "logo", source = "request.logo", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "categories", ignore = true)
     public abstract Brand fromRequestToEntity(BrandRequest request);
@@ -24,7 +23,6 @@ public abstract class BrandMapper {
 
     public BrandResponse fromEntityToResponse(Brand entity) {
         BrandResponse response = toBrandResponse(entity);
-        response.setLogo(uploader.getFileUrl(entity.getLogo()));
         return response;
     }
 

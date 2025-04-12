@@ -73,7 +73,6 @@ public class BrandServiceImpl implements BrandService {
         brand.setCategories(categories);
 
         CloudinaryUploadResponse response = uploader.uploadFile(request.getLogo(), uploadOptions);
-        brand.setLogo(response.url());
 
         Brand savedBrand = brandRepository.save(brand);
         return brandMapper.fromEntityToResponse(savedBrand);
@@ -102,10 +101,7 @@ public class BrandServiceImpl implements BrandService {
 
         // Update logo
         if (request.getLogo() != null) {
-            String oldPublicId = existingBrand.getLogo();
             CloudinaryUploadResponse response = uploader.uploadFile(request.getLogo(), uploadOptions);
-            existingBrand.setLogo(response.url());
-            uploader.deleteFile(oldPublicId);
         }
 
         Brand updatedBrand = brandRepository.save(existingBrand);
@@ -123,7 +119,6 @@ public class BrandServiceImpl implements BrandService {
         //            throw new BadRequestException(i18nUtils.getBrandCannotDeleteMsg(existingBrand.getName()));
         //        }
         brandRepository.delete(existingBrand);
-        uploader.deleteFile(existingBrand.getLogo());
     }
 
     @Override
