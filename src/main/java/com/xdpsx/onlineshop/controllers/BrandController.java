@@ -3,46 +3,46 @@ package com.xdpsx.onlineshop.controllers;
 import java.util.Map;
 
 import jakarta.validation.Valid;
-import jakarta.validation.groups.Default;
 
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import com.xdpsx.onlineshop.constants.messages.SMessage;
+import com.xdpsx.onlineshop.dtos.brand.AdminBrandFilter;
+import com.xdpsx.onlineshop.dtos.brand.AdminBrandResponse;
 import com.xdpsx.onlineshop.dtos.brand.BrandRequest;
-import com.xdpsx.onlineshop.dtos.brand.BrandResponse;
-import com.xdpsx.onlineshop.dtos.common.PageParams;
+import com.xdpsx.onlineshop.dtos.brand.CreateBrandRequest;
+import com.xdpsx.onlineshop.dtos.common.APIResponse;
 import com.xdpsx.onlineshop.dtos.common.PageResponse;
 import com.xdpsx.onlineshop.services.BrandService;
-import com.xdpsx.onlineshop.validations.OnCreate;
 
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/brands")
 @RequiredArgsConstructor
 public class BrandController {
     private final BrandService brandService;
 
-    @GetMapping("/filters")
-    public ResponseEntity<PageResponse<BrandResponse>> getBrandsByPage(@Valid PageParams params) {
-        PageResponse<BrandResponse> pageResponse = brandService.listBrandsByPage(params);
-        return ResponseEntity.status(HttpStatus.OK).body(pageResponse);
+    @GetMapping("/admin/brands")
+    public APIResponse<PageResponse<AdminBrandResponse>> getAdminBrands(
+            @ParameterObject @Valid AdminBrandFilter filter) {
+        PageResponse<AdminBrandResponse> data = brandService.getAdminBrands(filter);
+        return APIResponse.ok(data);
     }
 
-    @PostMapping(path = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<BrandResponse> createBrand(
-            @Validated({OnCreate.class, Default.class}) @ModelAttribute BrandRequest request) {
-        BrandResponse response = brandService.createBrand(request);
-        return new ResponseEntity<>(response, HttpStatus.CREATED);
+    @PostMapping(path = "/brands/create")
+    @ResponseStatus(HttpStatus.CREATED)
+    public APIResponse<AdminBrandResponse> createBrand(@Valid @RequestBody CreateBrandRequest request) {
+        AdminBrandResponse data = brandService.createBrand(request);
+        return new APIResponse<>(HttpStatus.CREATED, data, SMessage.CREATE_SUCCESSFULLY);
     }
 
     @PutMapping("/{id}/update")
-    public ResponseEntity<BrandResponse> updateBrand(
+    public ResponseEntity<AdminBrandResponse> updateBrand(
             @PathVariable Integer id, @Valid @ModelAttribute BrandRequest request) {
-        BrandResponse response = brandService.updateBrand(id, request);
+        AdminBrandResponse response = brandService.updateBrand(id, request);
         return ResponseEntity.ok(response);
     }
 

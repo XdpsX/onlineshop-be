@@ -1,8 +1,5 @@
 package com.xdpsx.onlineshop.repositories.specs;
 
-import static com.xdpsx.onlineshop.constants.FieldConstants.FIELD_DATE;
-import static com.xdpsx.onlineshop.constants.FieldConstants.FIELD_NAME;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -80,17 +77,5 @@ public class CategorySpecification extends BaseSpecification<Category> {
                 default -> throw new IllegalArgumentException("Only levels 1 to 3 are supported.");
             };
         };
-    }
-
-    private Specification<Category> applySort(Specification<Category> spec, String sort) {
-        if (sort != null && !sort.isBlank()) {
-            boolean asc = !sort.startsWith("-");
-            String sortField = asc ? sort : sort.substring(1);
-            spec = switch (sortField) {
-                case FIELD_NAME -> spec.and(sortByField(FIELD_NAME, asc));
-                case FIELD_DATE -> spec.and(sortByAuditDate(asc));
-                default -> throw new IllegalStateException("Unexpected value: " + sortField);};
-        }
-        return spec;
     }
 }

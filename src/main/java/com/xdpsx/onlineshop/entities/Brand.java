@@ -4,10 +4,8 @@ import java.util.List;
 
 import jakarta.persistence.*;
 
-import lombok.experimental.SuperBuilder;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter

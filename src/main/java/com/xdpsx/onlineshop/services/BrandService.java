@@ -3,18 +3,15 @@ package com.xdpsx.onlineshop.services;
 import java.util.List;
 import java.util.Map;
 
-import com.xdpsx.onlineshop.dtos.brand.BrandNoCatsDTO;
-import com.xdpsx.onlineshop.dtos.brand.BrandRequest;
-import com.xdpsx.onlineshop.dtos.brand.BrandResponse;
-import com.xdpsx.onlineshop.dtos.common.PageParams;
+import com.xdpsx.onlineshop.dtos.brand.*;
 import com.xdpsx.onlineshop.dtos.common.PageResponse;
 
 public interface BrandService {
-    PageResponse<BrandResponse> listBrandsByPage(PageParams params);
+    PageResponse<AdminBrandResponse> getAdminBrands(AdminBrandFilter filter);
 
-    BrandResponse createBrand(BrandRequest request);
+    AdminBrandResponse createBrand(CreateBrandRequest request);
 
-    BrandResponse updateBrand(Integer id, BrandRequest request);
+    AdminBrandResponse updateBrand(Integer id, BrandRequest request);
 
     void deleteBrand(Integer id);
 
