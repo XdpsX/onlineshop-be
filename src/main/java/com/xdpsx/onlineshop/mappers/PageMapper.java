@@ -7,10 +7,8 @@ import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
-import com.xdpsx.onlineshop.dtos.brand.BrandResponse;
 import com.xdpsx.onlineshop.dtos.common.PageResponse;
 import com.xdpsx.onlineshop.dtos.product.ProductResponse;
-import com.xdpsx.onlineshop.entities.Brand;
 import com.xdpsx.onlineshop.entities.Product;
 
 import lombok.RequiredArgsConstructor;
@@ -18,12 +16,7 @@ import lombok.RequiredArgsConstructor;
 @Component
 @RequiredArgsConstructor
 public class PageMapper {
-    private final BrandMapper brandMapper;
     private final ProductMapper productMapper;
-
-    public PageResponse<BrandResponse> toBrandPageResponse(Page<Brand> brandPage) {
-        return toPageResponse(brandPage, brandMapper::fromEntityToResponse);
-    }
 
     public PageResponse<ProductResponse> toProductPageResponse(Page<Product> productPage) {
         return toPageResponse(productPage, productMapper::fromEntityToResponse);

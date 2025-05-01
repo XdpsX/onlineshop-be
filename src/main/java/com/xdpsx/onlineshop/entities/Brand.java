@@ -4,18 +4,16 @@ import java.util.List;
 
 import jakarta.persistence.*;
 
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 @Entity
 @Table(name = "brands")
-@EntityListeners(AuditingEntityListener.class)
 public class Brand extends AuditEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,10 +22,13 @@ public class Brand extends AuditEntity {
     @Column(length = 64, nullable = false, unique = true)
     private String name;
 
-    @Column(nullable = false)
-    private String logo;
+    private boolean publicFlg;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @OneToOne
+    @JoinColumn(name = "image_id", referencedColumnName = "id")
+    private Media image;
+
+    @ManyToMany
     @JoinTable(
             name = "category_brands",
             joinColumns = @JoinColumn(name = "brand_id", referencedColumnName = "id"),

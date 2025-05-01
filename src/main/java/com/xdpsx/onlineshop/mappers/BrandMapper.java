@@ -2,31 +2,27 @@ package com.xdpsx.onlineshop.mappers;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.mapstruct.factory.Mappers;
 
+import com.xdpsx.onlineshop.dtos.brand.AdminBrandResponse;
 import com.xdpsx.onlineshop.dtos.brand.BrandNoCatsDTO;
-import com.xdpsx.onlineshop.dtos.brand.BrandRequest;
-import com.xdpsx.onlineshop.dtos.brand.BrandResponse;
+import com.xdpsx.onlineshop.dtos.brand.CreateBrandRequest;
 import com.xdpsx.onlineshop.entities.Brand;
-import com.xdpsx.onlineshop.utils.CloudinaryUploader;
 
-@Mapper(componentModel = "spring")
-public abstract class BrandMapper {
-    @Autowired
-    private CloudinaryUploader uploader;
+@Mapper
+public interface BrandMapper {
+    BrandMapper INSTANCE = Mappers.getMapper(BrandMapper.class);
 
-    @Mapping(target = "logo", source = "request.logo", ignore = true)
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "image", ignore = true)
     @Mapping(target = "categories", ignore = true)
-    public abstract Brand fromRequestToEntity(BrandRequest request);
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    Brand toEntity(CreateBrandRequest request);
 
-    abstract BrandResponse toBrandResponse(Brand entity);
+    @Mapping(target = "image", source = "entity.image.url")
+    @Mapping(target = "categories", source = "entity.categories")
+    AdminBrandResponse toAdminBrandResponse(Brand entity);
 
-    public BrandResponse fromEntityToResponse(Brand entity) {
-        BrandResponse response = toBrandResponse(entity);
-        response.setLogo(uploader.getFileUrl(entity.getLogo()));
-        return response;
-    }
-
-    public abstract BrandNoCatsDTO fromEntityToNotCatsDTO(Brand entity);
+    BrandNoCatsDTO fromEntityToNotCatsDTO(Brand entity);
 }

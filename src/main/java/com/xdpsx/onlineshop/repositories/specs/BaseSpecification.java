@@ -1,5 +1,7 @@
 package com.xdpsx.onlineshop.repositories.specs;
 
+import static com.xdpsx.onlineshop.constants.FieldConstants.FIELD_DATE;
+import static com.xdpsx.onlineshop.constants.FieldConstants.FIELD_NAME;
 import static com.xdpsx.onlineshop.repositories.common.SearchOperator.IS_NULL;
 
 import java.util.ArrayList;
@@ -92,10 +94,33 @@ public abstract class BaseSpecification<T> {
         };
     }
 
+    /**
+     * Sort by audit date (updatedAt or createdAt)
+     * @param asc boolean indicating whether the sorting is ascending or descending
+     * @return Specification
+     */
     public Specification<T> sortByAuditDate(boolean asc) {
         return (root, query, criteriaBuilder) -> {
             Expression<?> sortExpression = criteriaBuilder.coalesce(root.get("updatedAt"), root.get("createdAt"));
             return sortByField(sortExpression, asc).toPredicate(root, query, criteriaBuilder);
         };
+    }
+
+    /**
+     * Apply sorting to the specification based on the provided sort string
+     * @param spec the existing specification
+     * @param sort the sort string (e.g. "name", "-createdAt")
+     * @return Specification
+     */
+    public Specification<T> applySort(Specification<T> spec, String sort) {
+        if (sort != null && !sort.isBlank()) {
+            boolean asc = !sort.startsWith("-");
+            String sortField = asc ? sort : sort.substring(1);
+            spec = switch (sortField) {
+                case FIELD_NAME -> spec.and(sortByField(FIELD_NAME, asc));
+                case FIELD_DATE -> spec.and(sortByAuditDate(asc));
+                default -> throw new IllegalStateException("Unexpected value: " + sortField);};
+        }
+        return spec;
     }
 }
