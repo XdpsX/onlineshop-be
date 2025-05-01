@@ -30,20 +30,27 @@ public class MediaServiceImpl implements MediaService {
     @Override
     public ViewMediaDTO createMedia(CreateMediaDTO request, MediaResourceType resourceType) {
         validateImageSize(request.file(), resourceType);
-        CloudinaryUploadResponse response =
-                cloudinaryUploader.uploadFile(request.file(), resourceType.getUploadOptions());
-        Media media = Media.builder()
-                .id(response.displayName())
-                .externalId(response.publicId())
-                .url(response.url())
-                .caption(request.caption())
-                .contentType(request.file().getContentType())
-                .resourceType(resourceType)
-                .tempFlg(true)
-                .deleteFlg(false)
-                .build();
-        Media savedMedia = mediaRepository.save(media);
-        return MediaMapper.INSTANCE.toViewMediaDTO(savedMedia);
+        CloudinaryUploadResponse response = null;
+        try {
+            response = cloudinaryUploader.uploadFile(request.file(), resourceType.getUploadOptions());
+            Media media = Media.builder()
+                    .id(response.displayName())
+                    .externalId(response.publicId())
+                    .url(response.url())
+                    .caption(request.caption())
+                    .contentType(request.file().getContentType())
+                    .resourceType(resourceType)
+                    .tempFlg(true)
+                    .deleteFlg(false)
+                    .build();
+            Media savedMedia = mediaRepository.save(media);
+            return MediaMapper.INSTANCE.toViewMediaDTO(savedMedia);
+        } catch (Exception e) {
+            if (response != null) {
+                cloudinaryUploader.deleteFile(response.publicId());
+            }
+            throw new RuntimeException(EMessage.UPLOAD_IMAGE_FAILED.message());
+        }
     }
 
     public void validateImageSize(MultipartFile file, MediaResourceType resourceType) {
