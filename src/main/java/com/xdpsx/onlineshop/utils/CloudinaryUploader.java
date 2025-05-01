@@ -26,18 +26,45 @@ public class CloudinaryUploader {
             Map response = cloudinary.uploader().upload(file.getBytes(), uploadOptions);
             return objectMapper.convertValue(response, CloudinaryUploadResponse.class);
         } catch (IOException io) {
-            throw new RuntimeException("Uploading image failed!", io);
+            throw new RuntimeException("Uploading image to Cloudinary failed!", io);
         }
     }
 
     public void deleteFile(String publicId) {
-        try {
-            cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
-        } catch (IOException io) {
-            log.error("Deleting image is failed, public_id {}", publicId);
-        } catch (Exception e) {
-            throw e;
+        int maxRetries = 3;
+        int attempt = 0;
+        boolean success = false;
+
+        while (attempt < maxRetries) {
+            try {
+                Map result = cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
+                String destroyResult = (String) result.get("result");
+                if (destroyResult.equals("ok") || destroyResult.equals("not found")) {
+                    success = true;
+                    break;
+                } else {
+                    log.warn("Unexpected result when deleting publicId {}: {}", publicId, destroyResult);
+                }
+            } catch (IOException io) {
+                log.error(
+                        "IOException when deleting publicId {}: attempt {}/{}", publicId, attempt + 1, maxRetries, io);
+            }
+            attempt++;
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException ignored) {
+            }
         }
+
+        if (!success) {
+            log.error("Failed to delete image in Cloudinary after {} attempts, publicId {}", maxRetries, publicId);
+            savePendingDeletion(publicId);
+        }
+    }
+
+    private void savePendingDeletion(String publicId) {
+        // TODO: Implement a mechanism to save the publicId for later deletion retry
+        log.info("Saving publicId {} for later deletion retry", publicId);
     }
 
     public String getFileUrl(String publicId) {

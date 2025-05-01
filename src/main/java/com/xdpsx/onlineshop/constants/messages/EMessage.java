@@ -11,6 +11,7 @@ public enum EMessage implements APIMessage {
     INVALID_RESOURCE_TYPE("E_MESSAGE_0008"),
     INVALID_DEPTH("E_MESSAGE_0009"),
     INVALID_IMAGE_WIDTH("E_MESSAGE_0010"),
+    UPLOAD_IMAGE_FAILED("E_MESSAGE_0011"),
     ;
 
     private final String message;
