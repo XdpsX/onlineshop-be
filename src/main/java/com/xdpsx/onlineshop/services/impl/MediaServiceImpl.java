@@ -14,6 +14,7 @@ import com.xdpsx.onlineshop.dtos.media.ViewMediaDTO;
 import com.xdpsx.onlineshop.entities.Media;
 import com.xdpsx.onlineshop.entities.enums.MediaResourceType;
 import com.xdpsx.onlineshop.exceptions.BadRequestException;
+import com.xdpsx.onlineshop.exceptions.NotFoundException;
 import com.xdpsx.onlineshop.mappers.MediaMapper;
 import com.xdpsx.onlineshop.repositories.MediaRepository;
 import com.xdpsx.onlineshop.services.MediaService;
@@ -51,6 +52,13 @@ public class MediaServiceImpl implements MediaService {
             }
             throw new RuntimeException(EMessage.UPLOAD_IMAGE_FAILED.message());
         }
+    }
+
+    @Override
+    public void deleteMedia(String id) {
+        Media media = mediaRepository.findById(id).orElseThrow(() -> new NotFoundException(EMessage.NOT_FOUND, id));
+        media.setDeleteFlg(true);
+        mediaRepository.save(media);
     }
 
     public void validateImageSize(MultipartFile file, MediaResourceType resourceType) {

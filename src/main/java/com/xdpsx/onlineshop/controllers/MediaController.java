@@ -29,4 +29,10 @@ public class MediaController implements MediaAPI {
         ViewMediaDTO data = mediaService.createMedia(request, resourceType);
         return new APIResponse<>(HttpStatus.CREATED, data, SMessage.CREATE_SUCCESSFULLY);
     }
+
+    @DeleteMapping("/media/{id}")
+    public APIResponse<Void> deleteMedia(@PathVariable String id) {
+        mediaService.deleteMedia(id);
+        return APIResponse.noContent(SMessage.DELETE_SUCCESSFULLY);
+    }
 }

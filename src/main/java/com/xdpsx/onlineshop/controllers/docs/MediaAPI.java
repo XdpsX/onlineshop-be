@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.xdpsx.onlineshop.dtos.common.APIResponse;
@@ -54,6 +55,22 @@ public interface MediaAPI {
     APIResponse<ViewMediaDTO> createMedia(
             @Parameter(description = "category, brand,...") @RequestParam String resource,
             @Valid @ModelAttribute CreateMediaDTO request);
+
+    @Operation(
+            summary = "Delete media",
+            description = "Deletes a media file from the server",
+            responses = {
+                @ApiResponse(responseCode = "204", description = "No Content", content = @Content),
+                @ApiResponse(
+                        responseCode = "404",
+                        description = "Not Found",
+                        content = @Content(schema = @Schema(implementation = ErrorDTO.class))),
+                @ApiResponse(
+                        responseCode = "500",
+                        description = "Internal Server Error",
+                        content = @Content(schema = @Schema(implementation = ErrorDTO.class)))
+            })
+    APIResponse<Void> deleteMedia(@Parameter(description = "ID of the media to be deleted") @PathVariable String id);
 
     class CreateMediaVM extends APIResponse<ViewMediaDTO> {}
 }
