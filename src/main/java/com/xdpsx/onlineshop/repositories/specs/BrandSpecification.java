@@ -3,6 +3,8 @@ package com.xdpsx.onlineshop.repositories.specs;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.persistence.criteria.JoinType;
+
 import org.springframework.data.jpa.domain.Specification;
 
 import com.xdpsx.onlineshop.entities.Brand;
@@ -33,6 +35,11 @@ public class BrandSpecification extends BaseSpecification<Brand> {
         Specification<Brand> spec = build(criteriaList);
 
         spec = applySort(spec, sort);
+
+        spec = spec.and((root, query, builder) -> {
+            root.fetch("categories", JoinType.LEFT);
+            return builder.conjunction();
+        });
 
         return spec;
     }

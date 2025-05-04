@@ -1,8 +1,6 @@
 package com.xdpsx.onlineshop.services.impl;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -10,18 +8,19 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.xdpsx.onlineshop.constants.messages.EMessage;
 import com.xdpsx.onlineshop.dtos.brand.*;
+import com.xdpsx.onlineshop.dtos.common.CheckExistResponse;
+import com.xdpsx.onlineshop.dtos.common.ModifyExclusiveDTO;
 import com.xdpsx.onlineshop.dtos.common.PageResponse;
 import com.xdpsx.onlineshop.entities.Brand;
 import com.xdpsx.onlineshop.entities.Category;
 import com.xdpsx.onlineshop.entities.Media;
 import com.xdpsx.onlineshop.entities.enums.MediaResourceType;
 import com.xdpsx.onlineshop.exceptions.DuplicateException;
-import com.xdpsx.onlineshop.exceptions.InvalidResourceTypeException;
+import com.xdpsx.onlineshop.exceptions.ModifyExclusiveException;
 import com.xdpsx.onlineshop.exceptions.NotFoundException;
 import com.xdpsx.onlineshop.mappers.BrandMapper;
 import com.xdpsx.onlineshop.mappers.PageMapper;
@@ -31,15 +30,17 @@ import com.xdpsx.onlineshop.repositories.MediaRepository;
 import com.xdpsx.onlineshop.repositories.specs.BrandSpecification;
 import com.xdpsx.onlineshop.services.BrandService;
 
-import lombok.RequiredArgsConstructor;
-
 @Service
-@RequiredArgsConstructor
-public class BrandServiceImpl implements BrandService {
-    private final BrandMapper brandMapper;
-    private final MediaRepository mediaRepository;
+public class BrandServiceImpl extends AbstractImageUpdatableService implements BrandService {
     private final BrandRepository brandRepository;
     private final CategoryRepository categoryRepository;
+
+    public BrandServiceImpl(
+            MediaRepository mediaRepository, BrandRepository brandRepository, CategoryRepository categoryRepository) {
+        super(mediaRepository);
+        this.brandRepository = brandRepository;
+        this.categoryRepository = categoryRepository;
+    }
 
     @Override
     public PageResponse<AdminBrandResponse> getAdminBrands(AdminBrandFilter filter) {
@@ -50,9 +51,16 @@ public class BrandServiceImpl implements BrandService {
         return PageMapper.toPageResponse(brandPage, BrandMapper.INSTANCE::toAdminBrandResponse);
     }
 
+    @Override
+    public BrandDetailResponse getAdminBrandDetail(Integer id) {
+        Brand brand =
+                brandRepository.findDetailById(id).orElseThrow(() -> new NotFoundException(EMessage.NOT_FOUND, id));
+        return BrandMapper.INSTANCE.toBrandDetailResponse(brand);
+    }
+
     @Transactional
     @Override
-    public AdminBrandResponse createBrand(CreateBrandRequest request) {
+    public BrandDetailResponse createBrand(CreateBrandRequest request) {
         Brand brand = BrandMapper.INSTANCE.toEntity(request);
         if (brandRepository.existsByName(request.name())) {
             throw new DuplicateException(EMessage.DATA_EXISTS, request.name());
@@ -60,11 +68,8 @@ public class BrandServiceImpl implements BrandService {
 
         if (request.imageId() != null) {
             Media image = mediaRepository
-                    .findById(request.imageId())
+                    .findPublicTempMediaById(request.imageId(), MediaResourceType.BRAND)
                     .orElseThrow(() -> new NotFoundException(EMessage.NOT_FOUND, request.imageId()));
-            if (!image.getResourceType().equals(MediaResourceType.BRAND)) {
-                throw new InvalidResourceTypeException(EMessage.INVALID_RESOURCE_TYPE);
-            }
             image.setTempFlg(false);
             brand.setImage(image);
         }
@@ -74,70 +79,64 @@ public class BrandServiceImpl implements BrandService {
         }
 
         Brand savedBrand = brandRepository.save(brand);
-        return BrandMapper.INSTANCE.toAdminBrandResponse(savedBrand);
+        return BrandMapper.INSTANCE.toBrandDetailResponse(savedBrand);
     }
 
-    @Transactional(isolation = Isolation.READ_COMMITTED)
+    @Transactional
     @Override
-    public AdminBrandResponse updateBrand(Integer id, BrandRequest request) {
-        //        Brand existingBrand = brandRepository
-        //                .findById(id)
-        //                .orElseThrow(() -> new NotFoundException("Brand with id=%s not found".formatted(id)));
-        //
-        //        // Update name
-        //        if (!existingBrand.getName().equals(request.getName())) {
-        //            if (brandRepository.existsByName(request.getName())) {
-        //                throw new DuplicateException("Brand with name=%s already
-        // exists".formatted(request.getName()));
-        //            }
-        //            existingBrand.setName(request.getName());
-        //        }
-        //
-        //        // Update categories
-        //        if (request.getCategoryIds() != null) {
-        //            List<Category> newCategories = fetchCategories(request.getCategoryIds());
-        //            existingBrand.setCategories(newCategories);
-        //        }
-        //
-        //        // Update logo
-        //        if (request.getLogo() != null) {
-        //            CloudinaryUploadResponse response = uploader.uploadFile(request.getLogo(), uploadOptions);
-        //        }
-        //
-        //        Brand updatedBrand = brandRepository.save(existingBrand);
-        //        return brandMapper.fromEntityToResponse(updatedBrand);
-        return null;
+    public BrandDetailResponse updateBrand(Integer id, UpdateBrandRequest request) {
+        Brand brand = brandRepository.findById(id).orElseThrow(() -> new NotFoundException(EMessage.NOT_FOUND, id));
+
+        if (brand.getUpdatedAt() != null && !request.lastRetrievedAt().isAfter(brand.getUpdatedAt())) {
+            throw new ModifyExclusiveException(EMessage.MODIFY_EXCLUSIVE);
+        }
+
+        // Update name
+        if (!brand.getName().equals(request.name())) {
+            if (brandRepository.existsByName(request.name())) {
+                throw new DuplicateException(EMessage.DATA_EXISTS, request.name());
+            }
+            brand.setName(request.name());
+        }
+
+        brand.setPublicFlg(request.publicFlg());
+
+        // Update image
+        updateImage(brand, request.imageId(), MediaResourceType.BRAND);
+
+        // Update categories
+        if (request.categoryIds() != null) {
+            List<Category> categories = fetchCategories(request.categoryIds());
+            brand.setCategories(categories);
+        } else {
+            brand.setCategories(null);
+        }
+        Brand savedBrand = brandRepository.save(brand);
+        return BrandMapper.INSTANCE.toBrandDetailResponse(savedBrand);
     }
 
-    @Transactional(isolation = Isolation.READ_COMMITTED)
+    @Transactional
     @Override
-    public void deleteBrand(Integer id) {
-        Brand existingBrand = brandRepository
-                .findById(id)
-                .orElseThrow(() -> new NotFoundException("Brand with id=%s not found".formatted(id)));
+    public void deleteBrand(Integer id, ModifyExclusiveDTO request) {
+        Brand brand = brandRepository.findById(id).orElseThrow(() -> new NotFoundException(EMessage.NOT_FOUND, id));
+        if (!request.lastRetrievedAt().isAfter(brand.getUpdatedAt())) {
+            throw new ModifyExclusiveException(EMessage.MODIFY_EXCLUSIVE);
+        }
         //        long countBrands = brandRepository.countBrandsInOtherTables(id);
         //        if (countBrands > 0){
         //            throw new BadRequestException(i18nUtils.getBrandCannotDeleteMsg(existingBrand.getName()));
         //        }
-        brandRepository.delete(existingBrand);
+        if (brand.getImage() != null) {
+            Media image = brand.getImage();
+            image.setDeleteFlg(true);
+            mediaRepository.save(image);
+        }
+        brandRepository.delete(brand);
     }
 
     @Override
-    public Map<String, Boolean> checkExistsBrand(String name) {
-        Map<String, Boolean> exists = new HashMap<>();
-        exists.put("nameExists", brandRepository.existsByName(name));
-        return exists;
-    }
-
-    //    @Transactional(readOnly = true)
-    @Override
-    public List<BrandNoCatsDTO> listBrandsByCategoryId(Integer categoryId) {
-        Category category = categoryRepository
-                .findById(categoryId)
-                .orElseThrow(() -> new NotFoundException("Category with id=%s not found".formatted(categoryId)));
-        //        List<Brand> brands = category.getBrands();
-        List<Brand> brands = brandRepository.findBrandsByCategoryId(category.getId());
-        return brands.stream().map(brandMapper::fromEntityToNotCatsDTO).collect(Collectors.toList());
+    public CheckExistResponse checkBrandExist(BrandExistRequest request) {
+        return new CheckExistResponse("name", brandRepository.existsByName(request.name()));
     }
 
     private List<Category> fetchCategories(Set<Integer> categoryIds) {

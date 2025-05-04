@@ -5,6 +5,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import com.xdpsx.onlineshop.dtos.brand.AdminBrandResponse;
+import com.xdpsx.onlineshop.dtos.brand.BrandDetailResponse;
 import com.xdpsx.onlineshop.dtos.brand.BrandNoCatsDTO;
 import com.xdpsx.onlineshop.dtos.brand.CreateBrandRequest;
 import com.xdpsx.onlineshop.entities.Brand;
@@ -23,6 +24,10 @@ public interface BrandMapper {
     @Mapping(target = "image", source = "entity.image.url")
     @Mapping(target = "categories", source = "entity.categories")
     AdminBrandResponse toAdminBrandResponse(Brand entity);
+
+    @Mapping(target = "image", source = "entity.image")
+    @Mapping(target = "categories", source = "entity.categories")
+    BrandDetailResponse toBrandDetailResponse(Brand entity);
 
     BrandNoCatsDTO fromEntityToNotCatsDTO(Brand entity);
 }

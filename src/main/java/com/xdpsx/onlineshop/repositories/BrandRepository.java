@@ -1,10 +1,12 @@
 package com.xdpsx.onlineshop.repositories;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.xdpsx.onlineshop.entities.Brand;
 
@@ -13,6 +15,9 @@ public interface BrandRepository extends JpaRepository<Brand, Integer>, JpaSpeci
 
     @Query("SELECT b FROM Brand b JOIN b.categories c WHERE c.id = :categoryId ORDER BY b.name")
     List<Brand> findBrandsByCategoryId(Integer categoryId);
+
+    @Query("SELECT b FROM Brand b LEFT JOIN FETCH b.categories WHERE b.id = :id")
+    Optional<Brand> findDetailById(@Param("id") Integer id);
 
     //    @Query(value =
     //            "SELECT COUNT(*) FROM (" +
