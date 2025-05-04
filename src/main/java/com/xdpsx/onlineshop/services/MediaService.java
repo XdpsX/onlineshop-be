@@ -6,4 +6,6 @@ import com.xdpsx.onlineshop.entities.enums.MediaResourceType;
 
 public interface MediaService {
     ViewMediaDTO createMedia(CreateMediaDTO request, MediaResourceType resourceType);
+
+    void deleteMedia(String id);
 }

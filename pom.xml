@@ -181,13 +181,15 @@
 				<configuration>
 					<includes>
 						<include>com/xdpsx/onlineshop/controllers/**</include>
-						<include>com/xdpsx/onlineshop/services/**</include>
-						<include>com/xdpsx/onlineshop/repositories/**</include>
-						<include>com/xdpsx/onlineshop/validations/**</include>
+						<include>com/xdpsx/onlineshop/services/impl/**</include>
+						<include>com/xdpsx/onlineshop/repositories/specs/**</include>
+						<include>com/xdpsx/onlineshop/validations/validators/**</include>
+						<include>com/xdpsx/onlineshop/utils/**</include>
+						<include>com/xdpsx/onlineshop/scheduled/**</include>
 					</includes>
-<!--					<excludes>-->
-<!--						<exclude>com/xdpsx/onlineshop/configs/**</exclude>-->
-<!--					</excludes>-->
+					<excludes>
+						<exclude>com/xdpsx/onlineshop/controllers/docs/**</exclude>
+					</excludes>
 				</configuration>
 			</plugin>
 			<plugin>

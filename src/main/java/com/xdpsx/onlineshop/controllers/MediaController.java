@@ -6,12 +6,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
+import com.xdpsx.onlineshop.constants.messages.EMessage;
 import com.xdpsx.onlineshop.constants.messages.SMessage;
 import com.xdpsx.onlineshop.controllers.docs.MediaAPI;
 import com.xdpsx.onlineshop.dtos.common.APIResponse;
 import com.xdpsx.onlineshop.dtos.media.CreateMediaDTO;
 import com.xdpsx.onlineshop.dtos.media.ViewMediaDTO;
 import com.xdpsx.onlineshop.entities.enums.MediaResourceType;
+import com.xdpsx.onlineshop.exceptions.BadRequestException;
 import com.xdpsx.onlineshop.services.MediaService;
 
 import lombok.RequiredArgsConstructor;
@@ -26,7 +28,16 @@ public class MediaController implements MediaAPI {
     public APIResponse<ViewMediaDTO> createMedia(
             @RequestParam String resource, @Valid @ModelAttribute CreateMediaDTO request) {
         MediaResourceType resourceType = MediaResourceType.fromResource(resource);
+        if (resourceType == null) {
+            throw new BadRequestException(EMessage.INVALID_RESOURCE_TYPE, resource);
+        }
         ViewMediaDTO data = mediaService.createMedia(request, resourceType);
         return new APIResponse<>(HttpStatus.CREATED, data, SMessage.CREATE_SUCCESSFULLY);
+    }
+
+    @DeleteMapping("/media/{id}")
+    public APIResponse<Void> deleteMedia(@PathVariable String id) {
+        mediaService.deleteMedia(id);
+        return APIResponse.noContent(SMessage.DELETE_SUCCESSFULLY);
     }
 }
