@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.cloudinary.Transformation;
-import com.xdpsx.onlineshop.exceptions.BadRequestException;
 
 public enum MediaResourceType {
     CATEGORY("category", "categories", 280),
@@ -53,6 +52,7 @@ public enum MediaResourceType {
         return Arrays.stream(MediaResourceType.values())
                 .filter(type -> type.resource.equalsIgnoreCase(resource))
                 .findFirst()
-                .orElseThrow(() -> new BadRequestException("Invalid media resource type: " + resource));
+                .orElse(null);
+        //                .orElseThrow(() -> new BadRequestException("Invalid media resource type: " + resource));
     }
 }

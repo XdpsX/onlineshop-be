@@ -2,6 +2,7 @@ package com.xdpsx.onlineshop.repositories;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -18,4 +19,10 @@ public interface MediaRepository extends CrudRepository<Media, String> {
 		WHERE m.tempFlg = true AND m.createdAt < :expiryTime
 		""")
     List<Media> findExpiredMedia(@Param("expiryTime") LocalDateTime expiryTime);
+
+    @Query("""
+		SELECT m FROM Media m
+		WHERE m.id = :id AND m.deleteFlg = false
+	""")
+    Optional<Media> findPublicMediaById(String id);
 }

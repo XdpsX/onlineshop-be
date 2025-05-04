@@ -16,4 +16,8 @@ public record CloudinaryUploadResponse(
         long bytes,
         @JsonProperty("display_name") String displayName,
         @JsonProperty("asset_folder") String assetFolder,
-        @JsonProperty("asset_id") String assetId) {}
+        @JsonProperty("asset_id") String assetId) {
+    public CloudinaryUploadResponse(String displayName, String publicId, String url) {
+        this(publicId, url, url, null, null, null, null, null, 0, 0, 0L, displayName, null, null);
+    }
+}

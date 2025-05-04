@@ -56,12 +56,14 @@ public class MediaServiceImpl implements MediaService {
 
     @Override
     public void deleteMedia(String id) {
-        Media media = mediaRepository.findById(id).orElseThrow(() -> new NotFoundException(EMessage.NOT_FOUND, id));
+        Media media = mediaRepository
+                .findPublicMediaById(id)
+                .orElseThrow(() -> new NotFoundException(EMessage.NOT_FOUND, id));
         media.setDeleteFlg(true);
         mediaRepository.save(media);
     }
 
-    public void validateImageSize(MultipartFile file, MediaResourceType resourceType) {
+    private void validateImageSize(MultipartFile file, MediaResourceType resourceType) {
         if (resourceType.minWidth() == null) {
             return;
         }
