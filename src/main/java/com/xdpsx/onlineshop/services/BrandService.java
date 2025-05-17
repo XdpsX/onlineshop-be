@@ -1,21 +1,20 @@
 package com.xdpsx.onlineshop.services;
 
-import java.util.List;
-import java.util.Map;
-
 import com.xdpsx.onlineshop.dtos.brand.*;
+import com.xdpsx.onlineshop.dtos.common.CheckExistResponse;
+import com.xdpsx.onlineshop.dtos.common.ModifyExclusiveDTO;
 import com.xdpsx.onlineshop.dtos.common.PageResponse;
 
 public interface BrandService {
     PageResponse<AdminBrandResponse> getAdminBrands(AdminBrandFilter filter);
 
-    AdminBrandResponse createBrand(CreateBrandRequest request);
+    BrandDetailResponse getAdminBrandDetail(Integer id);
 
-    AdminBrandResponse updateBrand(Integer id, BrandRequest request);
+    BrandDetailResponse createBrand(CreateBrandRequest request);
 
-    void deleteBrand(Integer id);
+    BrandDetailResponse updateBrand(Integer id, UpdateBrandRequest request);
 
-    Map<String, Boolean> checkExistsBrand(String name);
+    void deleteBrand(Integer id, ModifyExclusiveDTO request);
 
-    List<BrandNoCatsDTO> listBrandsByCategoryId(Integer categoryId);
+    CheckExistResponse checkBrandExist(BrandExistRequest request);
 }

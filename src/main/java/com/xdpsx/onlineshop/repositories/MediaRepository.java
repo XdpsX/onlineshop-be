@@ -9,6 +9,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 import com.xdpsx.onlineshop.entities.Media;
+import com.xdpsx.onlineshop.entities.enums.MediaResourceType;
 
 public interface MediaRepository extends CrudRepository<Media, String> {
     @Query("SELECT m FROM Media m WHERE m.deleteFlg = true")
@@ -25,4 +26,13 @@ public interface MediaRepository extends CrudRepository<Media, String> {
 		WHERE m.id = :id AND m.deleteFlg = false
 	""")
     Optional<Media> findPublicMediaById(String id);
+
+    @Query(
+            """
+		SELECT m FROM Media m
+		WHERE m.id = :id AND m.deleteFlg = false
+			AND m.tempFlg = true
+			AND m.resourceType = :resourceType
+	""")
+    Optional<Media> findPublicTempMediaById(String id, MediaResourceType resourceType);
 }

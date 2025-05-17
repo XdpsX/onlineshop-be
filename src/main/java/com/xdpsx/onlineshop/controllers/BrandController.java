@@ -1,20 +1,16 @@
 package com.xdpsx.onlineshop.controllers;
 
-import java.util.Map;
-
 import jakarta.validation.Valid;
 
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.xdpsx.onlineshop.constants.messages.SMessage;
-import com.xdpsx.onlineshop.dtos.brand.AdminBrandFilter;
-import com.xdpsx.onlineshop.dtos.brand.AdminBrandResponse;
-import com.xdpsx.onlineshop.dtos.brand.BrandRequest;
-import com.xdpsx.onlineshop.dtos.brand.CreateBrandRequest;
+import com.xdpsx.onlineshop.dtos.brand.*;
 import com.xdpsx.onlineshop.dtos.common.APIResponse;
+import com.xdpsx.onlineshop.dtos.common.CheckExistResponse;
+import com.xdpsx.onlineshop.dtos.common.ModifyExclusiveDTO;
 import com.xdpsx.onlineshop.dtos.common.PageResponse;
 import com.xdpsx.onlineshop.services.BrandService;
 
@@ -32,29 +28,35 @@ public class BrandController {
         return APIResponse.ok(data);
     }
 
+    @GetMapping("/admin/brands/{id}")
+    public APIResponse<BrandDetailResponse> getAdminBrandDetail(@PathVariable Integer id) {
+        BrandDetailResponse data = brandService.getAdminBrandDetail(id);
+        return APIResponse.ok(data);
+    }
+
     @PostMapping(path = "/brands/create")
     @ResponseStatus(HttpStatus.CREATED)
-    public APIResponse<AdminBrandResponse> createBrand(@Valid @RequestBody CreateBrandRequest request) {
-        AdminBrandResponse data = brandService.createBrand(request);
+    public APIResponse<BrandDetailResponse> createBrand(@Valid @RequestBody CreateBrandRequest request) {
+        BrandDetailResponse data = brandService.createBrand(request);
         return new APIResponse<>(HttpStatus.CREATED, data, SMessage.CREATE_SUCCESSFULLY);
     }
 
-    @PutMapping("/{id}/update")
-    public ResponseEntity<AdminBrandResponse> updateBrand(
-            @PathVariable Integer id, @Valid @ModelAttribute BrandRequest request) {
-        AdminBrandResponse response = brandService.updateBrand(id, request);
-        return ResponseEntity.ok(response);
+    @PutMapping("/brands/{id}/update")
+    public APIResponse<BrandDetailResponse> updateBrand(
+            @PathVariable Integer id, @Valid @RequestBody UpdateBrandRequest request) {
+        BrandDetailResponse data = brandService.updateBrand(id, request);
+        return APIResponse.ok(data);
     }
 
     @DeleteMapping("/{id}/delete")
-    public ResponseEntity<Void> deleteBrand(@PathVariable Integer id) {
-        brandService.deleteBrand(id);
-        return ResponseEntity.noContent().build();
+    public APIResponse<Void> deleteBrand(@PathVariable Integer id, @Valid @RequestBody ModifyExclusiveDTO request) {
+        brandService.deleteBrand(id, request);
+        return APIResponse.noContent(SMessage.DELETE_SUCCESSFULLY);
     }
 
-    @GetMapping("/exists")
-    public ResponseEntity<Map<String, Boolean>> checkExistsBrand(@RequestParam String name) {
-        Map<String, Boolean> exists = brandService.checkExistsBrand(name);
-        return ResponseEntity.ok(exists);
+    @PostMapping("/brands/exists")
+    public APIResponse<CheckExistResponse> checkBrandExist(@Valid @RequestBody BrandExistRequest request) {
+        CheckExistResponse data = brandService.checkBrandExist(request);
+        return APIResponse.ok(data);
     }
 }
