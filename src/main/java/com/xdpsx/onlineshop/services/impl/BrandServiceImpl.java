@@ -108,8 +108,6 @@ public class BrandServiceImpl extends AbstractImageUpdatableService implements B
         if (request.categoryIds() != null) {
             List<Category> categories = fetchCategories(request.categoryIds());
             brand.setCategories(categories);
-        } else {
-            brand.setCategories(null);
         }
         Brand savedBrand = brandRepository.save(brand);
         return BrandMapper.INSTANCE.toBrandDetailResponse(savedBrand);
