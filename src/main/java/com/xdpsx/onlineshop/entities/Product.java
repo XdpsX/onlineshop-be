@@ -5,6 +5,7 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.xdpsx.onlineshop.entities.common.AuditEntity;
 import jakarta.persistence.*;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;

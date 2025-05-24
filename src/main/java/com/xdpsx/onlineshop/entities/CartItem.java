@@ -1,5 +1,6 @@
 package com.xdpsx.onlineshop.entities;
 
+import com.xdpsx.onlineshop.entities.common.AuditEntity;
 import jakarta.persistence.*;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;

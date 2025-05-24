@@ -39,7 +39,7 @@ public class CustomUserDetails implements UserDetails, OAuth2User {
                 .username(user.getEmail())
                 .password(user.getPassword())
                 .authProvider(user.getAuthProvider())
-                .role(user.getRole())
+//                .role(user.getRole())
                 .build();
     }
 

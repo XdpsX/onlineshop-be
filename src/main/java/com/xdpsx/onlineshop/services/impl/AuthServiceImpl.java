@@ -37,8 +37,8 @@ public class AuthServiceImpl implements AuthService {
                 .name(request.getName())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .authProvider(AuthProvider.LOCAL)
-                .role(Role.USER)
+                .authProvider(AuthProvider.SYSTEM)
+//                .role(Role.USER)
                 .build();
         User savedUser = userRepository.save(user);
         String accessToken = tokenProvider.generateToken(savedUser);

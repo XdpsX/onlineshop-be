@@ -1,4 +1,4 @@
-package com.xdpsx.onlineshop.entities;
+package com.xdpsx.onlineshop.entities.common;
 
 import java.time.LocalDateTime;
 
