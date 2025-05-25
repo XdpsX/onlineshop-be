@@ -11,7 +11,6 @@ import com.xdpsx.onlineshop.dtos.auth.RegisterRequest;
 import com.xdpsx.onlineshop.dtos.auth.TokenResponse;
 import com.xdpsx.onlineshop.entities.User;
 import com.xdpsx.onlineshop.entities.enums.AuthProvider;
-import com.xdpsx.onlineshop.entities.enums.Role;
 import com.xdpsx.onlineshop.exceptions.DuplicateException;
 import com.xdpsx.onlineshop.repositories.UserRepository;
 import com.xdpsx.onlineshop.security.CustomUserDetails;

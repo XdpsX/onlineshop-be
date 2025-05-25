@@ -1,19 +1,14 @@
 package com.xdpsx.onlineshop.security;
 
-import static com.xdpsx.onlineshop.constants.SecurityConstants.ROLE_PREFIX;
-
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import com.xdpsx.onlineshop.entities.User;
 import com.xdpsx.onlineshop.entities.enums.AuthProvider;
-import com.xdpsx.onlineshop.entities.enums.Role;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,7 +26,7 @@ public class CustomUserDetails implements UserDetails, OAuth2User {
     private String username;
     private String password;
     private AuthProvider authProvider;
-    private Role role;
+//    private Role role;
 
     public static CustomUserDetails buildFromUser(final User user) {
         return CustomUserDetails.builder()
@@ -50,7 +45,8 @@ public class CustomUserDetails implements UserDetails, OAuth2User {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(ROLE_PREFIX + role.name()));
+//        return List.of(new SimpleGrantedAuthority(ROLE_PREFIX + role.name()));
+        return null;
     }
 
     @Override

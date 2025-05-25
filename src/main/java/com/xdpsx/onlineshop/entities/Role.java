@@ -1,6 +1,7 @@
 package com.xdpsx.onlineshop.entities;
 
 import com.xdpsx.onlineshop.entities.common.AuditEntity;
+import com.xdpsx.onlineshop.entities.enums.RoleName;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -18,8 +19,9 @@ public class Role extends AuditEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Enumerated(EnumType.STRING)
     @Column(length = 64, nullable = false, unique = true)
-    private String name;
+    private RoleName name;
 
     private String description;
 

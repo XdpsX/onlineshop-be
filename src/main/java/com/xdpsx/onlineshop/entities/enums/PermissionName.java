@@ -1,0 +1,32 @@
+package com.xdpsx.onlineshop.entities.enums;
+
+public enum PermissionName {
+    VIEW_ALL,
+    CREATE_ALL,
+    UPDATE_ALL,
+    DELETE_ALL,
+
+    USER_VIEW,
+    USER_CREATE,
+    USER_UPDATE,
+    USER_DELETE,
+
+    PRODUCT_VIEW,
+    PRODUCT_CREATE,
+    PRODUCT_UPDATE,
+    PRODUCT_DELETE,
+
+    CATEGORY_VIEW,
+    CATEGORY_CREATE,
+    CATEGORY_UPDATE,
+    CATEGORY_DELETE,
+
+    ORDER_VIEW,
+    ORDER_CREATE,
+    ORDER_UPDATE,
+
+    BRAND_VIEW,
+    BRAND_CREATE,
+    BRAND_UPDATE,
+    BRAND_DELETE,
+}

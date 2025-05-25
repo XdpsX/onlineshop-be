@@ -5,7 +5,6 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import com.xdpsx.onlineshop.entities.enums.AuthProvider;
-import com.xdpsx.onlineshop.entities.enums.Role;
 import com.xdpsx.onlineshop.security.CustomUserDetails;
 
 @Service
@@ -17,7 +16,7 @@ public class GoogleOAuth2UserInfoExtractor implements OAuth2UserInfoExtractor {
         customUserDetails.setName(retrieveAttr("name", oAuth2User));
         customUserDetails.setAvatar(retrieveAttr("picture", oAuth2User));
         customUserDetails.setAuthProvider(AuthProvider.GOOGLE);
-        customUserDetails.setRole(Role.USER);
+//        customUserDetails.setRole(Role.USER);
         return customUserDetails;
     }
 

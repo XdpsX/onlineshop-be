@@ -10,7 +10,6 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
 import com.xdpsx.onlineshop.entities.User;
-import com.xdpsx.onlineshop.entities.enums.Role;
 import com.xdpsx.onlineshop.repositories.UserRepository;
 import com.xdpsx.onlineshop.security.CustomUserDetails;
 
