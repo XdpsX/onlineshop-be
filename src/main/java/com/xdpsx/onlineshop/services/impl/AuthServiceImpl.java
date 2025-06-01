@@ -1,5 +1,10 @@
 package com.xdpsx.onlineshop.services.impl;
 
+import com.xdpsx.onlineshop.constants.messages.EMessage;
+import com.xdpsx.onlineshop.entities.Role;
+import com.xdpsx.onlineshop.entities.enums.RoleName;
+import com.xdpsx.onlineshop.exceptions.NotFoundException;
+import com.xdpsx.onlineshop.repositories.RoleRepository;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -19,6 +24,9 @@ import com.xdpsx.onlineshop.services.AuthService;
 
 import lombok.RequiredArgsConstructor;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
@@ -26,22 +34,40 @@ public class AuthServiceImpl implements AuthService {
     private final PasswordEncoder passwordEncoder;
     private final TokenProvider tokenProvider;
     private final AuthenticationManager authenticationManager;
+    private final RoleRepository roleRepository;
 
     @Override
-    public TokenResponse register(RegisterRequest request) {
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new DuplicateException("Email %s is already in use".formatted(request.getEmail()));
+    public String register(RegisterRequest request) {
+        User user = userRepository.findByEmail(request.email())
+                .orElse(null);
+
+        // User already exists
+        if (user != null) {
+            // User is already verified
+            if (user.isEnabled()) {
+                throw new DuplicateException(EMessage.DATA_EXISTS, request.email());
+            } else { // User is not verified
+                user.setName(request.name());
+                user.setPassword(passwordEncoder.encode(request.password()));
+                userRepository.save(user);
+            }
+        }else { // User does not exist
+            Role userRole = roleRepository.findByName(RoleName.USER)
+                    .orElseThrow(() -> new NotFoundException(EMessage.NOT_FOUND, "Role User"));
+            Set<Role> roles = new HashSet<>();
+            roles.add(userRole);
+
+            User newUser = User.builder()
+                    .email(request.email())
+                    .name(request.name())
+                    .password(passwordEncoder.encode(request.password()))
+                    .enabled(false)
+                    .roles(roles)
+                    .authProvider(AuthProvider.SYSTEM)
+                    .build();
+            userRepository.save(newUser);
         }
-        User user = User.builder()
-                .name(request.getName())
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .authProvider(AuthProvider.SYSTEM)
-//                .role(Role.USER)
-                .build();
-        User savedUser = userRepository.save(user);
-        String accessToken = tokenProvider.generateToken(savedUser);
-        return TokenResponse.builder().accessToken(accessToken).build();
+        return request.email();
     }
 
     @Override

@@ -7,6 +7,7 @@ import com.xdpsx.onlineshop.entities.enums.AuthProvider;
 
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 
 @Setter
@@ -24,7 +25,7 @@ public class User extends AuditEntity {
     @Column(length = 64, nullable = false)
     private String name;
 
-    @Column(length = 128, nullable = false)
+    @Column(length = 64, nullable = false)
     private String email;
 
     @Column(nullable = false)
@@ -39,6 +40,8 @@ public class User extends AuditEntity {
     private boolean enabled;
 
     private boolean locked;
+
+    private LocalDateTime lastLoginTime;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

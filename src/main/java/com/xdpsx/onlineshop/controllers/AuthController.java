@@ -1,5 +1,6 @@
 package com.xdpsx.onlineshop.controllers;
 
+import com.xdpsx.onlineshop.dtos.common.APIResponse;
 import jakarta.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
@@ -22,9 +23,9 @@ public class AuthController {
     //    private String ERROR_URL;
 
     @PostMapping("/register")
-    public ResponseEntity<TokenResponse> register(@Valid @RequestBody RegisterRequest request) {
-        TokenResponse response = authService.register(request);
-        return ResponseEntity.ok(response);
+    public APIResponse<String> register(@Valid @RequestBody RegisterRequest request) {
+        String data = authService.register(request);
+        return APIResponse.ok(data);
     }
 
     @PostMapping("/login")

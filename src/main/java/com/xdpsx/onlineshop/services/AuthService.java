@@ -5,7 +5,7 @@ import com.xdpsx.onlineshop.dtos.auth.RegisterRequest;
 import com.xdpsx.onlineshop.dtos.auth.TokenResponse;
 
 public interface AuthService {
-    TokenResponse register(RegisterRequest request);
+    String register(RegisterRequest request);
 
     TokenResponse login(LoginRequest request);
 }
