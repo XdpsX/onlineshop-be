@@ -15,6 +15,25 @@ services:
       - "${DB_PORT}:${DB_PORT}"
     networks:
       - onlineshop-network
+  redis:
+    container_name: redis
+    image: redis:7.4
+    ports:
+      - "${REDIS_PORT}:${REDIS_PORT}"
+    networks:
+      - onlineshop-network
+    volumes:
+      - redis:/data
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    command: [ "redis-server", "--requirepass", "${REDIS_PASSWORD}" ]
+    restart: unless-stopped
+  maildev:
+    image: maildev/maildev:2.1.0
+    container_name: maildev_container
+    ports:
+      - "1025:1025"
+      - "1080:1080"
 
 networks:
   onlineshop-network:
@@ -22,3 +41,4 @@ networks:
 
 volumes:
   mysql:
+  redis:

@@ -13,15 +13,38 @@ spring:
     open-in-view: false
     hibernate:
       ddl-auto: none
-#      cache:
-#        use_second_level_cache: true
-#        region.factory_class: org.hibernate.cache.jcache.JCacheRegionFactory
+    #      cache:
+    #        use_second_level_cache: true
+    #        region.factory_class: org.hibernate.cache.jcache.JCacheRegionFactory
     show-sql: true
     properties:
       hibernate:
         format_sql: true
   liquibase:
     enabled: true
+  #  cache:
+  #    type: redis
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
+      timeout: 5000
+      repositories:
+        enabled: false
+  mail:
+    host: localhost
+    port: 1025
+    properties:
+      mail:
+        smtp:
+          trust: localhost
+        auth: true
+        starttls:
+          enable: true
+        connection-timeout: 5000
+        timeout: 3000
+        write-timeout: 5000
   security:
     oauth2:
       client:
