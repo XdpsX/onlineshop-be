@@ -25,7 +25,7 @@ public class TokenProvider {
     private Long EXPIRATION_SECONDS;
 
     public String generateToken(User user) {
-        CustomUserDetails userDetails = CustomUserDetails.buildFromUser(user);
+        CustomUserDetails userDetails = UserDetailsBuilder.fromUser(user);
         return generateToken(userDetails);
     }
 

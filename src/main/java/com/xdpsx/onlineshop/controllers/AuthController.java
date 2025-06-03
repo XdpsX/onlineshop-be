@@ -6,10 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.xdpsx.onlineshop.constants.messages.SMessage;
-import com.xdpsx.onlineshop.dtos.auth.LoginRequest;
-import com.xdpsx.onlineshop.dtos.auth.RegisterRequest;
-import com.xdpsx.onlineshop.dtos.auth.SendOtpRequest;
-import com.xdpsx.onlineshop.dtos.auth.TokenResponse;
+import com.xdpsx.onlineshop.dtos.auth.*;
 import com.xdpsx.onlineshop.dtos.common.APIResponse;
 import com.xdpsx.onlineshop.services.AuthService;
 
@@ -33,6 +30,12 @@ public class AuthController {
     @PostMapping("/send-otp")
     public APIResponse<Void> sendVerifyEmailOTP(@Valid @RequestBody SendOtpRequest request) {
         authService.sendVerifyEmailOTP(request);
+        return APIResponse.noContent(SMessage.SUCCESS);
+    }
+
+    @PostMapping("/verify-email")
+    public APIResponse<Void> verifyEmail(@Valid @RequestBody VerifyEmailRequest request) {
+        authService.verifyEmail(request);
         return APIResponse.noContent(SMessage.SUCCESS);
     }
 

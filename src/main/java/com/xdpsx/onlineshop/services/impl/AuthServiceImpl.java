@@ -19,10 +19,7 @@ import org.springframework.stereotype.Service;
 import com.xdpsx.onlineshop.constants.AuthConstants;
 import com.xdpsx.onlineshop.constants.CacheKey;
 import com.xdpsx.onlineshop.constants.messages.EMessage;
-import com.xdpsx.onlineshop.dtos.auth.LoginRequest;
-import com.xdpsx.onlineshop.dtos.auth.RegisterRequest;
-import com.xdpsx.onlineshop.dtos.auth.SendOtpRequest;
-import com.xdpsx.onlineshop.dtos.auth.TokenResponse;
+import com.xdpsx.onlineshop.dtos.auth.*;
 import com.xdpsx.onlineshop.entities.Role;
 import com.xdpsx.onlineshop.entities.User;
 import com.xdpsx.onlineshop.entities.enums.AuthProvider;
@@ -135,6 +132,32 @@ public class AuthServiceImpl implements AuthService {
             //            redisTemplateString.delete(cacheKey);
             throw new BadRequestException(EMessage.EMAIL_SEND_FAILED, request.email());
         }
+    }
+
+    @Override
+    public void verifyEmail(VerifyEmailRequest request) {
+        String otpVerifyEmailKey = CacheKey.buildOtpKey(OTPKey.OTP_VERIFY_EMAIL, request.email());
+        String cachedOtp = redisTemplateString.opsForValue().get(otpVerifyEmailKey);
+
+        if (cachedOtp == null) {
+            throw new NotFoundException(EMessage.OTP_EXPIRED, request.otp());
+        }
+
+        if (!cachedOtp.equals(request.otp())) {
+            throw new BadRequestException(EMessage.OTP_INVALID, request.otp());
+        }
+
+        User user = userRepository
+                .findByEmail(request.email())
+                .orElseThrow(() -> new NotFoundException(EMessage.NOT_FOUND, request.email()));
+
+        if (user.isEnabled()) {
+            throw new BadRequestException(EMessage.EMAIL_VERIFIED, request.email());
+        }
+
+        user.setEnabled(true);
+        userRepository.save(user);
+        redisTemplateString.delete(otpVerifyEmailKey);
     }
 
     @Override

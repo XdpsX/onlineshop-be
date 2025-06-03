@@ -2,41 +2,31 @@ package com.xdpsx.onlineshop.security;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
-import com.xdpsx.onlineshop.entities.User;
-import com.xdpsx.onlineshop.entities.enums.AuthProvider;
+import com.xdpsx.onlineshop.entities.Role;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Data
-@Builder
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class CustomUserDetails implements UserDetails, OAuth2User {
-    private Long id;
     private String name;
-    private String avatar;
     private String username;
     private String password;
-    private AuthProvider authProvider;
-    //    private Role role;
-
-    public static CustomUserDetails buildFromUser(final User user) {
-        return CustomUserDetails.builder()
-                .id(user.getId())
-                .username(user.getEmail())
-                .password(user.getPassword())
-                .authProvider(user.getAuthProvider())
-                //                .role(user.getRole())
-                .build();
-    }
+    private boolean enabled;
+    private boolean locked;
+    private Set<Role> roles;
 
     @Override
     public Map<String, Object> getAttributes() {
@@ -45,8 +35,13 @@ public class CustomUserDetails implements UserDetails, OAuth2User {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        //        return List.of(new SimpleGrantedAuthority(ROLE_PREFIX + role.name()));
-        return null;
+        return roles.stream()
+                .filter(Objects::nonNull)
+                .flatMap(role -> role.getPermissions().stream())
+                .filter(Objects::nonNull)
+                .map(permission ->
+                        new SimpleGrantedAuthority(permission.getName().name()))
+                .collect(Collectors.toSet());
     }
 
     @Override
@@ -66,7 +61,7 @@ public class CustomUserDetails implements UserDetails, OAuth2User {
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return !locked;
     }
 
     @Override
@@ -76,6 +71,6 @@ public class CustomUserDetails implements UserDetails, OAuth2User {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return enabled;
     }
 }

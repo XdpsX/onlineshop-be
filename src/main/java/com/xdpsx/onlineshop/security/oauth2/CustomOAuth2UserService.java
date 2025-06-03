@@ -35,7 +35,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         CustomUserDetails customUserDetails =
                 oAuth2UserInfoExtractorOptional.get().extractUserInfo(oAuth2User);
         User user = upsertUser(customUserDetails);
-        customUserDetails.setId(user.getId());
+        //        customUserDetails.setId(user.getId());
         return customUserDetails;
     }
 
@@ -47,7 +47,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             user.setName(customUserDetails.getName());
             user.setEmail(customUserDetails.getUsername());
             //            user.setAvatar(customUserDetails.getAvatar());
-            user.setAuthProvider(customUserDetails.getAuthProvider());
+            //            user.setAuthProvider(customUserDetails.getAuthProvider());
             //            user.setRole(Role.USER);
             return userRepository.save(user);
         } else {
