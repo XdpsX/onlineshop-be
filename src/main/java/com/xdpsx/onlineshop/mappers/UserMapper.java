@@ -20,11 +20,11 @@ public abstract class UserMapper {
     public UserProfile fromEntityToProfile(User entity) {
         UserProfile response = buildUserProfile(entity);
         if (entity.getAuthProvider().equals(AuthProvider.SYSTEM)) {
-//            response.setAvatarUrl(uploader.getFileUrl(entity.getAvatar()));
+            //            response.setAvatarUrl(uploader.getFileUrl(entity.getAvatar()));
         } else {
-//            response.setAvatarUrl(entity.getAvatar());
+            //            response.setAvatarUrl(entity.getAvatar());
         }
-//        response.setRole(entity.getRole().name());
+        //        response.setRole(entity.getRole().name());
         return response;
     }
 }

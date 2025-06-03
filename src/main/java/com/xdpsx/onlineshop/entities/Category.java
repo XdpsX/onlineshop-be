@@ -2,8 +2,9 @@ package com.xdpsx.onlineshop.entities;
 
 import java.util.List;
 
-import com.xdpsx.onlineshop.entities.common.AuditEntity;
 import jakarta.persistence.*;
+
+import com.xdpsx.onlineshop.entities.common.AuditEntity;
 
 import lombok.*;
 import lombok.experimental.SuperBuilder;

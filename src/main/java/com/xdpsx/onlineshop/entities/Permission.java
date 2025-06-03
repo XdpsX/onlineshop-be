@@ -1,8 +1,10 @@
 package com.xdpsx.onlineshop.entities;
 
+import jakarta.persistence.*;
+
 import com.xdpsx.onlineshop.entities.common.AuditEntity;
 import com.xdpsx.onlineshop.entities.enums.PermissionName;
-import jakarta.persistence.*;
+
 import lombok.*;
 
 @Setter

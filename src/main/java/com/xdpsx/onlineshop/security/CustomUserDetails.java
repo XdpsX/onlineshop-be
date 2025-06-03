@@ -26,7 +26,7 @@ public class CustomUserDetails implements UserDetails, OAuth2User {
     private String username;
     private String password;
     private AuthProvider authProvider;
-//    private Role role;
+    //    private Role role;
 
     public static CustomUserDetails buildFromUser(final User user) {
         return CustomUserDetails.builder()
@@ -34,7 +34,7 @@ public class CustomUserDetails implements UserDetails, OAuth2User {
                 .username(user.getEmail())
                 .password(user.getPassword())
                 .authProvider(user.getAuthProvider())
-//                .role(user.getRole())
+                //                .role(user.getRole())
                 .build();
     }
 
@@ -45,7 +45,7 @@ public class CustomUserDetails implements UserDetails, OAuth2User {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-//        return List.of(new SimpleGrantedAuthority(ROLE_PREFIX + role.name()));
+        //        return List.of(new SimpleGrantedAuthority(ROLE_PREFIX + role.name()));
         return null;
     }
 

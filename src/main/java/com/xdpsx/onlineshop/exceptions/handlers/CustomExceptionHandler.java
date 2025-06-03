@@ -14,6 +14,13 @@ import lombok.extern.slf4j.Slf4j;
 @RestControllerAdvice
 public class CustomExceptionHandler {
 
+    @ExceptionHandler(TooManyRequestsException.class)
+    @ResponseStatus(HttpStatus.TOO_MANY_REQUESTS)
+    public ErrorDTO handleTooManyRequestsException(TooManyRequestsException e) {
+        log.error(e.getMessage(), e);
+        return new ErrorDTO(HttpStatus.TOO_MANY_REQUESTS, e.getMessage(), e.getArgs());
+    }
+
     @ExceptionHandler(InvalidResourceTypeException.class)
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     public ErrorDTO handleInvalidMediaResourceException(InvalidResourceTypeException e) {

@@ -1,5 +1,15 @@
 package com.xdpsx.onlineshop.runner;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Component;
+
 import com.xdpsx.onlineshop.entities.Permission;
 import com.xdpsx.onlineshop.entities.Role;
 import com.xdpsx.onlineshop.entities.User;
@@ -8,17 +18,11 @@ import com.xdpsx.onlineshop.entities.enums.RoleName;
 import com.xdpsx.onlineshop.repositories.PermissionRepository;
 import com.xdpsx.onlineshop.repositories.RoleRepository;
 import com.xdpsx.onlineshop.repositories.UserRepository;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class RolePermissionInitializer implements ApplicationRunner {
@@ -27,14 +31,8 @@ public class RolePermissionInitializer implements ApplicationRunner {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    private static final Set<PermissionName> ROLE_ADMIN_PERMISSIONS = new HashSet<>(
-            Arrays.asList(
-                    PermissionName.VIEW_ALL,
-                    PermissionName.CREATE_ALL,
-                    PermissionName.UPDATE_ALL,
-                    PermissionName.DELETE_ALL
-            )
-    );
+    private static final Set<PermissionName> ROLE_ADMIN_PERMISSIONS = new HashSet<>(Arrays.asList(
+            PermissionName.VIEW_ALL, PermissionName.CREATE_ALL, PermissionName.UPDATE_ALL, PermissionName.DELETE_ALL));
 
     @Override
     public void run(ApplicationArguments args) {
@@ -49,20 +47,19 @@ public class RolePermissionInitializer implements ApplicationRunner {
                         .password(passwordEncoder.encode("12345678"))
                         .enabled(true)
                         .build(),
-                new HashSet<>(List.of(RoleName.ADMIN))
-        );
+                new HashSet<>(List.of(RoleName.ADMIN)));
     }
 
     private void initPermission() {
         for (PermissionName permissionName : PermissionName.values()) {
-            permissionRepository.findByName(permissionName)
-                    .orElseGet(() -> {
-                        Permission permission = Permission.builder()
-                                .name(permissionName)
-                                .description(permissionName.name().replace('_', ' ').toLowerCase())
-                                .build();
-                        return permissionRepository.save(permission);
-                    });
+            permissionRepository.findByName(permissionName).orElseGet(() -> {
+                Permission permission = Permission.builder()
+                        .name(permissionName)
+                        .description(permissionName.name().replace('_', ' ').toLowerCase())
+                        .build();
+                log.info("Creating permission {}", permissionName);
+                return permissionRepository.save(permission);
+            });
         }
     }
 
@@ -71,6 +68,7 @@ public class RolePermissionInitializer implements ApplicationRunner {
             return;
         }
 
+        log.info("Initializing role {}", roleName);
         List<Permission> permissions = permissionRepository.findByNameIn(permissionNames);
 
         Role role = Role.builder()
@@ -83,12 +81,14 @@ public class RolePermissionInitializer implements ApplicationRunner {
     }
 
     private void initUser(User user, Set<RoleName> roleNames) {
-        if(userRepository.existsByEmail(user.getEmail())) {
-          throw new RuntimeException("User with email " + user.getEmail() + " already exists.");
+        if (userRepository.existsByEmail(user.getEmail())) {
+            return;
         }
+        log.info("Initializing user: {}", user.getEmail());
         Set<Role> roles = new HashSet<>();
         for (RoleName roleName : roleNames) {
-            Role role = roleRepository.findByName(roleName)
+            Role role = roleRepository
+                    .findByName(roleName)
                     .orElseThrow(() -> new RuntimeException("Role not found: " + roleName));
             roles.add(role);
         }

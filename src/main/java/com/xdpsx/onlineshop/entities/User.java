@@ -1,14 +1,14 @@
 package com.xdpsx.onlineshop.entities;
 
-import com.xdpsx.onlineshop.entities.common.AuditEntity;
+import java.time.LocalDateTime;
+import java.util.Set;
+
 import jakarta.persistence.*;
 
+import com.xdpsx.onlineshop.entities.common.AuditEntity;
 import com.xdpsx.onlineshop.entities.enums.AuthProvider;
 
 import lombok.*;
-
-import java.time.LocalDateTime;
-import java.util.Set;
 
 @Setter
 @Getter
@@ -54,5 +54,4 @@ public class User extends AuditEntity {
             joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id"))
     private Set<Role> roles;
-
 }

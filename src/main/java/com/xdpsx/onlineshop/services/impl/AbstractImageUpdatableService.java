@@ -1,8 +1,8 @@
 package com.xdpsx.onlineshop.services.impl;
 
 import com.xdpsx.onlineshop.constants.messages.EMessage;
-import com.xdpsx.onlineshop.entities.common.HasImage;
 import com.xdpsx.onlineshop.entities.Media;
+import com.xdpsx.onlineshop.entities.common.HasImage;
 import com.xdpsx.onlineshop.entities.enums.MediaResourceType;
 import com.xdpsx.onlineshop.exceptions.NotFoundException;
 import com.xdpsx.onlineshop.repositories.MediaRepository;

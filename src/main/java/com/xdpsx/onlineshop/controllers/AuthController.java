@@ -1,14 +1,16 @@
 package com.xdpsx.onlineshop.controllers;
 
-import com.xdpsx.onlineshop.dtos.common.APIResponse;
 import jakarta.validation.Valid;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.xdpsx.onlineshop.constants.messages.SMessage;
 import com.xdpsx.onlineshop.dtos.auth.LoginRequest;
 import com.xdpsx.onlineshop.dtos.auth.RegisterRequest;
+import com.xdpsx.onlineshop.dtos.auth.SendOtpRequest;
 import com.xdpsx.onlineshop.dtos.auth.TokenResponse;
+import com.xdpsx.onlineshop.dtos.common.APIResponse;
 import com.xdpsx.onlineshop.services.AuthService;
 
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,12 @@ public class AuthController {
     public APIResponse<String> register(@Valid @RequestBody RegisterRequest request) {
         String data = authService.register(request);
         return APIResponse.ok(data);
+    }
+
+    @PostMapping("/send-otp")
+    public APIResponse<Void> sendVerifyEmailOTP(@Valid @RequestBody SendOtpRequest request) {
+        authService.sendVerifyEmailOTP(request);
+        return APIResponse.noContent(SMessage.SUCCESS);
     }
 
     @PostMapping("/login")

@@ -1,10 +1,10 @@
 package com.xdpsx.onlineshop.entities;
 
-import com.xdpsx.onlineshop.entities.common.AuditEntity;
 import jakarta.persistence.*;
 
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import com.xdpsx.onlineshop.entities.common.AuditEntity;
 import com.xdpsx.onlineshop.entities.ids.CartItemId;
 
 import lombok.*;

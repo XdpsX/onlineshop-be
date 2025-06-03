@@ -1,11 +1,13 @@
 package com.xdpsx.onlineshop.entities;
 
+import java.util.Set;
+
+import jakarta.persistence.*;
+
 import com.xdpsx.onlineshop.entities.common.AuditEntity;
 import com.xdpsx.onlineshop.entities.enums.RoleName;
-import jakarta.persistence.*;
-import lombok.*;
 
-import java.util.Set;
+import lombok.*;
 
 @Setter
 @Getter
