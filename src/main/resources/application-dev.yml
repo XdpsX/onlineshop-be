@@ -80,9 +80,12 @@ cloudinary:
 
 app:
   jwt:
-    secret: AxdbTQmW/abSjS3TpqhS2rHHUTtK8ESb0xq9uueSj34=
-    expiration:
-      seconds: 3600
+    access:
+      secret: AxdbTQmW/abSjS3TpqhS2rHHUTtK8ESb0xq9uueSj34=
+      expiration-sec: 3600 # 1 hour
+    refresh:
+      secret: AxdbTQmW/abSjS3TpqhS2rHHUTtK8ESb1xq8uueSj35=
+      expiration-sec: 604800 # 7 days
   cors:
     allowed-origins: http://localhost:3000,http://localhost:3001
   oauth2:

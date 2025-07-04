@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import com.nimbusds.jwt.SignedJWT;
 import jakarta.mail.MessagingException;
 
 import org.springframework.data.redis.core.RedisTemplate;
@@ -163,9 +164,67 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public TokenResponse login(LoginRequest request) {
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+                new UsernamePasswordAuthenticationToken(request.email(), request.password()));
         CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
-        String accessToken = tokenProvider.generateToken(user);
-        return TokenResponse.builder().accessToken(accessToken).build();
+        String accessToken = tokenProvider.generateAccessToken(user);
+        String refreshToken = tokenProvider.generateRefreshToken(user);
+        return TokenResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
+    }
+
+    @Override
+    public void logout(String accessToken, LogoutRequest request) {
+        String accessJti = tokenProvider.extractJti(accessToken);
+        String refreshJti = tokenProvider.extractJti(request.refreshToken());
+
+        long accessTtl = tokenProvider.getRemainingTTL(accessToken);
+        long refreshTtl = tokenProvider.getRemainingTTL(request.refreshToken());
+
+        redisTemplateString
+                .opsForValue()
+                .set(CacheKey.buildLogoutKey(accessJti), "true", Duration.ofSeconds(accessTtl));
+        redisTemplateString
+                .opsForValue()
+                .set(CacheKey.buildLogoutKey(refreshJti), "true", Duration.ofSeconds(refreshTtl));
+    }
+
+    @Override
+    public TokenResponse refreshToken(String accessToken, RefreshTokenRequest request) {
+        String refreshToken = request.refreshToken();
+
+        // 1. Verify refresh token
+        tokenProvider.verifyRefreshToken(refreshToken);
+
+        String jti;
+        String username;
+        try {
+            jti = jwt.getJWTClaimsSet().getJWTID();
+            username = jwt.getJWTClaimsSet().getSubject();
+        } catch (ParseException e) {
+            throw new RuntimeException("Cannot parse refresh token", e);
+        }
+
+        // 2. Check if token is blacklisted (optional)
+        if (blacklistService.isBlacklisted("refresh:" + jti)) {
+            throw new RuntimeException("Refresh token is blacklisted");
+        }
+
+        // 3. Invalidate current refresh token (blacklist)
+        long ttl = tokenProvider.getRemainingTTL(refreshToken);
+        blacklistService.blacklist("refresh:" + jti, ttl);
+
+        // 4. Generate new tokens
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        String newAccessToken = tokenProvider.generateAccessToken((CustomUserDetails) userDetails);
+        String newRefreshToken = tokenProvider.generateRefreshToken((CustomUserDetails) userDetails);
+
+        return ResponseEntity.ok(new TokenResponse(
+                newAccessToken,
+                newRefreshToken,
+                "Bearer",
+                tokenProvider.getAccessTokenExpirationSeconds()
+        ));
     }
 }

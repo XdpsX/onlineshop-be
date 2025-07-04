@@ -29,33 +29,28 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 
 import com.nimbusds.jose.JWSAlgorithm;
-import com.xdpsx.onlineshop.security.oauth2.CustomAuthenticationSuccessHandler;
-import com.xdpsx.onlineshop.security.oauth2.CustomOAuth2FailureHandler;
-import com.xdpsx.onlineshop.security.oauth2.CustomOAuth2UserService;
+import com.xdpsx.onlineshop.filter.JwtBlacklistFilter;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    @Value("${app.jwt.secret}")
-    private String SECRET_KEY;
+    @Value("${app.jwt.access.secret}")
+    private String ACCESS_TOKEN_SECRET_KEY;
 
     @Value("${app.cors.allowed-origins}")
     List<String> allowedOrigins;
 
     @Bean
     public SecurityFilterChain filterChain(
-            HttpSecurity http,
-            AuthenticationEntryPoint authenticationEntryPoint,
-            CustomOAuth2UserService customOAuth2UserService,
-            CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler,
-            CustomOAuth2FailureHandler customOAuth2FailureHandler)
+            HttpSecurity http, AuthenticationEntryPoint authenticationEntryPoint, JwtBlacklistFilter jwtBlacklistFilter)
             throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(request -> {
@@ -77,14 +72,10 @@ public class SecurityConfig {
                 // TODO: remove after refactoring
                 //                .authenticated()
                 .permitAll());
+        http.addFilterAfter(jwtBlacklistFilter, BearerTokenAuthenticationFilter.class);
         http.oauth2ResourceServer(oauth2 -> oauth2.jwt(
                         config -> config.decoder(jwtDecoder()).jwtAuthenticationConverter(jwtAuthenticationConverter()))
                 .authenticationEntryPoint(authenticationEntryPoint));
-
-        http.oauth2Login(oauth2 -> oauth2.loginPage("/auth/nopage")
-                .userInfoEndpoint(userInfo -> userInfo.userService(customOAuth2UserService))
-                .successHandler(customAuthenticationSuccessHandler)
-                .failureHandler(customOAuth2FailureHandler));
         return http.build();
     }
 
@@ -95,7 +86,8 @@ public class SecurityConfig {
 
     @Bean
     public JwtDecoder jwtDecoder() {
-        SecretKeySpec secretKeySpec = new SecretKeySpec(SECRET_KEY.getBytes(), JWSAlgorithm.HS256.getName());
+        SecretKeySpec secretKeySpec =
+                new SecretKeySpec(ACCESS_TOKEN_SECRET_KEY.getBytes(), JWSAlgorithm.HS256.getName());
         return NimbusJwtDecoder.withSecretKey(secretKeySpec)
                 .macAlgorithm(MacAlgorithm.HS256)
                 .build();

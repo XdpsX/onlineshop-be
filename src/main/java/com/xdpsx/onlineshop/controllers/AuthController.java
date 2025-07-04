@@ -2,7 +2,6 @@ package com.xdpsx.onlineshop.controllers;
 
 import jakarta.validation.Valid;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.xdpsx.onlineshop.constants.messages.SMessage;
@@ -40,9 +39,24 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<TokenResponse> login(@Valid @RequestBody LoginRequest request) {
-        TokenResponse response = authService.login(request);
-        return ResponseEntity.ok(response);
+    public APIResponse<TokenResponse> login(@Valid @RequestBody LoginRequest request) {
+        TokenResponse data = authService.login(request);
+        return APIResponse.ok(data);
+    }
+
+    @PostMapping("/logout")
+    public APIResponse<Void> logout(
+            @RequestHeader("Authorization") String bearerToken, @Valid @RequestBody LogoutRequest request) {
+        String accessToken = bearerToken.startsWith("Bearer ") ? bearerToken.substring(7) : bearerToken;
+        authService.logout(accessToken, request);
+        return APIResponse.noContent(SMessage.SUCCESS);
+    }
+
+    @PostMapping("/refresh")
+    public APIResponse<TokenResponse> refreshToken(@RequestHeader("Authorization") String bearerToken, @Valid @RequestBody RefreshTokenRequest request) {
+        String accessToken = bearerToken.startsWith("Bearer ") ? bearerToken.substring(7) : bearerToken;
+        TokenResponse data = authService.refreshToken(accessToken, request);
+        return APIResponse.ok(data);
     }
 
     //    @GetMapping("/nopage")

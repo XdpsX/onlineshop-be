@@ -11,6 +11,4 @@ public class SecurityConstants {
         "/products",
         "/products/slug/*"
     };
-
-    public static final String ROLE_PREFIX = "ROLE_";
 }

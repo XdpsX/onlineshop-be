@@ -17,7 +17,8 @@ public enum EMessage implements APIMessage {
     OTP_COOLDOWN("E_MESSAGE_0014"),
     OTP_DAILY_LIMIT_EXCEEDED("E_MESSAGE_0015"),
     OTP_EXPIRED("E_MESSAGE_0016"),
-    OTP_INVALID("E_MESSAGE_0017");
+    OTP_INVALID("E_MESSAGE_0017"),
+    ;
 
     private final String message;
 
